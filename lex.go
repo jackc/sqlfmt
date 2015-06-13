@@ -21,13 +21,13 @@ type sqlLex struct {
 	width  int
 	state  stateFn
 	tokens chan token
+	stmt   *SelectStmt
 }
 
 func (x *sqlLex) Lex(yylval *sqlSymType) int {
 	for {
 		select {
 		case token := <-x.tokens:
-			log.Println(token)
 			yylval.src = token.src
 			return token.typ
 		default:
@@ -99,7 +99,7 @@ func lexAlphanumeric(l *sqlLex) stateFn {
 
 	switch {
 	case strings.EqualFold(t.src, "select"):
-		t.typ = COMMA
+		t.typ = SELECT
 	default:
 		t.typ = IDENTIFIER
 	}

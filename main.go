@@ -5,19 +5,18 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"os"
 )
 
 func main() {
-	lexer := NewSqlLexer("select foo")
-
-	fmt.Println(sqlParse(lexer))
-
-	var ss SelectStmt
-	ss.Fields = append(ss.Fields, "foo")
-	ss.Fields = append(ss.Fields, "bar")
-	ss.FromTable = "baz"
-
-	fmt.Println(ss)
+	input, err := ioutil.ReadAll(os.Stdin)
+	if err != nil {
+		os.Exit(1)
+	}
+	lexer := NewSqlLexer(string(input))
+	sqlParse(lexer)
+	fmt.Println(lexer.stmt)
 }
 
 type SelectStmt struct {

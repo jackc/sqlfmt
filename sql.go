@@ -4,11 +4,7 @@ package main
 import __yyfmt__ "fmt"
 
 //line sql.y:3
-import (
-	"fmt"
-)
-
-//line sql.y:11
+//line sql.y:7
 type sqlSymType struct {
 	yys       int
 	sqlSelect *SelectStmt
@@ -33,7 +29,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:60
+//line sql.y:56
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -320,29 +316,29 @@ sqldefault:
 	switch sqlnt {
 
 	case 1:
-		//line sql.y:31
+		//line sql.y:27
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-0].fields
-			fmt.Println("=", sqlVAL.sqlSelect)
+			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 2:
-		//line sql.y:39
+		//line sql.y:35
 		{
 			sqlVAL.fields = sqlS[sqlpt-0].fields
 		}
 	case 3:
-		//line sql.y:45
+		//line sql.y:41
 		{
 			sqlVAL.fields = []string{sqlS[sqlpt-0].src}
 		}
 	case 4:
-		//line sql.y:49
+		//line sql.y:45
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].src)
 		}
 	case 5:
-		//line sql.y:55
+		//line sql.y:51
 		{
 			sqlVAL.src = sqlS[sqlpt-0].src
 		}

@@ -2,10 +2,6 @@
 
 package main
 
-import (
-  "fmt"
-)
-
 %}
 
 %union {
@@ -31,7 +27,7 @@ top:
   {
     $$ = &SelectStmt{}
     $$.Fields = $1
-    fmt.Println("=", $$)
+    sqllex.(*sqlLex).stmt = $$
   }
 
 selectClause:
