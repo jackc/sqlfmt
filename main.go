@@ -1,26 +1,38 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
-	"io"
-	"os"
 )
 
 func main() {
-	fmt.Println("Hello, world")
-	io.Copy(os.Stdout, os.Stdin)
+	var ss SelectStmt
+	ss.Fields = append(ss.Fields, "foo")
+	ss.Fields = append(ss.Fields, "bar")
+	ss.FromTable = "baz"
+
+	fmt.Println(ss)
 }
 
 type SelectStmt struct {
-  Fields    []string
-  FromTable string
+	Fields    []string
+	FromTable string
 }
 
-type PrettyPrinter interface {
-  io.Writer
-  Indent(string)
-  Unindent()
-  Newline() error
-}
+func (s SelectStmt) String() string {
+	var buf bytes.Buffer
 
-func (s *SelectStmt)
+	fmt.Fprintln(&buf, "select")
+
+	for i, f := range s.Fields {
+		fmt.Fprintf(&buf, "  %s", f)
+		if i < len(s.Fields)-1 {
+			fmt.Fprint(&buf, ",")
+		}
+		fmt.Fprint(&buf, "\n")
+	}
+
+	fmt.Fprintln(&buf, "from", s.FromTable)
+
+	return buf.String()
+}
