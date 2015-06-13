@@ -1,3 +1,5 @@
+//go:generate -command yacc go tool yacc
+//go:generate yacc -o sql.go -p "sql" sql.y
 package main
 
 import (
@@ -6,6 +8,10 @@ import (
 )
 
 func main() {
+	lexer := NewSqlLexer("select foo")
+
+	fmt.Println(sqlParse(lexer))
+
 	var ss SelectStmt
 	ss.Fields = append(ss.Fields, "foo")
 	ss.Fields = append(ss.Fields, "bar")
