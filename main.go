@@ -37,7 +37,9 @@ func (s SelectStmt) String() string {
 		fmt.Fprint(&buf, "\n")
 	}
 
-	fmt.Fprintln(&buf, "from", s.FromTable)
+	if s.FromTable != "" {
+		fmt.Fprintln(&buf, "from", s.FromTable)
+	}
 
 	return buf.String()
 }
