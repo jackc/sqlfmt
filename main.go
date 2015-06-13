@@ -16,7 +16,7 @@ func main() {
 	}
 	lexer := NewSqlLexer(string(input))
 	sqlParse(lexer)
-	fmt.Println(lexer.stmt)
+	fmt.Print(lexer.stmt)
 }
 
 type SelectStmt struct {
