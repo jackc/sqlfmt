@@ -29,7 +29,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:56
+//line sql.y:76
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -42,41 +42,45 @@ var sqlExca = []int{
 	-2, 0,
 }
 
-const sqlNprod = 6
+const sqlNprod = 9
 const sqlPrivate = 57344
 
 var sqlTokenNames []string
 var sqlStates []string
 
-const sqlLast = 9
+const sqlLast = 13
 
 var sqlAct = []int{
 
-	5, 6, 3, 7, 4, 2, 1, 0, 8,
+	7, 8, 10, 5, 3, 11, 9, 4, 6, 2,
+	1, 0, 12,
 }
 var sqlPact = []int{
 
-	-3, -1000, -1000, -6, -1, -1000, -1000, -6, -1000,
+	-1, -1000, -3, -6, -1000, -5, 1, -1000, -1000, -1000,
+	-1000, -6, -1000,
 }
 var sqlPgo = []int{
 
-	0, 6, 5, 4, 0,
+	0, 10, 9, 8, 0, 7, 6,
 }
 var sqlR1 = []int{
 
-	0, 1, 2, 3, 3, 4,
+	0, 1, 1, 2, 3, 3, 4, 5, 6,
 }
 var sqlR2 = []int{
 
-	0, 1, 2, 1, 3, 1,
+	0, 1, 2, 2, 1, 3, 1, 2, 1,
 }
 var sqlChk = []int{
 
-	-1000, -1, -2, 5, -3, -4, 7, 4, -4,
+	-1000, -1, -2, 5, -5, 6, -3, -4, 7, -6,
+	7, 4, -4,
 }
 var sqlDef = []int{
 
-	0, -2, 1, 0, 2, 3, 5, 0, 4,
+	0, -2, 1, 0, 2, 0, 3, 4, 6, 7,
+	8, 0, 5,
 }
 var sqlTok1 = []int{
 
@@ -316,7 +320,7 @@ sqldefault:
 	switch sqlnt {
 
 	case 1:
-		//line sql.y:27
+		//line sql.y:29
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-0].fields
@@ -325,20 +329,38 @@ sqldefault:
 	case 2:
 		//line sql.y:35
 		{
-			sqlVAL.fields = sqlS[sqlpt-0].fields
+			sqlVAL.sqlSelect = &SelectStmt{}
+			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-1].fields
+			sqlVAL.sqlSelect.FromTable = sqlS[sqlpt-0].src
+			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 3:
-		//line sql.y:41
+		//line sql.y:44
+		{
+			sqlVAL.fields = sqlS[sqlpt-0].fields
+		}
+	case 4:
+		//line sql.y:50
 		{
 			sqlVAL.fields = []string{sqlS[sqlpt-0].src}
 		}
-	case 4:
-		//line sql.y:45
+	case 5:
+		//line sql.y:54
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].src)
 		}
-	case 5:
-		//line sql.y:51
+	case 6:
+		//line sql.y:60
+		{
+			sqlVAL.src = sqlS[sqlpt-0].src
+		}
+	case 7:
+		//line sql.y:66
+		{
+			sqlVAL.src = sqlS[sqlpt-0].src
+		}
+	case 8:
+		//line sql.y:72
 		{
 			sqlVAL.src = sqlS[sqlpt-0].src
 		}

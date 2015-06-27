@@ -67,3 +67,17 @@ func TestSqlFmt(t *testing.T) {
 		t.Errorf("Unexpected output: %v", output)
 	}
 }
+
+func TestSqlFmt2(t *testing.T) {
+	output := sqlfmt(t, "select foo, bar from baz")
+	expected := `select
+  foo,
+  bar
+from
+  baz
+`
+
+	if output != expected {
+		t.Errorf("Unexpected output: %v\n%v", output, expected)
+	}
+}

@@ -14,6 +14,8 @@ package main
 %type <fields> selectClause
 %type <fields> selectExprSeq
 %type <src> selectExpr
+%type <src> fromClause
+%type <src> tableExpr
 
 %token  <src> COMMA
 %token  <src> SELECT
@@ -27,6 +29,13 @@ top:
   {
     $$ = &SelectStmt{}
     $$.Fields = $1
+    sqllex.(*sqlLex).stmt = $$
+  }
+| selectClause fromClause
+  {
+    $$ = &SelectStmt{}
+    $$.Fields = $1
+    $$.FromTable = $2
     sqllex.(*sqlLex).stmt = $$
   }
 
@@ -52,6 +61,17 @@ selectExpr:
     $$ = $1
   }
 
+fromClause:
+  FROM tableExpr
+  {
+    $$ = $2
+  }
+
+tableExpr:
+  IDENTIFIER
+  {
+    $$ = $1
+  }
 
 %%
 
