@@ -100,6 +100,8 @@ func lexAlphanumeric(l *sqlLex) stateFn {
 	switch {
 	case strings.EqualFold(t.src, "select"):
 		t.typ = SELECT
+	case strings.EqualFold(t.src, "as"):
+		t.typ = AS
 	case strings.EqualFold(t.src, "from"):
 		t.typ = FROM
 	default:

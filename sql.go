@@ -8,18 +8,21 @@ import __yyfmt__ "fmt"
 type sqlSymType struct {
 	yys       int
 	sqlSelect *SelectStmt
-	fields    []string
+	fields    []SelectExpr
+	field     SelectExpr
 	src       string
 }
 
 const COMMA = 57346
 const SELECT = 57347
-const FROM = 57348
-const IDENTIFIER = 57349
+const AS = 57348
+const FROM = 57349
+const IDENTIFIER = 57350
 
 var sqlToknames = []string{
 	"COMMA",
 	"SELECT",
+	"AS",
 	"FROM",
 	"IDENTIFIER",
 }
@@ -29,7 +32,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:76
+//line sql.y:82
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -42,45 +45,45 @@ var sqlExca = []int{
 	-2, 0,
 }
 
-const sqlNprod = 9
+const sqlNprod = 10
 const sqlPrivate = 57344
 
 var sqlTokenNames []string
 var sqlStates []string
 
-const sqlLast = 13
+const sqlLast = 14
 
 var sqlAct = []int{
 
-	7, 8, 10, 5, 3, 11, 9, 4, 6, 2,
-	1, 0, 12,
+	7, 14, 8, 10, 5, 12, 3, 11, 9, 4,
+	6, 2, 13, 1,
 }
 var sqlPact = []int{
 
-	-1, -1000, -3, -6, -1000, -5, 1, -1000, -1000, -1000,
-	-1000, -6, -1000,
+	1, -1000, -3, -6, -1000, -5, 3, -1000, -1, -1000,
+	-1000, -6, -7, -1000, -1000,
 }
 var sqlPgo = []int{
 
-	0, 10, 9, 8, 0, 7, 6,
+	0, 13, 11, 10, 0, 9, 8,
 }
 var sqlR1 = []int{
 
-	0, 1, 1, 2, 3, 3, 4, 5, 6,
+	0, 1, 1, 2, 3, 3, 4, 4, 5, 6,
 }
 var sqlR2 = []int{
 
-	0, 1, 2, 2, 1, 3, 1, 2, 1,
+	0, 1, 2, 2, 1, 3, 1, 3, 2, 1,
 }
 var sqlChk = []int{
 
-	-1000, -1, -2, 5, -5, 6, -3, -4, 7, -6,
-	7, 4, -4,
+	-1000, -1, -2, 5, -5, 7, -3, -4, 8, -6,
+	8, 4, 6, -4, 8,
 }
 var sqlDef = []int{
 
-	0, -2, 1, 0, 2, 0, 3, 4, 6, 7,
-	8, 0, 5,
+	0, -2, 1, 0, 2, 0, 3, 4, 6, 8,
+	9, 0, 0, 5, 7,
 }
 var sqlTok1 = []int{
 
@@ -88,7 +91,7 @@ var sqlTok1 = []int{
 }
 var sqlTok2 = []int{
 
-	2, 3, 4, 5, 6, 7,
+	2, 3, 4, 5, 6, 7, 8,
 }
 var sqlTok3 = []int{
 	0,
@@ -320,14 +323,14 @@ sqldefault:
 	switch sqlnt {
 
 	case 1:
-		//line sql.y:29
+		//line sql.y:31
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-0].fields
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 2:
-		//line sql.y:35
+		//line sql.y:37
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-1].fields
@@ -335,32 +338,37 @@ sqldefault:
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 3:
-		//line sql.y:44
+		//line sql.y:46
 		{
 			sqlVAL.fields = sqlS[sqlpt-0].fields
 		}
 	case 4:
-		//line sql.y:50
+		//line sql.y:52
 		{
-			sqlVAL.fields = []string{sqlS[sqlpt-0].src}
+			sqlVAL.fields = []SelectExpr{sqlS[sqlpt-0].field}
 		}
 	case 5:
-		//line sql.y:54
+		//line sql.y:56
 		{
-			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].src)
+			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].field)
 		}
 	case 6:
-		//line sql.y:60
+		//line sql.y:62
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.field = SelectExpr{Expr: sqlS[sqlpt-0].src}
 		}
 	case 7:
 		//line sql.y:66
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.field = SelectExpr{Expr: sqlS[sqlpt-2].src, Alias: sqlS[sqlpt-0].src}
 		}
 	case 8:
 		//line sql.y:72
+		{
+			sqlVAL.src = sqlS[sqlpt-0].src
+		}
+	case 9:
+		//line sql.y:78
 		{
 			sqlVAL.src = sqlS[sqlpt-0].src
 		}

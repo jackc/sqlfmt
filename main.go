@@ -19,8 +19,13 @@ func main() {
 	fmt.Print(lexer.stmt)
 }
 
+type SelectExpr struct {
+	Expr  string
+	Alias string
+}
+
 type SelectStmt struct {
-	Fields    []string
+	Fields    []SelectExpr
 	FromTable string
 }
 
@@ -30,7 +35,10 @@ func (s SelectStmt) String() string {
 	fmt.Fprintln(&buf, "select")
 
 	for i, f := range s.Fields {
-		fmt.Fprintf(&buf, "  %s", f)
+		fmt.Fprintf(&buf, "  %s", f.Expr)
+		if f.Alias != "" {
+			fmt.Fprintf(&buf, " as %s", f.Alias)
+		}
 		if i < len(s.Fields)-1 {
 			fmt.Fprint(&buf, ",")
 		}

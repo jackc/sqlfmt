@@ -6,19 +6,21 @@ package main
 
 %union {
   sqlSelect *SelectStmt
-  fields []string
+  fields []SelectExpr
+  field SelectExpr
   src string
 }
 
 %type <sqlSelect> top
 %type <fields> selectClause
 %type <fields> selectExprSeq
-%type <src> selectExpr
+%type <field> selectExpr
 %type <src> fromClause
 %type <src> tableExpr
 
 %token  <src> COMMA
 %token  <src> SELECT
+%token  <src> AS
 %token  <src> FROM
 %token  <src> IDENTIFIER
 
@@ -48,7 +50,7 @@ selectClause:
 selectExprSeq:
   selectExpr
   {
-    $$ = []string{$1}
+    $$ = []SelectExpr{$1}
   }
 | selectExprSeq COMMA selectExpr
   {
@@ -58,7 +60,11 @@ selectExprSeq:
 selectExpr:
   IDENTIFIER
   {
-    $$ = $1
+    $$ = SelectExpr{Expr: $1}
+  }
+| IDENTIFIER AS IDENTIFIER
+  {
+    $$ = SelectExpr{Expr: $1, Alias: $3}
   }
 
 fromClause:
