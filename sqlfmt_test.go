@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"testing"
 )
 
@@ -59,25 +60,41 @@ func sqlfmt(t *testing.T, sql string, args ...string) string {
 }
 
 func TestSqlFmt(t *testing.T) {
-	output := sqlfmt(t, "select foo, bar")
-	if output != `select
-  foo,
-  bar
-` {
-		t.Errorf("Unexpected output: %v", output)
+	tests := []struct {
+		inputFile          string
+		expectedOutputFile string
+	}{
+		{
+			inputFile:          "simple_select_without_from.sql",
+			expectedOutputFile: "simple_select_without_from.fmt.sql",
+		},
+		{
+			inputFile:          "simple_select_with_from.sql",
+			expectedOutputFile: "simple_select_with_from.fmt.sql",
+		},
 	}
-}
 
-func TestSqlFmt2(t *testing.T) {
-	output := sqlfmt(t, "select foo, bar from baz")
-	expected := `select
-  foo,
-  bar
-from
-  baz
-`
+	for i, tt := range tests {
+		input, err := ioutil.ReadFile(path.Join("testdata", tt.inputFile))
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	if output != expected {
-		t.Errorf("Unexpected output: %v\n%v", output, expected)
+		expected, err := ioutil.ReadFile(path.Join("testdata", tt.expectedOutputFile))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		output := sqlfmt(t, string(input))
+
+		if output != string(expected) {
+			actualFileName := path.Join("tmp", fmt.Sprintf("%d.sql", i))
+			err = ioutil.WriteFile(actualFileName, []byte(output), os.ModePerm)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			t.Errorf("%d. Given %s, did not receive %s. Unexpected output written to %s", i, tt.inputFile, tt.expectedOutputFile, actualFileName)
+		}
 	}
 }
