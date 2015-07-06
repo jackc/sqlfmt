@@ -13,7 +13,9 @@ func main() {
 		os.Exit(1)
 	}
 	lexer := NewSqlLexer(string(input))
-	sqlParse(lexer)
+	if rc := sqlParse(lexer); rc != 0 {
+		os.Exit(1)
+	}
 
 	r := NewTextRenderer(os.Stdout)
 	lexer.stmt.RenderTo(r)
