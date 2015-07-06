@@ -3,8 +3,6 @@
 package main
 
 import (
-	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -16,7 +14,9 @@ func main() {
 	}
 	lexer := NewSqlLexer(string(input))
 	sqlParse(lexer)
-	fmt.Print(lexer.stmt)
+
+	r := NewTextRenderer(os.Stdout)
+	lexer.stmt.RenderTo(r)
 }
 
 type ColumnRef struct {
@@ -34,30 +34,35 @@ type SelectStmt struct {
 	FromTable string
 }
 
-func (s SelectStmt) String() string {
-	var buf bytes.Buffer
-
-	fmt.Fprintln(&buf, "select")
-
+func (s SelectStmt) RenderTo(r Renderer) {
+	r.Text("select", "keyword")
+	r.NewLine()
+	r.Indent()
 	for i, f := range s.Fields {
 		if f.Expr.Table != "" {
-			fmt.Fprintf(&buf, "  %s.%s", f.Expr.Table, f.Expr.Column)
-		} else {
-			fmt.Fprintf(&buf, "  %s", f.Expr.Column)
+			r.Text(f.Expr.Table, "identifier")
+			r.Text(".", "period")
 		}
+		r.Text(f.Expr.Column, "identifier")
+
 		if f.Alias != "" {
-			fmt.Fprintf(&buf, " as %s", f.Alias)
+			r.Text(" ", "space")
+			r.Text("as", "keyword")
+			r.Text(" ", "space")
+			r.Text(f.Alias, "identifier")
 		}
 		if i < len(s.Fields)-1 {
-			fmt.Fprint(&buf, ",")
+			r.Text(",", "comma")
 		}
-		fmt.Fprint(&buf, "\n")
+		r.NewLine()
 	}
+	r.Unindent()
 
 	if s.FromTable != "" {
-		fmt.Fprintln(&buf, "from")
-		fmt.Fprintf(&buf, "  %s\n", s.FromTable)
+		r.Text("from", "keyword")
+		r.NewLine()
+		r.Indent()
+		r.Text(s.FromTable, "identifier")
+		r.NewLine()
 	}
-
-	return buf.String()
 }
