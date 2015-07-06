@@ -76,6 +76,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "simple_select_with_selection_alias.sql",
 			expectedOutputFile: "simple_select_with_selection_alias.fmt.sql",
 		},
+		{
+			inputFile:          "simple_select_with_selection_alias_no_as.sql",
+			expectedOutputFile: "simple_select_with_selection_alias.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

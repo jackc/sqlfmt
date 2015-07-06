@@ -32,7 +32,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:82
+//line sql.y:86
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -45,45 +45,47 @@ var sqlExca = []int{
 	-2, 0,
 }
 
-const sqlNprod = 10
+const sqlNprod = 11
 const sqlPrivate = 57344
 
 var sqlTokenNames []string
 var sqlStates []string
 
-const sqlLast = 14
+const sqlLast = 15
 
 var sqlAct = []int{
 
-	7, 14, 8, 10, 5, 12, 3, 11, 9, 4,
-	6, 2, 13, 1,
+	7, 12, 15, 13, 8, 10, 5, 3, 11, 9,
+	4, 6, 14, 2, 1,
 }
 var sqlPact = []int{
 
-	1, -1000, -3, -6, -1000, -5, 3, -1000, -1, -1000,
-	-1000, -6, -7, -1000, -1000,
+	2, -1000, -1, -4, -1000, -3, 4, -1000, -5, -1000,
+	-1000, -4, -6, -1000, -1000, -1000,
 }
 var sqlPgo = []int{
 
-	0, 13, 11, 10, 0, 9, 8,
+	0, 14, 13, 11, 0, 10, 9,
 }
 var sqlR1 = []int{
 
-	0, 1, 1, 2, 3, 3, 4, 4, 5, 6,
+	0, 1, 1, 2, 3, 3, 4, 4, 4, 5,
+	6,
 }
 var sqlR2 = []int{
 
-	0, 1, 2, 2, 1, 3, 1, 3, 2, 1,
+	0, 1, 2, 2, 1, 3, 1, 3, 2, 2,
+	1,
 }
 var sqlChk = []int{
 
 	-1000, -1, -2, 5, -5, 7, -3, -4, 8, -6,
-	8, 4, 6, -4, 8,
+	8, 4, 6, 8, -4, 8,
 }
 var sqlDef = []int{
 
-	0, -2, 1, 0, 2, 0, 3, 4, 6, 8,
-	9, 0, 0, 5, 7,
+	0, -2, 1, 0, 2, 0, 3, 4, 6, 9,
+	10, 0, 0, 8, 5, 7,
 }
 var sqlTok1 = []int{
 
@@ -363,12 +365,17 @@ sqldefault:
 			sqlVAL.field = SelectExpr{Expr: sqlS[sqlpt-2].src, Alias: sqlS[sqlpt-0].src}
 		}
 	case 8:
-		//line sql.y:72
+		//line sql.y:70
+		{
+			sqlVAL.field = SelectExpr{Expr: sqlS[sqlpt-1].src, Alias: sqlS[sqlpt-0].src}
+		}
+	case 9:
+		//line sql.y:76
 		{
 			sqlVAL.src = sqlS[sqlpt-0].src
 		}
-	case 9:
-		//line sql.y:78
+	case 10:
+		//line sql.y:82
 		{
 			sqlVAL.src = sqlS[sqlpt-0].src
 		}

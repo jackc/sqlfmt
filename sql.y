@@ -66,6 +66,10 @@ selectExpr:
   {
     $$ = SelectExpr{Expr: $1, Alias: $3}
   }
+| IDENTIFIER IDENTIFIER
+  {
+    $$ = SelectExpr{Expr: $1, Alias: $2}
+  }
 
 fromClause:
   FROM tableExpr
