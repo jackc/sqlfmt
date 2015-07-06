@@ -19,13 +19,25 @@ func main() {
 	lexer.stmt.RenderTo(r)
 }
 
+type Expr interface {
+	RenderTo(Renderer)
+}
+
 type ColumnRef struct {
 	Table  string
 	Column string
 }
 
+func (cr ColumnRef) RenderTo(r Renderer) {
+	if cr.Table != "" {
+		r.Text(cr.Table, "identifier")
+		r.Text(".", "period")
+	}
+	r.Text(cr.Column, "identifier")
+}
+
 type SelectExpr struct {
-	Expr  ColumnRef
+	Expr  Expr
 	Alias string
 }
 
@@ -39,11 +51,7 @@ func (s SelectStmt) RenderTo(r Renderer) {
 	r.NewLine()
 	r.Indent()
 	for i, f := range s.Fields {
-		if f.Expr.Table != "" {
-			r.Text(f.Expr.Table, "identifier")
-			r.Text(".", "period")
-		}
-		r.Text(f.Expr.Column, "identifier")
+		f.Expr.RenderTo(r)
 
 		if f.Alias != "" {
 			r.Text(" ", "space")
