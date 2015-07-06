@@ -83,6 +83,8 @@ func blankState(l *sqlLex) stateFn {
 		return nil
 	case r == ',':
 		return lexComma
+	case r == '.':
+		return lexPeriod
 	case isWhitespace(r):
 		l.skipWhitespace()
 		return blankState
@@ -115,6 +117,12 @@ func lexAlphanumeric(l *sqlLex) stateFn {
 
 func lexComma(l *sqlLex) stateFn {
 	l.tokens <- token{COMMA, l.src[l.start:l.pos]}
+	l.start = l.pos
+	return blankState
+}
+
+func lexPeriod(l *sqlLex) stateFn {
+	l.tokens <- token{PERIOD, l.src[l.start:l.pos]}
 	l.start = l.pos
 	return blankState
 }

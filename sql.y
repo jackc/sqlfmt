@@ -8,6 +8,7 @@ package main
   sqlSelect *SelectStmt
   fields []SelectExpr
   field SelectExpr
+  columnRef ColumnRef
   src string
 }
 
@@ -15,10 +16,12 @@ package main
 %type <fields> selectClause
 %type <fields> selectExprSeq
 %type <field> selectExpr
+%type <columnRef> columnRef
 %type <src> fromClause
 %type <src> tableExpr
 
 %token  <src> COMMA
+%token  <src> PERIOD
 %token  <src> SELECT
 %token  <src> AS
 %token  <src> FROM
@@ -58,18 +61,29 @@ selectExprSeq:
   }
 
 selectExpr:
-  IDENTIFIER
+  columnRef
   {
     $$ = SelectExpr{Expr: $1}
   }
-| IDENTIFIER AS IDENTIFIER
+| columnRef AS IDENTIFIER
   {
     $$ = SelectExpr{Expr: $1, Alias: $3}
   }
-| IDENTIFIER IDENTIFIER
+| columnRef IDENTIFIER
   {
     $$ = SelectExpr{Expr: $1, Alias: $2}
   }
+
+columnRef:
+  IDENTIFIER
+  {
+    $$ = ColumnRef{Column: $1}
+  }
+| IDENTIFIER PERIOD IDENTIFIER
+  {
+    $$ = ColumnRef{Table: $1, Column: $3}
+  }
+
 
 fromClause:
   FROM tableExpr
