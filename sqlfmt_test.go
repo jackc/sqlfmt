@@ -109,6 +109,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "paren_expression.sql",
 			expectedOutputFile: "paren_expression.fmt.sql",
 		},
+		{
+			inputFile:          "subselect_expression.sql",
+			expectedOutputFile: "subselect_expression.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

@@ -13,6 +13,7 @@ package main
 }
 
 %type <sqlSelect> top
+%type <sqlSelect> selectStatement
 %type <fields> selectClause
 %type <fields> selectExprSeq
 %type <field> selectExpr
@@ -37,6 +38,12 @@ package main
 %%
 
 top:
+  selectStatement
+  {
+    $$ = $1
+  }
+
+selectStatement:
   selectClause
   {
     $$ = &SelectStmt{}
@@ -103,6 +110,10 @@ expr:
     $$ = BinaryExpr{Left: $1, Operator: $2, Right: $3}
   }
 | LPAREN expr RPAREN
+  {
+    $$ = ParenExpr{Expr: $2}
+  }
+| LPAREN selectStatement RPAREN
   {
     $$ = ParenExpr{Expr: $2}
   }

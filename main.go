@@ -110,5 +110,6 @@ func (s SelectStmt) RenderTo(r Renderer) {
 		r.Indent()
 		r.Text(s.FromTable, "identifier")
 		r.NewLine()
+		r.Unindent()
 	}
 }
