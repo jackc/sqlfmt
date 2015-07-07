@@ -81,17 +81,14 @@ type AliasedExpr struct {
 
 func (e AliasedExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
-
-	if e.Alias != "" {
-		r.Text(" ", "space")
-		r.Text("as", "keyword")
-		r.Text(" ", "space")
-		r.Text(e.Alias, "identifier")
-	}
+	r.Text(" ", "space")
+	r.Text("as", "keyword")
+	r.Text(" ", "space")
+	r.Text(e.Alias, "identifier")
 }
 
 type SelectStmt struct {
-	Fields    []AliasedExpr
+	Fields    []Expr
 	FromTable string
 }
 

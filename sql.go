@@ -8,8 +8,7 @@ import __yyfmt__ "fmt"
 type sqlSymType struct {
 	yys       int
 	sqlSelect *SelectStmt
-	fields    []AliasedExpr
-	field     AliasedExpr
+	fields    []Expr
 	expr      Expr
 	src       string
 }
@@ -45,7 +44,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:133
+//line sql.y:132
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -344,19 +343,19 @@ sqldefault:
 	switch sqlnt {
 
 	case 1:
-		//line sql.y:42
+		//line sql.y:41
 		{
 			sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 		}
 	case 2:
-		//line sql.y:48
+		//line sql.y:47
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-0].fields
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 3:
-		//line sql.y:54
+		//line sql.y:53
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-1].fields
@@ -364,77 +363,77 @@ sqldefault:
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 4:
-		//line sql.y:63
+		//line sql.y:62
 		{
 			sqlVAL.fields = sqlS[sqlpt-0].fields
 		}
 	case 5:
-		//line sql.y:69
+		//line sql.y:68
 		{
-			sqlVAL.fields = []AliasedExpr{sqlS[sqlpt-0].field}
+			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
 	case 6:
-		//line sql.y:73
+		//line sql.y:72
 		{
-			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].field)
+			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
 	case 7:
-		//line sql.y:79
+		//line sql.y:78
 		{
-			sqlVAL.field = AliasedExpr{Expr: sqlS[sqlpt-0].expr}
+			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 8:
-		//line sql.y:83
+		//line sql.y:82
 		{
-			sqlVAL.field = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
+			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
 		}
 	case 9:
-		//line sql.y:87
+		//line sql.y:86
 		{
-			sqlVAL.field = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
+			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
 		}
 	case 10:
-		//line sql.y:93
+		//line sql.y:92
 		{
 			sqlVAL.expr = ColumnRef{Column: sqlS[sqlpt-0].src}
 		}
 	case 11:
-		//line sql.y:97
+		//line sql.y:96
 		{
 			sqlVAL.expr = ColumnRef{Table: sqlS[sqlpt-2].src, Column: sqlS[sqlpt-0].src}
 		}
 	case 12:
-		//line sql.y:101
+		//line sql.y:100
 		{
 			sqlVAL.expr = StringLiteral(sqlS[sqlpt-0].src)
 		}
 	case 13:
-		//line sql.y:105
+		//line sql.y:104
 		{
 			sqlVAL.expr = IntegerLiteral(sqlS[sqlpt-0].src)
 		}
 	case 14:
-		//line sql.y:109
+		//line sql.y:108
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: sqlS[sqlpt-1].src, Right: sqlS[sqlpt-0].expr}
 		}
 	case 15:
-		//line sql.y:113
+		//line sql.y:112
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].expr}
 		}
 	case 16:
-		//line sql.y:117
+		//line sql.y:116
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].sqlSelect}
 		}
 	case 17:
-		//line sql.y:123
+		//line sql.y:122
 		{
 			sqlVAL.src = sqlS[sqlpt-0].src
 		}
 	case 18:
-		//line sql.y:129
+		//line sql.y:128
 		{
 			sqlVAL.src = sqlS[sqlpt-0].src
 		}
