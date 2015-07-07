@@ -87,6 +87,10 @@ func blankState(l *sqlLex) stateFn {
 		return lexPeriod
 	case r == '\'':
 		return lexStringLiteral
+	case r == '+' || r == '-' || r == '*' || r == '/':
+		return lexOperator
+	case unicode.IsDigit(r):
+		return lexNumber
 	case isWhitespace(r):
 		l.skipWhitespace()
 		return blankState
@@ -94,6 +98,14 @@ func blankState(l *sqlLex) stateFn {
 		return lexAlphanumeric
 	}
 	return nil
+}
+
+func lexNumber(l *sqlLex) stateFn {
+	l.acceptRunFunc(unicode.IsDigit)
+	t := token{src: l.src[l.start:l.pos], typ: NUMBER_LITERAL}
+	l.tokens <- t
+	l.start = l.pos
+	return blankState
 }
 
 func lexAlphanumeric(l *sqlLex) stateFn {
@@ -137,6 +149,12 @@ func lexStringLiteral(l *sqlLex) stateFn {
 			}
 		}
 	}
+}
+
+func lexOperator(l *sqlLex) stateFn {
+	l.tokens <- token{OPERATOR, l.src[l.start:l.pos]}
+	l.start = l.pos
+	return blankState
 }
 
 func lexComma(l *sqlLex) stateFn {

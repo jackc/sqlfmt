@@ -27,6 +27,10 @@ package main
 %token  <src> FROM
 %token  <src> IDENTIFIER
 %token  <src> STRING_LITERAL
+%token  <src> NUMBER_LITERAL
+%token  <src> OPERATOR
+
+%left OPERATOR
 
 %%
 
@@ -87,6 +91,14 @@ expr:
 | STRING_LITERAL
   {
     $$ = StringLiteral($1)
+  }
+| NUMBER_LITERAL
+  {
+    $$ = IntegerLiteral($1)
+  }
+| expr OPERATOR expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: $2, Right: $3}
   }
 
 fromClause:

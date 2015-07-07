@@ -44,6 +44,26 @@ func (s StringLiteral) RenderTo(r Renderer) {
 	r.Text(string(s), "stringLiteral")
 }
 
+type IntegerLiteral string
+
+func (s IntegerLiteral) RenderTo(r Renderer) {
+	r.Text(string(s), "integerLiteral")
+}
+
+type BinaryExpr struct {
+	Left     Expr
+	Operator string
+	Right    Expr
+}
+
+func (e BinaryExpr) RenderTo(r Renderer) {
+	e.Left.RenderTo(r)
+	r.Text(" ", "space")
+	r.Text(e.Operator, "operator")
+	r.Text(" ", "space")
+	e.Right.RenderTo(r)
+}
+
 type SelectExpr struct {
 	Expr  Expr
 	Alias string
