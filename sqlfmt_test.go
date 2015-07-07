@@ -30,6 +30,10 @@ func sqlfmt(t *testing.T, sql string, args ...string) string {
 	if err != nil {
 		t.Fatalf("cmd.StdoutPipe failed: %v", err)
 	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		t.Fatalf("cmd.StderrPipe failed: %v", err)
+	}
 
 	err = cmd.Start()
 	if err != nil {
@@ -51,9 +55,14 @@ func sqlfmt(t *testing.T, sql string, args ...string) string {
 		t.Fatalf("ioutil.ReadAll(stdout) failed: %v", err)
 	}
 
+	errout, err := ioutil.ReadAll(stderr)
+	if err != nil {
+		t.Fatalf("ioutil.ReadAll(stderr) failed: %v", err)
+	}
+
 	err = cmd.Wait()
 	if err != nil {
-		t.Fatalf("cmd.Wait failed: %v", err)
+		t.Fatalf("cmd.Wait failed: %v\n%s", err, string(errout))
 	}
 
 	return string(output)

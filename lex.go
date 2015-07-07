@@ -41,7 +41,7 @@ func (x *sqlLex) Lex(yylval *sqlSymType) int {
 
 // The parser calls this method on a parse error.
 func (x *sqlLex) Error(s string) {
-	log.Printf("parse error: %s", s)
+	log.Printf("parse error: %s at character %d", s, x.start)
 }
 
 func NewSqlLexer(src string) *sqlLex {
