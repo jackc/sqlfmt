@@ -104,10 +104,12 @@ type JoinExpr struct {
 	Left  Expr
 	Join  string
 	Right Expr
+	Using string
 }
 
 func (s JoinExpr) RenderTo(r Renderer) {
 	s.Left.RenderTo(r)
+
 	if s.Join == "," {
 		r.Text(",", "comma")
 		r.NewLine()
@@ -116,7 +118,16 @@ func (s JoinExpr) RenderTo(r Renderer) {
 		r.Text(s.Join, "keyword")
 		r.Text(" ", "space")
 	}
+
 	s.Right.RenderTo(r)
+
+	if s.Using != "" {
+		r.Text(" ", "space")
+		r.Text("using", "keyword")
+		r.Text("(", "lparen")
+		r.Text(s.Using, "identifier")
+		r.Text(")", "rparen")
+	}
 }
 
 type SelectStmt struct {
