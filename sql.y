@@ -26,6 +26,8 @@ package main
 %token  <src> SELECT
 %token  <src> AS
 %token  <src> FROM
+%token  <src> CROSS
+%token  <src> JOIN
 %token  <src> IDENTIFIER
 %token  <src> STRING_LITERAL
 %token  <src> NUMBER_LITERAL
@@ -122,6 +124,10 @@ joinExpr:
   aliasableExpr COMMA aliasableExpr
   {
     $$ = JoinExpr{Left: $1, Join: $2, Right: $3}
+  }
+| aliasableExpr CROSS JOIN aliasableExpr
+  {
+    $$ = JoinExpr{Left: $1, Join: "cross join", Right: $4}
   }
 
 fromClause:

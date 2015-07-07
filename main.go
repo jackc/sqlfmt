@@ -114,6 +114,7 @@ func (s JoinExpr) RenderTo(r Renderer) {
 	} else {
 		r.NewLine()
 		r.Text(s.Join, "keyword")
+		r.Text(" ", "space")
 	}
 	s.Right.RenderTo(r)
 }
