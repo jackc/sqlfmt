@@ -31,6 +31,7 @@ package main
 %token  <src> CROSS
 %token  <src> JOIN
 %token  <src> USING
+%token  <src> ON
 %token  <src> IDENTIFIER
 %token  <src> STRING_LITERAL
 %token  <src> NUMBER_LITERAL
@@ -145,6 +146,10 @@ joinExpr:
 | aliasableExpr JOIN aliasableExpr USING LPAREN identifierSeq RPAREN
   {
     $$ = JoinExpr{Left: $1, Join: "join", Right: $3, Using: $6}
+  }
+| aliasableExpr JOIN aliasableExpr ON expr
+  {
+    $$ = JoinExpr{Left: $1, Join: "join", Right: $3, On: $5}
   }
 
 fromClause:

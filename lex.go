@@ -130,6 +130,8 @@ func lexAlphanumeric(l *sqlLex) stateFn {
 		t.typ = JOIN
 	case strings.EqualFold(t.src, "using"):
 		t.typ = USING
+	case strings.EqualFold(t.src, "on"):
+		t.typ = ON
 	default:
 		t.typ = IDENTIFIER
 	}

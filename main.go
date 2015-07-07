@@ -105,6 +105,7 @@ type JoinExpr struct {
 	Join  string
 	Right Expr
 	Using []string
+	On    Expr
 }
 
 func (s JoinExpr) RenderTo(r Renderer) {
@@ -135,6 +136,13 @@ func (s JoinExpr) RenderTo(r Renderer) {
 		}
 
 		r.Text(")", "rparen")
+	}
+
+	if s.On != nil {
+		r.Text(" ", "space")
+		r.Text("on", "keyword")
+		r.Text(" ", "space")
+		s.On.RenderTo(r)
 	}
 }
 

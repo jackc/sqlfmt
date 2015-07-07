@@ -23,12 +23,13 @@ const FROM = 57350
 const CROSS = 57351
 const JOIN = 57352
 const USING = 57353
-const IDENTIFIER = 57354
-const STRING_LITERAL = 57355
-const NUMBER_LITERAL = 57356
-const OPERATOR = 57357
-const LPAREN = 57358
-const RPAREN = 57359
+const ON = 57354
+const IDENTIFIER = 57355
+const STRING_LITERAL = 57356
+const NUMBER_LITERAL = 57357
+const OPERATOR = 57358
+const LPAREN = 57359
+const RPAREN = 57360
 
 var sqlToknames = []string{
 	"COMMA",
@@ -39,6 +40,7 @@ var sqlToknames = []string{
 	"CROSS",
 	"JOIN",
 	"USING",
+	"ON",
 	"IDENTIFIER",
 	"STRING_LITERAL",
 	"NUMBER_LITERAL",
@@ -52,7 +54,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:159
+//line sql.y:164
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -65,61 +67,62 @@ var sqlExca = []int{
 	-2, 0,
 }
 
-const sqlNprod = 24
+const sqlNprod = 25
 const sqlPrivate = 57344
 
 var sqlTokenNames []string
 var sqlStates []string
 
-const sqlLast = 48
+const sqlLast = 51
 
 var sqlAct = []int{
 
-	8, 9, 4, 40, 19, 31, 30, 14, 10, 11,
-	12, 37, 13, 2, 42, 21, 41, 26, 10, 11,
-	12, 28, 13, 17, 32, 39, 34, 22, 18, 29,
-	27, 19, 23, 36, 35, 33, 4, 24, 25, 6,
-	20, 16, 15, 38, 5, 7, 3, 1,
+	9, 8, 4, 10, 11, 12, 31, 13, 14, 10,
+	11, 12, 42, 13, 21, 19, 19, 30, 26, 38,
+	28, 6, 17, 2, 44, 32, 43, 34, 18, 41,
+	29, 19, 36, 37, 23, 35, 27, 22, 39, 24,
+	25, 33, 4, 20, 16, 15, 40, 5, 7, 3,
+	1,
 }
 var sqlPact = []int{
 
-	30, -1000, -1000, 31, 6, -1000, 6, 37, -1000, 16,
-	35, -1000, -1000, -4, 28, -1000, 6, 18, -1000, 6,
-	17, -11, -12, 6, 25, 6, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, 6, 22, -1000, -5, 13, -1, -1000,
-	2, -1000, -1000,
+	36, -1000, -1000, 13, -10, -1000, -10, 40, -1000, 15,
+	38, -1000, -1000, -4, 30, -1000, -10, 23, -1000, -10,
+	17, -1, -12, -10, 31, -10, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -10, 21, -1000, 2, -10, 16, 0,
+	8, -1000, 11, -1000, -1000,
 }
 var sqlPgo = []int{
 
-	0, 47, 13, 46, 45, 0, 1, 44, 43, 42,
+	0, 50, 23, 49, 48, 1, 0, 47, 46, 45,
 }
 var sqlR1 = []int{
 
 	0, 1, 2, 2, 3, 4, 4, 5, 5, 5,
 	6, 6, 6, 6, 6, 6, 6, 8, 8, 9,
-	9, 9, 7, 7,
+	9, 9, 9, 7, 7,
 }
 var sqlR2 = []int{
 
 	0, 1, 1, 2, 2, 1, 3, 1, 3, 2,
 	1, 3, 1, 1, 3, 3, 3, 1, 3, 3,
-	4, 7, 2, 2,
+	4, 7, 5, 2, 2,
 }
 var sqlChk = []int{
 
 	-1000, -1, -2, -3, 6, -7, 8, -4, -5, -6,
-	12, 13, 14, 16, -5, -9, 4, 7, 12, 15,
-	5, -6, -2, 4, 9, 10, -5, 12, -6, 12,
-	17, 17, -5, 10, -5, -5, 11, 16, -8, 12,
-	4, 17, 12,
+	13, 14, 15, 17, -5, -9, 4, 7, 13, 16,
+	5, -6, -2, 4, 9, 10, -5, 13, -6, 13,
+	18, 18, -5, 10, -5, -5, 11, 12, 17, -6,
+	-8, 13, 4, 18, 13,
 }
 var sqlDef = []int{
 
 	0, -2, 1, 2, 0, 3, 0, 4, 5, 7,
-	10, 12, 13, 0, 22, 23, 0, 0, 9, 0,
+	10, 12, 13, 0, 23, 24, 0, 0, 9, 0,
 	0, 0, 0, 0, 0, 0, 6, 8, 14, 11,
-	15, 16, 19, 0, 0, 20, 0, 0, 0, 17,
-	0, 21, 18,
+	15, 16, 19, 0, 0, 20, 0, 0, 0, 22,
+	0, 17, 0, 21, 18,
 }
 var sqlTok1 = []int{
 
@@ -128,7 +131,7 @@ var sqlTok1 = []int{
 var sqlTok2 = []int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-	12, 13, 14, 15, 16, 17,
+	12, 13, 14, 15, 16, 17, 18,
 }
 var sqlTok3 = []int{
 	0,
@@ -360,19 +363,19 @@ sqldefault:
 	switch sqlnt {
 
 	case 1:
-		//line sql.y:47
+		//line sql.y:48
 		{
 			sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 		}
 	case 2:
-		//line sql.y:53
+		//line sql.y:54
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-0].fields
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 3:
-		//line sql.y:59
+		//line sql.y:60
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-1].fields
@@ -380,102 +383,107 @@ sqldefault:
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 4:
-		//line sql.y:68
+		//line sql.y:69
 		{
 			sqlVAL.fields = sqlS[sqlpt-0].fields
 		}
 	case 5:
-		//line sql.y:74
+		//line sql.y:75
 		{
 			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
 	case 6:
-		//line sql.y:78
+		//line sql.y:79
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
 	case 7:
-		//line sql.y:84
+		//line sql.y:85
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 8:
-		//line sql.y:88
+		//line sql.y:89
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
 		}
 	case 9:
-		//line sql.y:92
+		//line sql.y:93
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
 		}
 	case 10:
-		//line sql.y:98
+		//line sql.y:99
 		{
 			sqlVAL.expr = ColumnRef{Column: sqlS[sqlpt-0].src}
 		}
 	case 11:
-		//line sql.y:102
+		//line sql.y:103
 		{
 			sqlVAL.expr = ColumnRef{Table: sqlS[sqlpt-2].src, Column: sqlS[sqlpt-0].src}
 		}
 	case 12:
-		//line sql.y:106
+		//line sql.y:107
 		{
 			sqlVAL.expr = StringLiteral(sqlS[sqlpt-0].src)
 		}
 	case 13:
-		//line sql.y:110
+		//line sql.y:111
 		{
 			sqlVAL.expr = IntegerLiteral(sqlS[sqlpt-0].src)
 		}
 	case 14:
-		//line sql.y:114
+		//line sql.y:115
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: sqlS[sqlpt-1].src, Right: sqlS[sqlpt-0].expr}
 		}
 	case 15:
-		//line sql.y:118
+		//line sql.y:119
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].expr}
 		}
 	case 16:
-		//line sql.y:122
+		//line sql.y:123
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].sqlSelect}
 		}
 	case 17:
-		//line sql.y:128
+		//line sql.y:129
 		{
 			sqlVAL.identifiers = []string{sqlS[sqlpt-0].src}
 		}
 	case 18:
-		//line sql.y:132
+		//line sql.y:133
 		{
 			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].src)
 		}
 	case 19:
-		//line sql.y:138
+		//line sql.y:139
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-2].expr, Join: sqlS[sqlpt-1].src, Right: sqlS[sqlpt-0].expr}
 		}
 	case 20:
-		//line sql.y:142
+		//line sql.y:143
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-3].expr, Join: "cross join", Right: sqlS[sqlpt-0].expr}
 		}
 	case 21:
-		//line sql.y:146
+		//line sql.y:147
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-6].expr, Join: "join", Right: sqlS[sqlpt-4].expr, Using: sqlS[sqlpt-1].identifiers}
 		}
 	case 22:
-		//line sql.y:152
+		//line sql.y:151
+		{
+			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-4].expr, Join: "join", Right: sqlS[sqlpt-2].expr, On: sqlS[sqlpt-0].expr}
+		}
+	case 23:
+		//line sql.y:157
 		{
 			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
 		}
-	case 23:
-		//line sql.y:156
+	case 24:
+		//line sql.y:161
 		{
 			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
 		}
