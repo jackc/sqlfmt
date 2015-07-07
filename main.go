@@ -74,13 +74,24 @@ func (e ParenExpr) RenderTo(r Renderer) {
 	r.Text(")", "rparen")
 }
 
-type SelectExpr struct {
+type AliasedExpr struct {
 	Expr  Expr
 	Alias string
 }
 
+func (e AliasedExpr) RenderTo(r Renderer) {
+	e.Expr.RenderTo(r)
+
+	if e.Alias != "" {
+		r.Text(" ", "space")
+		r.Text("as", "keyword")
+		r.Text(" ", "space")
+		r.Text(e.Alias, "identifier")
+	}
+}
+
 type SelectStmt struct {
-	Fields    []SelectExpr
+	Fields    []AliasedExpr
 	FromTable string
 }
 
@@ -89,14 +100,7 @@ func (s SelectStmt) RenderTo(r Renderer) {
 	r.NewLine()
 	r.Indent()
 	for i, f := range s.Fields {
-		f.Expr.RenderTo(r)
-
-		if f.Alias != "" {
-			r.Text(" ", "space")
-			r.Text("as", "keyword")
-			r.Text(" ", "space")
-			r.Text(f.Alias, "identifier")
-		}
+		f.RenderTo(r)
 		if i < len(s.Fields)-1 {
 			r.Text(",", "comma")
 		}

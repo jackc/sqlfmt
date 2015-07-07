@@ -6,8 +6,8 @@ package main
 
 %union {
   sqlSelect *SelectStmt
-  fields []SelectExpr
-  field SelectExpr
+  fields []AliasedExpr
+  field AliasedExpr
   expr Expr
   src string
 }
@@ -67,7 +67,7 @@ selectClause:
 selectExprSeq:
   selectExpr
   {
-    $$ = []SelectExpr{$1}
+    $$ = []AliasedExpr{$1}
   }
 | selectExprSeq COMMA selectExpr
   {
@@ -77,15 +77,15 @@ selectExprSeq:
 selectExpr:
   expr
   {
-    $$ = SelectExpr{Expr: $1}
+    $$ = AliasedExpr{Expr: $1}
   }
 | expr AS IDENTIFIER
   {
-    $$ = SelectExpr{Expr: $1, Alias: $3}
+    $$ = AliasedExpr{Expr: $1, Alias: $3}
   }
 | expr IDENTIFIER
   {
-    $$ = SelectExpr{Expr: $1, Alias: $2}
+    $$ = AliasedExpr{Expr: $1, Alias: $2}
   }
 
 expr:

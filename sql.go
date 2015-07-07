@@ -8,8 +8,8 @@ import __yyfmt__ "fmt"
 type sqlSymType struct {
 	yys       int
 	sqlSelect *SelectStmt
-	fields    []SelectExpr
-	field     SelectExpr
+	fields    []AliasedExpr
+	field     AliasedExpr
 	expr      Expr
 	src       string
 }
@@ -371,7 +371,7 @@ sqldefault:
 	case 5:
 		//line sql.y:69
 		{
-			sqlVAL.fields = []SelectExpr{sqlS[sqlpt-0].field}
+			sqlVAL.fields = []AliasedExpr{sqlS[sqlpt-0].field}
 		}
 	case 6:
 		//line sql.y:73
@@ -381,17 +381,17 @@ sqldefault:
 	case 7:
 		//line sql.y:79
 		{
-			sqlVAL.field = SelectExpr{Expr: sqlS[sqlpt-0].expr}
+			sqlVAL.field = AliasedExpr{Expr: sqlS[sqlpt-0].expr}
 		}
 	case 8:
 		//line sql.y:83
 		{
-			sqlVAL.field = SelectExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
+			sqlVAL.field = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
 		}
 	case 9:
 		//line sql.y:87
 		{
-			sqlVAL.field = SelectExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
+			sqlVAL.field = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
 		}
 	case 10:
 		//line sql.y:93
