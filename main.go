@@ -38,6 +38,12 @@ func (cr ColumnRef) RenderTo(r Renderer) {
 	r.Text(cr.Column, "identifier")
 }
 
+type StringLiteral string
+
+func (s StringLiteral) RenderTo(r Renderer) {
+	r.Text(string(s), "stringLiteral")
+}
+
 type SelectExpr struct {
 	Expr  Expr
 	Alias string

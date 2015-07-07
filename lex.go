@@ -85,6 +85,8 @@ func blankState(l *sqlLex) stateFn {
 		return lexComma
 	case r == '.':
 		return lexPeriod
+	case r == '\'':
+		return lexStringLiteral
 	case isWhitespace(r):
 		l.skipWhitespace()
 		return blankState
@@ -113,6 +115,28 @@ func lexAlphanumeric(l *sqlLex) stateFn {
 	l.tokens <- t
 	l.start = l.pos
 	return blankState
+}
+
+func lexStringLiteral(l *sqlLex) stateFn {
+	for {
+		var r rune
+		r = l.next()
+		if r == 0 {
+			return nil // error for EOF inside of string literal
+		}
+
+		if r == '\'' {
+			r = l.next()
+			if r != '\'' {
+				l.unnext()
+				t := token{src: l.src[l.start:l.pos]}
+				t.typ = STRING_LITERAL
+				l.tokens <- t
+				l.start = l.pos
+				return blankState
+			}
+		}
+	}
 }
 
 func lexComma(l *sqlLex) stateFn {
