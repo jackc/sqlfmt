@@ -89,6 +89,10 @@ func blankState(l *sqlLex) stateFn {
 		return lexStringLiteral
 	case r == '+' || r == '-' || r == '*' || r == '/':
 		return lexOperator
+	case r == '(':
+		return lexLParen
+	case r == ')':
+		return lexRParen
 	case unicode.IsDigit(r):
 		return lexNumber
 	case isWhitespace(r):
@@ -165,6 +169,18 @@ func lexComma(l *sqlLex) stateFn {
 
 func lexPeriod(l *sqlLex) stateFn {
 	l.tokens <- token{PERIOD, l.src[l.start:l.pos]}
+	l.start = l.pos
+	return blankState
+}
+
+func lexLParen(l *sqlLex) stateFn {
+	l.tokens <- token{LPAREN, l.src[l.start:l.pos]}
+	l.start = l.pos
+	return blankState
+}
+
+func lexRParen(l *sqlLex) stateFn {
+	l.tokens <- token{RPAREN, l.src[l.start:l.pos]}
 	l.start = l.pos
 	return blankState
 }

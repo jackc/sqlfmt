@@ -29,6 +29,8 @@ package main
 %token  <src> STRING_LITERAL
 %token  <src> NUMBER_LITERAL
 %token  <src> OPERATOR
+%token  <src> LPAREN
+%token  <src> RPAREN
 
 %left OPERATOR
 
@@ -99,6 +101,10 @@ expr:
 | expr OPERATOR expr
   {
     $$ = BinaryExpr{Left: $1, Operator: $2, Right: $3}
+  }
+| LPAREN expr RPAREN
+  {
+    $$ = ParenExpr{Expr: $2}
   }
 
 fromClause:

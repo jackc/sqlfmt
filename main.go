@@ -64,6 +64,16 @@ func (e BinaryExpr) RenderTo(r Renderer) {
 	e.Right.RenderTo(r)
 }
 
+type ParenExpr struct {
+	Expr Expr
+}
+
+func (e ParenExpr) RenderTo(r Renderer) {
+	r.Text("(", "lparen")
+	e.Expr.RenderTo(r)
+	r.Text(")", "rparen")
+}
+
 type SelectExpr struct {
 	Expr  Expr
 	Alias string
