@@ -104,7 +104,7 @@ type JoinExpr struct {
 	Left  Expr
 	Join  string
 	Right Expr
-	Using string
+	Using []string
 }
 
 func (s JoinExpr) RenderTo(r Renderer) {
@@ -121,11 +121,19 @@ func (s JoinExpr) RenderTo(r Renderer) {
 
 	s.Right.RenderTo(r)
 
-	if s.Using != "" {
+	if len(s.Using) > 0 {
 		r.Text(" ", "space")
 		r.Text("using", "keyword")
 		r.Text("(", "lparen")
-		r.Text(s.Using, "identifier")
+
+		for i, u := range s.Using {
+			r.Text(u, "identifier")
+			if i+1 < len(s.Using) {
+				r.Text(",", "comma")
+				r.Text(" ", "space")
+			}
+		}
+
 		r.Text(")", "rparen")
 	}
 }

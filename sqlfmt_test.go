@@ -133,6 +133,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "select_from_join_using.sql",
 			expectedOutputFile: "select_from_join_using.fmt.sql",
 		},
+		{
+			inputFile:          "select_from_join_using_multiple.sql",
+			expectedOutputFile: "select_from_join_using_multiple.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

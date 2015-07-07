@@ -9,6 +9,7 @@ package main
   fields []Expr
   expr Expr
   src string
+  identifiers []string
   fromClause *FromClause
 }
 
@@ -19,6 +20,7 @@ package main
 %type <expr> aliasableExpr
 %type <expr> expr
 %type <fromClause> fromClause
+%type <identifiers> identifierSeq
 %type <expr> joinExpr
 
 %token  <src> COMMA
@@ -121,6 +123,16 @@ expr:
     $$ = ParenExpr{Expr: $2}
   }
 
+identifierSeq:
+  IDENTIFIER
+  {
+    $$ = []string{$1}
+  }
+| identifierSeq COMMA IDENTIFIER
+  {
+    $$ = append($1, $3)
+  }
+
 joinExpr:
   aliasableExpr COMMA aliasableExpr
   {
@@ -130,7 +142,7 @@ joinExpr:
   {
     $$ = JoinExpr{Left: $1, Join: "cross join", Right: $4}
   }
-| aliasableExpr JOIN aliasableExpr USING LPAREN IDENTIFIER RPAREN
+| aliasableExpr JOIN aliasableExpr USING LPAREN identifierSeq RPAREN
   {
     $$ = JoinExpr{Left: $1, Join: "join", Right: $3, Using: $6}
   }
