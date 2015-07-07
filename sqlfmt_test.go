@@ -82,6 +82,10 @@ func TestSqlFmt(t *testing.T) {
 			expectedOutputFile: "simple_select_with_from.fmt.sql",
 		},
 		{
+			inputFile:          "select_from_aliased.sql",
+			expectedOutputFile: "select_from_aliased.fmt.sql",
+		},
+		{
 			inputFile:          "simple_select_with_selection_alias.sql",
 			expectedOutputFile: "simple_select_with_selection_alias.fmt.sql",
 		},

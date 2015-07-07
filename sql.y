@@ -16,7 +16,7 @@ package main
 %type <sqlSelect> selectStatement
 %type <fields> selectClause
 %type <fields> selectExprSeq
-%type <expr> selectExpr
+%type <expr> aliasableExpr
 %type <expr> expr
 %type <fromClause> fromClause
 %type <expr> joinExpr
@@ -65,16 +65,16 @@ selectClause:
   }
 
 selectExprSeq:
-  selectExpr
+  aliasableExpr
   {
     $$ = []Expr{$1}
   }
-| selectExprSeq COMMA selectExpr
+| selectExprSeq COMMA aliasableExpr
   {
     $$ = append($1, $3)
   }
 
-selectExpr:
+aliasableExpr:
   expr
   {
     $$ = $1
@@ -119,13 +119,13 @@ expr:
   }
 
 joinExpr:
-  expr COMMA expr
+  aliasableExpr COMMA aliasableExpr
   {
     $$ = JoinExpr{Left: $1, Join: $2, Right: $3}
   }
 
 fromClause:
-  FROM expr
+  FROM aliasableExpr
   {
     $$ = &FromClause{Expr: $2}
   }
