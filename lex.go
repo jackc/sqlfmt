@@ -87,7 +87,7 @@ func blankState(l *sqlLex) stateFn {
 		return lexPeriod
 	case r == '\'':
 		return lexStringLiteral
-	case r == '+' || r == '-' || r == '*' || r == '/' || r == '=' || r == '<' || r == '>':
+	case isOperator(r):
 		return lexOperator
 	case r == '(':
 		return lexLParen
@@ -156,6 +156,7 @@ func lexStringLiteral(l *sqlLex) stateFn {
 }
 
 func lexOperator(l *sqlLex) stateFn {
+	l.acceptRunFunc(isOperator)
 	l.tokens <- token{OPERATOR, l.src[l.start:l.pos]}
 	l.start = l.pos
 	return blankState
@@ -203,4 +204,8 @@ func isWhitespace(r rune) bool {
 
 func isAlphanumeric(r rune) bool {
 	return r == '_' || unicode.In(r, unicode.Letter, unicode.Digit)
+}
+
+func isOperator(r rune) bool {
+	return r == '+' || r == '-' || r == '*' || r == '/' || r == '=' || r == '<' || r == '>' || r == '!'
 }
