@@ -9,6 +9,7 @@ package main
   fields []Expr
   expr Expr
   src string
+  fromClause *FromClause
 }
 
 %type <sqlSelect> top
@@ -17,8 +18,7 @@ package main
 %type <fields> selectExprSeq
 %type <expr> selectExpr
 %type <expr> expr
-%type <src> fromClause
-%type <src> tableExpr
+%type <fromClause> fromClause
 
 %token  <src> COMMA
 %token  <src> PERIOD
@@ -53,7 +53,7 @@ selectStatement:
   {
     $$ = &SelectStmt{}
     $$.Fields = $1
-    $$.FromTable = $2
+    $$.FromClause = $2
     sqllex.(*sqlLex).stmt = $$
   }
 
@@ -118,15 +118,9 @@ expr:
   }
 
 fromClause:
-  FROM tableExpr
+  FROM expr
   {
-    $$ = $2
-  }
-
-tableExpr:
-  IDENTIFIER
-  {
-    $$ = $1
+    $$ = &FromClause{Expr: $2}
   }
 
 %%

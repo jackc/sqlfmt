@@ -87,9 +87,22 @@ func (e AliasedExpr) RenderTo(r Renderer) {
 	r.Text(e.Alias, "identifier")
 }
 
+type FromClause struct {
+	Expr Expr
+}
+
+func (e FromClause) RenderTo(r Renderer) {
+	r.Text("from", "keyword")
+	r.NewLine()
+	r.Indent()
+	e.Expr.RenderTo(r)
+	r.NewLine()
+	r.Unindent()
+}
+
 type SelectStmt struct {
-	Fields    []Expr
-	FromTable string
+	Fields     []Expr
+	FromClause *FromClause
 }
 
 func (s SelectStmt) RenderTo(r Renderer) {
@@ -105,12 +118,7 @@ func (s SelectStmt) RenderTo(r Renderer) {
 	}
 	r.Unindent()
 
-	if s.FromTable != "" {
-		r.Text("from", "keyword")
-		r.NewLine()
-		r.Indent()
-		r.Text(s.FromTable, "identifier")
-		r.NewLine()
-		r.Unindent()
+	if s.FromClause != nil {
+		s.FromClause.RenderTo(r)
 	}
 }

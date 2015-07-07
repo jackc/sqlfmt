@@ -6,11 +6,12 @@ import __yyfmt__ "fmt"
 //line sql.y:3
 //line sql.y:7
 type sqlSymType struct {
-	yys       int
-	sqlSelect *SelectStmt
-	fields    []Expr
-	expr      Expr
-	src       string
+	yys        int
+	sqlSelect  *SelectStmt
+	fields     []Expr
+	expr       Expr
+	src        string
+	fromClause *FromClause
 }
 
 const COMMA = 57346
@@ -44,7 +45,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:132
+//line sql.y:126
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -57,7 +58,7 @@ var sqlExca = []int{
 	-2, 0,
 }
 
-const sqlNprod = 19
+const sqlNprod = 18
 const sqlPrivate = 57344
 
 var sqlTokenNames []string
@@ -67,42 +68,42 @@ const sqlLast = 34
 
 var sqlAct = []int{
 
-	9, 4, 8, 28, 10, 11, 12, 26, 13, 10,
-	11, 12, 2, 13, 21, 19, 17, 27, 18, 23,
-	25, 19, 24, 15, 6, 4, 22, 20, 16, 14,
+	9, 4, 8, 27, 10, 11, 12, 14, 13, 10,
+	11, 12, 2, 13, 20, 18, 18, 26, 22, 24,
+	16, 25, 17, 23, 6, 18, 21, 4, 19, 15,
 	5, 7, 3, 1,
 }
 var sqlPact = []int{
 
-	19, -1000, -1000, 16, 0, -1000, 14, 24, -1000, 9,
-	22, -1000, -1000, -5, -1000, -1000, 0, 13, -1000, 0,
-	-2, 3, -11, -1000, -1000, -1000, -1000, -1000, -1000,
+	21, -1000, -1000, 16, 0, -1000, 0, 25, -1000, 13,
+	23, -1000, -1000, -5, 4, 0, 14, -1000, 0, 12,
+	3, -11, -1000, -1000, -1000, -1000, -1000, -1000,
 }
 var sqlPgo = []int{
 
-	0, 33, 12, 32, 31, 2, 0, 30, 29,
+	0, 33, 12, 32, 31, 2, 0, 30,
 }
 var sqlR1 = []int{
 
 	0, 1, 2, 2, 3, 4, 4, 5, 5, 5,
-	6, 6, 6, 6, 6, 6, 6, 7, 8,
+	6, 6, 6, 6, 6, 6, 6, 7,
 }
 var sqlR2 = []int{
 
 	0, 1, 1, 2, 2, 1, 3, 1, 3, 2,
-	1, 3, 1, 1, 3, 3, 3, 2, 1,
+	1, 3, 1, 1, 3, 3, 3, 2,
 }
 var sqlChk = []int{
 
 	-1000, -1, -2, -3, 6, -7, 8, -4, -5, -6,
-	9, 10, 11, 13, -8, 9, 4, 7, 9, 12,
-	5, -6, -2, -5, 9, -6, 9, 14, 14,
+	9, 10, 11, 13, -6, 4, 7, 9, 12, 5,
+	-6, -2, -5, 9, -6, 9, 14, 14,
 }
 var sqlDef = []int{
 
 	0, -2, 1, 2, 0, 3, 0, 4, 5, 7,
-	10, 12, 13, 0, 17, 18, 0, 0, 9, 0,
-	0, 0, 0, 6, 8, 14, 11, 15, 16,
+	10, 12, 13, 0, 17, 0, 0, 9, 0, 0,
+	0, 0, 6, 8, 14, 11, 15, 16,
 }
 var sqlTok1 = []int{
 
@@ -359,7 +360,7 @@ sqldefault:
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-1].fields
-			sqlVAL.sqlSelect.FromTable = sqlS[sqlpt-0].src
+			sqlVAL.sqlSelect.FromClause = sqlS[sqlpt-0].fromClause
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 4:
@@ -430,12 +431,7 @@ sqldefault:
 	case 17:
 		//line sql.y:122
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
-		}
-	case 18:
-		//line sql.y:128
-		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
 		}
 	}
 	goto sqlstack /* stack new state and value */
