@@ -100,6 +100,24 @@ func (e FromClause) RenderTo(r Renderer) {
 	r.Unindent()
 }
 
+type JoinExpr struct {
+	Left  Expr
+	Join  string
+	Right Expr
+}
+
+func (s JoinExpr) RenderTo(r Renderer) {
+	s.Left.RenderTo(r)
+	if s.Join == "," {
+		r.Text(",", "comma")
+		r.NewLine()
+	} else {
+		r.NewLine()
+		r.Text(s.Join, "keyword")
+	}
+	s.Right.RenderTo(r)
+}
+
 type SelectStmt struct {
 	Fields     []Expr
 	FromClause *FromClause

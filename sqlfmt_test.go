@@ -117,6 +117,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "comparison_expression.sql",
 			expectedOutputFile: "comparison_expression.fmt.sql",
 		},
+		{
+			inputFile:          "select_from_comma_join.sql",
+			expectedOutputFile: "select_from_comma_join.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

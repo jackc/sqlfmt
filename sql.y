@@ -19,6 +19,7 @@ package main
 %type <expr> selectExpr
 %type <expr> expr
 %type <fromClause> fromClause
+%type <expr> joinExpr
 
 %token  <src> COMMA
 %token  <src> PERIOD
@@ -117,12 +118,21 @@ expr:
     $$ = ParenExpr{Expr: $2}
   }
 
+joinExpr:
+  expr COMMA expr
+  {
+    $$ = JoinExpr{Left: $1, Join: $2, Right: $3}
+  }
+
 fromClause:
   FROM expr
   {
     $$ = &FromClause{Expr: $2}
   }
-
+| FROM joinExpr
+  {
+    $$ = &FromClause{Expr: $2}
+  }
 %%
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
