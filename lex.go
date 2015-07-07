@@ -87,7 +87,7 @@ func blankState(l *sqlLex) stateFn {
 		return lexPeriod
 	case r == '\'':
 		return lexStringLiteral
-	case r == '+' || r == '-' || r == '*' || r == '/':
+	case r == '+' || r == '-' || r == '*' || r == '/' || r == '=' || r == '<' || r == '>':
 		return lexOperator
 	case r == '(':
 		return lexLParen
