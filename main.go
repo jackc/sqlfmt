@@ -74,6 +74,16 @@ func (e ParenExpr) RenderTo(r Renderer) {
 	r.Text(")", "rparen")
 }
 
+type NotExpr struct {
+	Expr Expr
+}
+
+func (e NotExpr) RenderTo(r Renderer) {
+	r.Text("not", "keyword")
+	r.Text(" ", "space")
+	e.Expr.RenderTo(r)
+}
+
 type AliasedExpr struct {
 	Expr  Expr
 	Alias string

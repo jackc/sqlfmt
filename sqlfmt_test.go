@@ -153,6 +153,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "boolean_binary_op.sql",
 			expectedOutputFile: "boolean_binary_op.fmt.sql",
 		},
+		{
+			inputFile:          "boolean_not.sql",
+			expectedOutputFile: "boolean_not.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

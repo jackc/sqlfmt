@@ -37,10 +37,12 @@ package main
 %token  <src> STRING_LITERAL
 %token  <src> NUMBER_LITERAL
 %token  <src> OPERATOR
+%token  <src> NOT
 %token  <src> LPAREN
 %token  <src> RPAREN
 
 %left OPERATOR
+%left NOT
 
 %%
 
@@ -115,6 +117,10 @@ expr:
 | expr OPERATOR expr
   {
     $$ = BinaryExpr{Left: $1, Operator: $2, Right: $3}
+  }
+| NOT expr
+  {
+    $$ = NotExpr{Expr: $2}
   }
 | LPAREN expr RPAREN
   {
