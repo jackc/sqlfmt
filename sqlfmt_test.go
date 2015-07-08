@@ -130,6 +130,10 @@ func TestSqlFmt(t *testing.T) {
 			expectedOutputFile: "select_from_cross_join.fmt.sql",
 		},
 		{
+			inputFile:          "select_from_natural_join.sql",
+			expectedOutputFile: "select_from_natural_join.fmt.sql",
+		},
+		{
 			inputFile:          "select_from_join_using.sql",
 			expectedOutputFile: "select_from_join_using.fmt.sql",
 		},

@@ -29,6 +29,7 @@ package main
 %token  <src> AS
 %token  <src> FROM
 %token  <src> CROSS
+%token  <src> NATURAL
 %token  <src> JOIN
 %token  <src> USING
 %token  <src> ON
@@ -142,6 +143,10 @@ joinExpr:
 | aliasableExpr CROSS JOIN aliasableExpr
   {
     $$ = JoinExpr{Left: $1, Join: "cross join", Right: $4}
+  }
+| aliasableExpr NATURAL JOIN aliasableExpr
+  {
+    $$ = JoinExpr{Left: $1, Join: "natural join", Right: $4}
   }
 | aliasableExpr JOIN aliasableExpr USING LPAREN identifierSeq RPAREN
   {
