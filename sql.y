@@ -11,6 +11,7 @@ package main
   src string
   identifiers []string
   fromClause *FromClause
+  whereClause *WhereClause
 }
 
 %type <sqlSelect> top
@@ -22,6 +23,7 @@ package main
 %type <fromClause> fromClause
 %type <identifiers> identifierSeq
 %type <expr> joinExpr
+%type <whereClause> whereClause
 
 %token  <src> COMMA
 %token  <src> PERIOD
@@ -40,6 +42,7 @@ package main
 %token  <src> NOT
 %token  <src> LPAREN
 %token  <src> RPAREN
+%token  <src> WHERE
 
 %left OPERATOR
 %left NOT
@@ -64,6 +67,21 @@ selectStatement:
     $$ = &SelectStmt{}
     $$.Fields = $1
     $$.FromClause = $2
+    sqllex.(*sqlLex).stmt = $$
+  }
+| selectClause fromClause whereClause
+  {
+    $$ = &SelectStmt{}
+    $$.Fields = $1
+    $$.FromClause = $2
+    $$.WhereClause = $3
+    sqllex.(*sqlLex).stmt = $$
+  }
+| selectClause whereClause
+  {
+    $$ = &SelectStmt{}
+    $$.Fields = $1
+    $$.WhereClause = $2
     sqllex.(*sqlLex).stmt = $$
   }
 
@@ -171,6 +189,12 @@ fromClause:
 | FROM joinExpr
   {
     $$ = &FromClause{Expr: $2}
+  }
+
+whereClause:
+  WHERE expr
+  {
+    $$ = &WhereClause{Expr: $2}
   }
 %%
 

@@ -157,6 +157,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "boolean_not.sql",
 			expectedOutputFile: "boolean_not.fmt.sql",
 		},
+		{
+			inputFile:          "select_where.sql",
+			expectedOutputFile: "select_where.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

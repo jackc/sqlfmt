@@ -13,6 +13,7 @@ type sqlSymType struct {
 	src         string
 	identifiers []string
 	fromClause  *FromClause
+	whereClause *WhereClause
 }
 
 const COMMA = 57346
@@ -32,6 +33,7 @@ const OPERATOR = 57359
 const NOT = 57360
 const LPAREN = 57361
 const RPAREN = 57362
+const WHERE = 57363
 
 var sqlToknames = []string{
 	"COMMA",
@@ -51,6 +53,7 @@ var sqlToknames = []string{
 	"NOT",
 	"LPAREN",
 	"RPAREN",
+	"WHERE",
 }
 var sqlStatenames = []string{}
 
@@ -58,7 +61,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:175
+//line sql.y:199
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -71,62 +74,67 @@ var sqlExca = []int{
 	-2, 0,
 }
 
-const sqlNprod = 27
+const sqlNprod = 30
 const sqlPrivate = 57344
 
 var sqlTokenNames []string
 var sqlStates []string
 
-const sqlLast = 57
+const sqlLast = 62
 
 var sqlAct = []int{
 
-	9, 8, 10, 11, 12, 34, 13, 14, 15, 20,
-	43, 20, 33, 18, 22, 23, 4, 47, 49, 29,
-	19, 31, 2, 20, 10, 11, 12, 35, 13, 14,
-	38, 46, 32, 48, 41, 42, 37, 24, 39, 40,
-	30, 25, 36, 44, 6, 4, 26, 27, 28, 21,
-	17, 16, 45, 5, 7, 3, 1,
+	11, 7, 10, 12, 13, 14, 51, 15, 16, 20,
+	18, 8, 24, 47, 8, 37, 26, 27, 4, 38,
+	24, 2, 52, 53, 33, 35, 12, 13, 14, 22,
+	15, 16, 39, 50, 36, 42, 23, 34, 28, 24,
+	45, 46, 41, 43, 44, 29, 40, 48, 4, 6,
+	30, 31, 32, 25, 21, 17, 19, 49, 5, 9,
+	3, 1,
 }
 var sqlPact = []int{
 
-	39, -1000, -1000, 36, -12, -1000, -12, 46, -1000, 6,
-	44, -1000, -1000, -12, 10, 37, -1000, -12, 26, -1000,
-	-12, 18, -1000, -8, -15, -12, 31, 25, -12, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -12, -12, 22, -1000,
-	-1000, -9, -12, 17, -6, 13, -1000, 4, -1000, -1000,
+	42, -1000, -1000, -7, -11, -10, -1000, -11, -11, 50,
+	-1000, 22, 48, -1000, -1000, -11, 12, -1000, 41, -1000,
+	3, -11, 23, -1000, -11, 20, -1000, -5, -1, -11,
+	35, 31, -11, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-11, -11, 28, -1000, -1000, -6, -11, 19, 3, 2,
+	-1000, 9, -1000, -1000,
 }
 var sqlPgo = []int{
 
-	0, 56, 22, 55, 54, 1, 0, 53, 52, 51,
+	0, 61, 21, 60, 59, 2, 0, 58, 57, 56,
+	49,
 }
 var sqlR1 = []int{
 
-	0, 1, 2, 2, 3, 4, 4, 5, 5, 5,
-	6, 6, 6, 6, 6, 6, 6, 6, 8, 8,
-	9, 9, 9, 9, 9, 7, 7,
+	0, 1, 2, 2, 2, 2, 3, 4, 4, 5,
+	5, 5, 6, 6, 6, 6, 6, 6, 6, 6,
+	8, 8, 9, 9, 9, 9, 9, 7, 7, 10,
 }
 var sqlR2 = []int{
 
-	0, 1, 1, 2, 2, 1, 3, 1, 3, 2,
-	1, 3, 1, 1, 3, 2, 3, 3, 1, 3,
-	3, 4, 4, 7, 5, 2, 2,
+	0, 1, 1, 2, 3, 2, 2, 1, 3, 1,
+	3, 2, 1, 3, 1, 1, 3, 2, 3, 3,
+	1, 3, 3, 4, 4, 7, 5, 2, 2, 2,
 }
 var sqlChk = []int{
 
-	-1000, -1, -2, -3, 6, -7, 8, -4, -5, -6,
-	14, 15, 16, 18, 19, -5, -9, 4, 7, 14,
-	17, 5, -6, -6, -2, 4, 9, 10, 11, -5,
-	14, -6, 14, 20, 20, -5, 11, 11, -5, -5,
-	-5, 12, 13, 19, -6, -8, 14, 4, 20, 14,
+	-1000, -1, -2, -3, 6, -7, -10, 8, 21, -4,
+	-5, -6, 14, 15, 16, 18, 19, -10, -5, -9,
+	-6, 4, 7, 14, 17, 5, -6, -6, -2, 4,
+	9, 10, 11, -5, 14, -6, 14, 20, 20, -5,
+	11, 11, -5, -5, -5, 12, 13, 19, -6, -8,
+	14, 4, 20, 14,
 }
 var sqlDef = []int{
 
-	0, -2, 1, 2, 0, 3, 0, 4, 5, 7,
-	10, 12, 13, 0, 0, 25, 26, 0, 0, 9,
-	0, 0, 15, 0, 0, 0, 0, 0, 0, 6,
-	8, 14, 11, 16, 17, 20, 0, 0, 0, 21,
-	22, 0, 0, 0, 24, 0, 18, 0, 23, 19,
+	0, -2, 1, 2, 0, 3, 5, 0, 0, 6,
+	7, 9, 12, 14, 15, 0, 0, 4, 27, 28,
+	29, 0, 0, 11, 0, 0, 17, 0, 0, 0,
+	0, 0, 0, 8, 10, 16, 13, 18, 19, 22,
+	0, 0, 0, 23, 24, 0, 0, 0, 26, 0,
+	20, 0, 25, 21,
 }
 var sqlTok1 = []int{
 
@@ -135,7 +143,7 @@ var sqlTok1 = []int{
 var sqlTok2 = []int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-	12, 13, 14, 15, 16, 17, 18, 19, 20,
+	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
 }
 var sqlTok3 = []int{
 	0,
@@ -367,19 +375,19 @@ sqldefault:
 	switch sqlnt {
 
 	case 1:
-		//line sql.y:51
+		//line sql.y:54
 		{
 			sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 		}
 	case 2:
-		//line sql.y:57
+		//line sql.y:60
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-0].fields
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 3:
-		//line sql.y:63
+		//line sql.y:66
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-1].fields
@@ -387,119 +395,141 @@ sqldefault:
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 4:
-		//line sql.y:72
+		//line sql.y:73
+		{
+			sqlVAL.sqlSelect = &SelectStmt{}
+			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-2].fields
+			sqlVAL.sqlSelect.FromClause = sqlS[sqlpt-1].fromClause
+			sqlVAL.sqlSelect.WhereClause = sqlS[sqlpt-0].whereClause
+			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
+		}
+	case 5:
+		//line sql.y:81
+		{
+			sqlVAL.sqlSelect = &SelectStmt{}
+			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-1].fields
+			sqlVAL.sqlSelect.WhereClause = sqlS[sqlpt-0].whereClause
+			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
+		}
+	case 6:
+		//line sql.y:90
 		{
 			sqlVAL.fields = sqlS[sqlpt-0].fields
 		}
-	case 5:
-		//line sql.y:78
+	case 7:
+		//line sql.y:96
 		{
 			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
-	case 6:
-		//line sql.y:82
+	case 8:
+		//line sql.y:100
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
-	case 7:
-		//line sql.y:88
+	case 9:
+		//line sql.y:106
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
-	case 8:
-		//line sql.y:92
+	case 10:
+		//line sql.y:110
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
 		}
-	case 9:
-		//line sql.y:96
+	case 11:
+		//line sql.y:114
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
 		}
-	case 10:
-		//line sql.y:102
+	case 12:
+		//line sql.y:120
 		{
 			sqlVAL.expr = ColumnRef{Column: sqlS[sqlpt-0].src}
 		}
-	case 11:
-		//line sql.y:106
+	case 13:
+		//line sql.y:124
 		{
 			sqlVAL.expr = ColumnRef{Table: sqlS[sqlpt-2].src, Column: sqlS[sqlpt-0].src}
 		}
-	case 12:
-		//line sql.y:110
+	case 14:
+		//line sql.y:128
 		{
 			sqlVAL.expr = StringLiteral(sqlS[sqlpt-0].src)
 		}
-	case 13:
-		//line sql.y:114
+	case 15:
+		//line sql.y:132
 		{
 			sqlVAL.expr = IntegerLiteral(sqlS[sqlpt-0].src)
 		}
-	case 14:
-		//line sql.y:118
+	case 16:
+		//line sql.y:136
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: sqlS[sqlpt-1].src, Right: sqlS[sqlpt-0].expr}
 		}
-	case 15:
-		//line sql.y:122
+	case 17:
+		//line sql.y:140
 		{
 			sqlVAL.expr = NotExpr{Expr: sqlS[sqlpt-0].expr}
 		}
-	case 16:
-		//line sql.y:126
+	case 18:
+		//line sql.y:144
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].expr}
 		}
-	case 17:
-		//line sql.y:130
+	case 19:
+		//line sql.y:148
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].sqlSelect}
 		}
-	case 18:
-		//line sql.y:136
+	case 20:
+		//line sql.y:154
 		{
 			sqlVAL.identifiers = []string{sqlS[sqlpt-0].src}
 		}
-	case 19:
-		//line sql.y:140
+	case 21:
+		//line sql.y:158
 		{
 			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].src)
 		}
-	case 20:
-		//line sql.y:146
+	case 22:
+		//line sql.y:164
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-2].expr, Join: sqlS[sqlpt-1].src, Right: sqlS[sqlpt-0].expr}
 		}
-	case 21:
-		//line sql.y:150
+	case 23:
+		//line sql.y:168
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-3].expr, Join: "cross join", Right: sqlS[sqlpt-0].expr}
 		}
-	case 22:
-		//line sql.y:154
+	case 24:
+		//line sql.y:172
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-3].expr, Join: "natural join", Right: sqlS[sqlpt-0].expr}
 		}
-	case 23:
-		//line sql.y:158
+	case 25:
+		//line sql.y:176
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-6].expr, Join: "join", Right: sqlS[sqlpt-4].expr, Using: sqlS[sqlpt-1].identifiers}
 		}
-	case 24:
-		//line sql.y:162
+	case 26:
+		//line sql.y:180
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-4].expr, Join: "join", Right: sqlS[sqlpt-2].expr, On: sqlS[sqlpt-0].expr}
 		}
-	case 25:
-		//line sql.y:168
+	case 27:
+		//line sql.y:186
 		{
 			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
 		}
-	case 26:
-		//line sql.y:172
+	case 28:
+		//line sql.y:190
 		{
 			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
+		}
+	case 29:
+		//line sql.y:196
+		{
+			sqlVAL.whereClause = &WhereClause{Expr: sqlS[sqlpt-0].expr}
 		}
 	}
 	goto sqlstack /* stack new state and value */

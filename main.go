@@ -156,9 +156,23 @@ func (s JoinExpr) RenderTo(r Renderer) {
 	}
 }
 
+type WhereClause struct {
+	Expr Expr
+}
+
+func (e WhereClause) RenderTo(r Renderer) {
+	r.Text("where", "keyword")
+	r.NewLine()
+	r.Indent()
+	e.Expr.RenderTo(r)
+	r.NewLine()
+	r.Unindent()
+}
+
 type SelectStmt struct {
-	Fields     []Expr
-	FromClause *FromClause
+	Fields      []Expr
+	FromClause  *FromClause
+	WhereClause *WhereClause
 }
 
 func (s SelectStmt) RenderTo(r Renderer) {
@@ -176,5 +190,9 @@ func (s SelectStmt) RenderTo(r Renderer) {
 
 	if s.FromClause != nil {
 		s.FromClause.RenderTo(r)
+	}
+
+	if s.WhereClause != nil {
+		s.WhereClause.RenderTo(r)
 	}
 }
