@@ -140,6 +140,14 @@ func lexAlphanumeric(l *sqlLex) stateFn {
 		t.typ = NOT
 	case strings.EqualFold(t.src, "where"):
 		t.typ = WHERE
+	case strings.EqualFold(t.src, "order"):
+		t.typ = ORDER
+	case strings.EqualFold(t.src, "by"):
+		t.typ = BY
+	case strings.EqualFold(t.src, "asc"):
+		t.typ = ASC
+	case strings.EqualFold(t.src, "desc"):
+		t.typ = DESC
 	case strings.EqualFold(t.src, "and") || strings.EqualFold(t.src, "or"):
 		t.typ = OPERATOR
 	default:

@@ -169,10 +169,43 @@ func (e WhereClause) RenderTo(r Renderer) {
 	r.Unindent()
 }
 
+type OrderExpr struct {
+	Expr  Expr
+	Order string
+}
+
+func (e OrderExpr) RenderTo(r Renderer) {
+	e.Expr.RenderTo(r)
+	if e.Order != "" {
+		r.Text(" ", "space")
+		r.Text(e.Order, "keyword")
+	}
+}
+
+type OrderClause struct {
+	Exprs []OrderExpr
+}
+
+func (e OrderClause) RenderTo(r Renderer) {
+	r.Text("order by", "keyword")
+	r.NewLine()
+	r.Indent()
+
+	for i, f := range e.Exprs {
+		f.RenderTo(r)
+		if i < len(e.Exprs)-1 {
+			r.Text(",", "comma")
+		}
+		r.NewLine()
+	}
+	r.Unindent()
+}
+
 type SelectStmt struct {
 	Fields      []Expr
 	FromClause  *FromClause
 	WhereClause *WhereClause
+	OrderClause *OrderClause
 }
 
 func (s SelectStmt) RenderTo(r Renderer) {
@@ -194,5 +227,9 @@ func (s SelectStmt) RenderTo(r Renderer) {
 
 	if s.WhereClause != nil {
 		s.WhereClause.RenderTo(r)
+	}
+
+	if s.OrderClause != nil {
+		s.OrderClause.RenderTo(r)
 	}
 }

@@ -12,6 +12,8 @@ package main
   identifiers []string
   fromClause *FromClause
   whereClause *WhereClause
+  orderExpr OrderExpr
+  orderClause *OrderClause
 }
 
 %type <sqlSelect> top
@@ -24,6 +26,8 @@ package main
 %type <identifiers> identifierSeq
 %type <expr> joinExpr
 %type <whereClause> whereClause
+%type <orderExpr> orderExpr
+%type <orderClause> orderClause
 
 %token  <src> COMMA
 %token  <src> PERIOD
@@ -43,6 +47,10 @@ package main
 %token  <src> LPAREN
 %token  <src> RPAREN
 %token  <src> WHERE
+%token  <src> ORDER
+%token  <src> BY
+%token  <src> ASC
+%token  <src> DESC
 
 %left OPERATOR
 %left NOT
@@ -82,6 +90,23 @@ selectStatement:
     $$ = &SelectStmt{}
     $$.Fields = $1
     $$.WhereClause = $2
+    sqllex.(*sqlLex).stmt = $$
+  }
+| selectClause fromClause whereClause orderClause
+  {
+    $$ = &SelectStmt{}
+    $$.Fields = $1
+    $$.FromClause = $2
+    $$.WhereClause = $3
+    $$.OrderClause = $4
+    sqllex.(*sqlLex).stmt = $$
+  }
+| selectClause fromClause orderClause
+  {
+    $$ = &SelectStmt{}
+    $$.Fields = $1
+    $$.FromClause = $2
+    $$.OrderClause = $3
     sqllex.(*sqlLex).stmt = $$
   }
 
@@ -195,6 +220,31 @@ whereClause:
   WHERE expr
   {
     $$ = &WhereClause{Expr: $2}
+  }
+
+orderExpr:
+  expr
+  {
+    $$ = OrderExpr{Expr: $1}
+  }
+| expr ASC
+  {
+    $$ = OrderExpr{Expr: $1, Order: $2}
+  }
+| expr DESC
+  {
+    $$ = OrderExpr{Expr: $1, Order: $2}
+  }
+
+orderClause:
+  ORDER BY orderExpr
+  {
+    $$ = &OrderClause{Exprs: []OrderExpr{$3}}
+  }
+| orderClause COMMA orderExpr
+  {
+    $1.Exprs = append($1.Exprs, $3)
+    $$ = $1
   }
 %%
 

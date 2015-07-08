@@ -161,6 +161,22 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "select_where.sql",
 			expectedOutputFile: "select_where.fmt.sql",
 		},
+		{
+			inputFile:          "order.sql",
+			expectedOutputFile: "order.fmt.sql",
+		},
+		{
+			inputFile:          "order_column_num.sql",
+			expectedOutputFile: "order_column_num.fmt.sql",
+		},
+		{
+			inputFile:          "order_desc.sql",
+			expectedOutputFile: "order_desc.fmt.sql",
+		},
+		{
+			inputFile:          "order_multiple.sql",
+			expectedOutputFile: "order_multiple.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {
