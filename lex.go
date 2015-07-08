@@ -87,6 +87,8 @@ func blankState(l *sqlLex) stateFn {
 		return lexPeriod
 	case r == '\'':
 		return lexStringLiteral
+	case r == '"':
+		return lexQuotedIdentifier
 	case isOperator(r):
 		return lexOperator
 	case r == '(':
@@ -155,6 +157,28 @@ func lexStringLiteral(l *sqlLex) stateFn {
 				l.unnext()
 				t := token{src: l.src[l.start:l.pos]}
 				t.typ = STRING_LITERAL
+				l.tokens <- t
+				l.start = l.pos
+				return blankState
+			}
+		}
+	}
+}
+
+func lexQuotedIdentifier(l *sqlLex) stateFn {
+	for {
+		var r rune
+		r = l.next()
+		if r == 0 {
+			return nil // error for EOF inside of string literal
+		}
+
+		if r == '"' {
+			r = l.next()
+			if r != '"' {
+				l.unnext()
+				t := token{src: l.src[l.start:l.pos]}
+				t.typ = IDENTIFIER
 				l.tokens <- t
 				l.start = l.pos
 				return blankState

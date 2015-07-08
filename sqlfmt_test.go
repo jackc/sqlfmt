@@ -141,6 +141,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "select_from_join_on.sql",
 			expectedOutputFile: "select_from_join_on.fmt.sql",
 		},
+		{
+			inputFile:          "quoted_identifier.sql",
+			expectedOutputFile: "quoted_identifier.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {
