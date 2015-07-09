@@ -20,52 +20,52 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func sqlfmt(t *testing.T, sql string, args ...string) string {
+func sqlfmt(sql string, args ...string) (string, error) {
 	cmd := exec.Command("tmp/sqlfmt", args...)
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		t.Fatalf("cmd.StdinPipe failed: %v", err)
+		return "", fmt.Errorf("cmd.StdinPipe failed: %v", err)
 	}
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		t.Fatalf("cmd.StdoutPipe failed: %v", err)
+		return "", fmt.Errorf("cmd.StdoutPipe failed: %v", err)
 	}
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		t.Fatalf("cmd.StderrPipe failed: %v", err)
+		return "", fmt.Errorf("cmd.StderrPipe failed: %v", err)
 	}
 
 	err = cmd.Start()
 	if err != nil {
-		t.Fatalf("cmd.Start failed: %v", err)
+		return "", fmt.Errorf("cmd.Start failed: %v", err)
 	}
 
 	_, err = fmt.Fprint(stdin, sql)
 	if err != nil {
-		t.Fatalf("fmt.Fprint failed: %v", err)
+		return "", fmt.Errorf("fmt.Fprint failed: %v", err)
 	}
 
 	err = stdin.Close()
 	if err != nil {
-		t.Fatalf("stdin.Close failed: %v", err)
+		return "", fmt.Errorf("stdin.Close failed: %v", err)
 	}
 
 	output, err := ioutil.ReadAll(stdout)
 	if err != nil {
-		t.Fatalf("ioutil.ReadAll(stdout) failed: %v", err)
+		return "", fmt.Errorf("ioutil.ReadAll(stdout) failed: %v", err)
 	}
 
 	errout, err := ioutil.ReadAll(stderr)
 	if err != nil {
-		t.Fatalf("ioutil.ReadAll(stderr) failed: %v", err)
+		return "", fmt.Errorf("ioutil.ReadAll(stderr) failed: %v", err)
 	}
 
 	err = cmd.Wait()
 	if err != nil {
-		t.Fatalf("cmd.Wait failed: %v\n%s", err, string(errout))
+		return "", fmt.Errorf("cmd.Wait failed: %v\n%s", err, string(errout))
 	}
 
-	return string(output)
+	return string(output), nil
 }
 
 func TestSqlFmt(t *testing.T) {
@@ -182,15 +182,21 @@ func TestSqlFmt(t *testing.T) {
 	for i, tt := range tests {
 		input, err := ioutil.ReadFile(path.Join("testdata", tt.inputFile))
 		if err != nil {
-			t.Fatal(err)
+			t.Errorf("%d. %v", i, err)
+			continue
 		}
 
 		expected, err := ioutil.ReadFile(path.Join("testdata", tt.expectedOutputFile))
 		if err != nil {
-			t.Fatal(err)
+			t.Errorf("%d. %v", i, err)
+			continue
 		}
 
-		output := sqlfmt(t, string(input))
+		output, err := sqlfmt(string(input))
+		if err != nil {
+			t.Errorf("%d. sqfmt failed: %v", i, err)
+			continue
+		}
 
 		if output != string(expected) {
 			actualFileName := path.Join("tmp", fmt.Sprintf("%d.sql", i))
