@@ -30,8 +30,6 @@ package main
 %type <orderClause> optOrderClause
 %type <orderClause> orderClause
 
-%token  <src> COMMA
-%token  <src> PERIOD
 %token  <src> SELECT
 %token  <src> AS
 %token  <src> FROM
@@ -45,8 +43,6 @@ package main
 %token  <src> NUMBER_LITERAL
 %token  <src> OPERATOR
 %token  <src> NOT
-%token  <src> LPAREN
-%token  <src> RPAREN
 %token  <src> WHERE
 %token  <src> ORDER
 %token  <src> BY
@@ -107,7 +103,7 @@ selectExprSeq:
   {
     $$ = []Expr{$1}
   }
-| selectExprSeq COMMA aliasableExpr
+| selectExprSeq ',' aliasableExpr
   {
     $$ = append($1, $3)
   }
@@ -131,7 +127,7 @@ expr:
   {
     $$ = ColumnRef{Column: $1}
   }
-| IDENTIFIER PERIOD IDENTIFIER
+| IDENTIFIER '.' IDENTIFIER
   {
     $$ = ColumnRef{Table: $1, Column: $3}
   }
@@ -151,11 +147,11 @@ expr:
   {
     $$ = NotExpr{Expr: $2}
   }
-| LPAREN expr RPAREN
+| '(' expr ')'
   {
     $$ = ParenExpr{Expr: $2}
   }
-| LPAREN selectStatement RPAREN
+| '(' selectStatement ')'
   {
     $$ = ParenExpr{Expr: $2}
   }
@@ -165,15 +161,15 @@ identifierSeq:
   {
     $$ = []string{$1}
   }
-| identifierSeq COMMA IDENTIFIER
+| identifierSeq ',' IDENTIFIER
   {
     $$ = append($1, $3)
   }
 
 joinExpr:
-  aliasableExpr COMMA aliasableExpr
+  aliasableExpr ',' aliasableExpr
   {
-    $$ = JoinExpr{Left: $1, Join: $2, Right: $3}
+    $$ = JoinExpr{Left: $1, Join: ",", Right: $3}
   }
 | aliasableExpr CROSS JOIN aliasableExpr
   {
@@ -183,7 +179,7 @@ joinExpr:
   {
     $$ = JoinExpr{Left: $1, Join: "natural join", Right: $4}
   }
-| aliasableExpr JOIN aliasableExpr USING LPAREN identifierSeq RPAREN
+| aliasableExpr JOIN aliasableExpr USING '(' identifierSeq ')'
   {
     $$ = JoinExpr{Left: $1, Join: "join", Right: $3, Using: $6}
   }
@@ -234,7 +230,7 @@ orderClause:
   {
     $$ = &OrderClause{Exprs: []OrderExpr{$3}}
   }
-| orderClause COMMA orderExpr
+| orderClause ',' orderExpr
   {
     $1.Exprs = append($1.Exprs, $3)
     $$ = $1
