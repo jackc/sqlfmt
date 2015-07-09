@@ -11,6 +11,7 @@ type sqlSymType struct {
 	fields      []Expr
 	expr        Expr
 	src         string
+	keyword     string
 	identifiers []string
 	fromClause  *FromClause
 	whereClause *WhereClause
@@ -18,44 +19,848 @@ type sqlSymType struct {
 	orderClause *OrderClause
 }
 
-const SELECT = 57346
-const AS = 57347
-const FROM = 57348
-const CROSS = 57349
-const NATURAL = 57350
-const JOIN = 57351
-const USING = 57352
-const ON = 57353
-const IDENT = 57354
-const STRING_LITERAL = 57355
-const NUMBER_LITERAL = 57356
-const OPERATOR = 57357
-const NOT = 57358
-const WHERE = 57359
-const ORDER = 57360
-const BY = 57361
-const ASC = 57362
-const DESC = 57363
+const IDENT = 57346
+const STRING_LITERAL = 57347
+const NUMBER_LITERAL = 57348
+const OP = 57349
+const ABORT_P = 57350
+const ABSOLUTE_P = 57351
+const ACCESS = 57352
+const ACTION = 57353
+const ADD_P = 57354
+const ADMIN = 57355
+const AFTER = 57356
+const AGGREGATE = 57357
+const ALL = 57358
+const ALSO = 57359
+const ALTER = 57360
+const ALWAYS = 57361
+const ANALYSE = 57362
+const ANALYZE = 57363
+const AND = 57364
+const ANY = 57365
+const ARRAY = 57366
+const AS = 57367
+const ASC = 57368
+const ASSERTION = 57369
+const ASSIGNMENT = 57370
+const ASYMMETRIC = 57371
+const AT = 57372
+const ATTRIBUTE = 57373
+const AUTHORIZATION = 57374
+const BACKWARD = 57375
+const BEFORE = 57376
+const BEGIN_P = 57377
+const BETWEEN = 57378
+const BIGINT = 57379
+const BINARY = 57380
+const BIT = 57381
+const BOOLEAN_P = 57382
+const BOTH = 57383
+const BY = 57384
+const CACHE = 57385
+const CALLED = 57386
+const CASCADE = 57387
+const CASCADED = 57388
+const CASE = 57389
+const CAST = 57390
+const CATALOG_P = 57391
+const CHAIN = 57392
+const CHAR_P = 57393
+const CHARACTER = 57394
+const CHARACTERISTICS = 57395
+const CHECK = 57396
+const CHECKPOINT = 57397
+const CLASS = 57398
+const CLOSE = 57399
+const CLUSTER = 57400
+const COALESCE = 57401
+const COLLATE = 57402
+const COLLATION = 57403
+const COLUMN = 57404
+const COMMENT = 57405
+const COMMENTS = 57406
+const COMMIT = 57407
+const COMMITTED = 57408
+const CONCURRENTLY = 57409
+const CONFIGURATION = 57410
+const CONFLICT = 57411
+const CONNECTION = 57412
+const CONSTRAINT = 57413
+const CONSTRAINTS = 57414
+const CONTENT_P = 57415
+const CONTINUE_P = 57416
+const CONVERSION_P = 57417
+const COPY = 57418
+const COST = 57419
+const CREATE = 57420
+const CROSS = 57421
+const CSV = 57422
+const CUBE = 57423
+const CURRENT_P = 57424
+const CURRENT_CATALOG = 57425
+const CURRENT_DATE = 57426
+const CURRENT_ROLE = 57427
+const CURRENT_SCHEMA = 57428
+const CURRENT_TIME = 57429
+const CURRENT_TIMESTAMP = 57430
+const CURRENT_USER = 57431
+const CURSOR = 57432
+const CYCLE = 57433
+const DATA_P = 57434
+const DATABASE = 57435
+const DAY_P = 57436
+const DEALLOCATE = 57437
+const DEC = 57438
+const DECIMAL_P = 57439
+const DECLARE = 57440
+const DEFAULT = 57441
+const DEFAULTS = 57442
+const DEFERRABLE = 57443
+const DEFERRED = 57444
+const DEFINER = 57445
+const DELETE_P = 57446
+const DELIMITER = 57447
+const DELIMITERS = 57448
+const DESC = 57449
+const DICTIONARY = 57450
+const DISABLE_P = 57451
+const DISCARD = 57452
+const DISTINCT = 57453
+const DO = 57454
+const DOCUMENT_P = 57455
+const DOMAIN_P = 57456
+const DOUBLE_P = 57457
+const DROP = 57458
+const EACH = 57459
+const ELSE = 57460
+const ENABLE_P = 57461
+const ENCODING = 57462
+const ENCRYPTED = 57463
+const END_P = 57464
+const ENUM_P = 57465
+const ESCAPE = 57466
+const EVENT = 57467
+const EXCEPT = 57468
+const EXCLUDE = 57469
+const EXCLUDING = 57470
+const EXCLUSIVE = 57471
+const EXECUTE = 57472
+const EXISTS = 57473
+const EXPLAIN = 57474
+const EXTENSION = 57475
+const EXTERNAL = 57476
+const EXTRACT = 57477
+const FALSE_P = 57478
+const FAMILY = 57479
+const FETCH = 57480
+const FILTER = 57481
+const FIRST_P = 57482
+const FLOAT_P = 57483
+const FOLLOWING = 57484
+const FOR = 57485
+const FORCE = 57486
+const FOREIGN = 57487
+const FORWARD = 57488
+const FREEZE = 57489
+const FROM = 57490
+const FULL = 57491
+const FUNCTION = 57492
+const FUNCTIONS = 57493
+const GLOBAL = 57494
+const GRANT = 57495
+const GRANTED = 57496
+const GREATEST = 57497
+const GROUP_P = 57498
+const GROUPING = 57499
+const HANDLER = 57500
+const HAVING = 57501
+const HEADER_P = 57502
+const HOLD = 57503
+const HOUR_P = 57504
+const IDENTITY_P = 57505
+const IF_P = 57506
+const ILIKE = 57507
+const IMMEDIATE = 57508
+const IMMUTABLE = 57509
+const IMPLICIT_P = 57510
+const IMPORT_P = 57511
+const IN_P = 57512
+const INCLUDING = 57513
+const INCREMENT = 57514
+const INDEX = 57515
+const INDEXES = 57516
+const INHERIT = 57517
+const INHERITS = 57518
+const INITIALLY = 57519
+const INLINE_P = 57520
+const INNER_P = 57521
+const INOUT = 57522
+const INPUT_P = 57523
+const INSENSITIVE = 57524
+const INSERT = 57525
+const INSTEAD = 57526
+const INT_P = 57527
+const INTEGER = 57528
+const INTERSECT = 57529
+const INTERVAL = 57530
+const INTO = 57531
+const INVOKER = 57532
+const IS = 57533
+const ISNULL = 57534
+const ISOLATION = 57535
+const JOIN = 57536
+const KEY = 57537
+const LABEL = 57538
+const LANGUAGE = 57539
+const LARGE_P = 57540
+const LAST_P = 57541
+const LATERAL_P = 57542
+const LEADING = 57543
+const LEAKPROOF = 57544
+const LEAST = 57545
+const LEFT = 57546
+const LEVEL = 57547
+const LIKE = 57548
+const LIMIT = 57549
+const LISTEN = 57550
+const LOAD = 57551
+const LOCAL = 57552
+const LOCALTIME = 57553
+const LOCALTIMESTAMP = 57554
+const LOCATION = 57555
+const LOCK_P = 57556
+const LOCKED = 57557
+const LOGGED = 57558
+const MAPPING = 57559
+const MATCH = 57560
+const MATERIALIZED = 57561
+const MAXVALUE = 57562
+const MINUTE_P = 57563
+const MINVALUE = 57564
+const MODE = 57565
+const MONTH_P = 57566
+const MOVE = 57567
+const NAME_P = 57568
+const NAMES = 57569
+const NATIONAL = 57570
+const NATURAL = 57571
+const NCHAR = 57572
+const NEXT = 57573
+const NO = 57574
+const NONE = 57575
+const NOT = 57576
+const NOTHING = 57577
+const NOTIFY = 57578
+const NOTNULL = 57579
+const NOWAIT = 57580
+const NULL_P = 57581
+const NULLIF = 57582
+const NULLS_P = 57583
+const NUMERIC = 57584
+const OBJECT_P = 57585
+const OF = 57586
+const OFF = 57587
+const OFFSET = 57588
+const OIDS = 57589
+const ON = 57590
+const ONLY = 57591
+const OPERATOR = 57592
+const OPTION = 57593
+const OPTIONS = 57594
+const OR = 57595
+const ORDER = 57596
+const ORDINALITY = 57597
+const OUT_P = 57598
+const OUTER_P = 57599
+const OVER = 57600
+const OVERLAPS = 57601
+const OVERLAY = 57602
+const OWNED = 57603
+const OWNER = 57604
+const PARSER = 57605
+const PARTIAL = 57606
+const PARTITION = 57607
+const PASSING = 57608
+const PASSWORD = 57609
+const PLACING = 57610
+const PLANS = 57611
+const POLICY = 57612
+const POSITION = 57613
+const PRECEDING = 57614
+const PRECISION = 57615
+const PRESERVE = 57616
+const PREPARE = 57617
+const PREPARED = 57618
+const PRIMARY = 57619
+const PRIOR = 57620
+const PRIVILEGES = 57621
+const PROCEDURAL = 57622
+const PROCEDURE = 57623
+const PROGRAM = 57624
+const QUOTE = 57625
+const RANGE = 57626
+const READ = 57627
+const REAL = 57628
+const REASSIGN = 57629
+const RECHECK = 57630
+const RECURSIVE = 57631
+const REF = 57632
+const REFERENCES = 57633
+const REFRESH = 57634
+const REINDEX = 57635
+const RELATIVE_P = 57636
+const RELEASE = 57637
+const RENAME = 57638
+const REPEATABLE = 57639
+const REPLACE = 57640
+const REPLICA = 57641
+const RESET = 57642
+const RESTART = 57643
+const RESTRICT = 57644
+const RETURNING = 57645
+const RETURNS = 57646
+const REVOKE = 57647
+const RIGHT = 57648
+const ROLE = 57649
+const ROLLBACK = 57650
+const ROLLUP = 57651
+const ROW = 57652
+const ROWS = 57653
+const RULE = 57654
+const SAVEPOINT = 57655
+const SCHEMA = 57656
+const SCROLL = 57657
+const SEARCH = 57658
+const SECOND_P = 57659
+const SECURITY = 57660
+const SELECT = 57661
+const SEQUENCE = 57662
+const SEQUENCES = 57663
+const SERIALIZABLE = 57664
+const SERVER = 57665
+const SESSION = 57666
+const SESSION_USER = 57667
+const SET = 57668
+const SETS = 57669
+const SETOF = 57670
+const SHARE = 57671
+const SHOW = 57672
+const SIMILAR = 57673
+const SIMPLE = 57674
+const SKIP = 57675
+const SMALLINT = 57676
+const SNAPSHOT = 57677
+const SOME = 57678
+const SQL_P = 57679
+const STABLE = 57680
+const STANDALONE_P = 57681
+const START = 57682
+const STATEMENT = 57683
+const STATISTICS = 57684
+const STDIN = 57685
+const STDOUT = 57686
+const STORAGE = 57687
+const STRICT_P = 57688
+const STRIP_P = 57689
+const SUBSTRING = 57690
+const SYMMETRIC = 57691
+const SYSID = 57692
+const SYSTEM_P = 57693
+const TABLE = 57694
+const TABLES = 57695
+const TABLESAMPLE = 57696
+const TABLESPACE = 57697
+const TEMP = 57698
+const TEMPLATE = 57699
+const TEMPORARY = 57700
+const TEXT_P = 57701
+const THEN = 57702
+const TIME = 57703
+const TIMESTAMP = 57704
+const TO = 57705
+const TRAILING = 57706
+const TRANSACTION = 57707
+const TRANSFORM = 57708
+const TREAT = 57709
+const TRIGGER = 57710
+const TRIM = 57711
+const TRUE_P = 57712
+const TRUNCATE = 57713
+const TRUSTED = 57714
+const TYPE_P = 57715
+const TYPES_P = 57716
+const UNBOUNDED = 57717
+const UNCOMMITTED = 57718
+const UNENCRYPTED = 57719
+const UNION = 57720
+const UNIQUE = 57721
+const UNKNOWN = 57722
+const UNLISTEN = 57723
+const UNLOGGED = 57724
+const UNTIL = 57725
+const UPDATE = 57726
+const USER = 57727
+const USING = 57728
+const VACUUM = 57729
+const VALID = 57730
+const VALIDATE = 57731
+const VALIDATOR = 57732
+const VALUE_P = 57733
+const VALUES = 57734
+const VARCHAR = 57735
+const VARIADIC = 57736
+const VARYING = 57737
+const VERBOSE = 57738
+const VERSION_P = 57739
+const VIEW = 57740
+const VIEWS = 57741
+const VOLATILE = 57742
+const WHEN = 57743
+const WHERE = 57744
+const WHITESPACE_P = 57745
+const WINDOW = 57746
+const WITH = 57747
+const WITHIN = 57748
+const WITHOUT = 57749
+const WORK = 57750
+const WRAPPER = 57751
+const WRITE = 57752
+const XML_P = 57753
+const XMLATTRIBUTES = 57754
+const XMLCONCAT = 57755
+const XMLELEMENT = 57756
+const XMLEXISTS = 57757
+const XMLFOREST = 57758
+const XMLPARSE = 57759
+const XMLPI = 57760
+const XMLROOT = 57761
+const XMLSERIALIZE = 57762
+const YEAR_P = 57763
+const YES_P = 57764
+const ZONE = 57765
 
 var sqlToknames = []string{
-	"SELECT",
-	"AS",
-	"FROM",
-	"CROSS",
-	"NATURAL",
-	"JOIN",
-	"USING",
-	"ON",
 	"IDENT",
 	"STRING_LITERAL",
 	"NUMBER_LITERAL",
-	"OPERATOR",
-	"NOT",
-	"WHERE",
-	"ORDER",
-	"BY",
+	"OP",
+	"ABORT_P",
+	"ABSOLUTE_P",
+	"ACCESS",
+	"ACTION",
+	"ADD_P",
+	"ADMIN",
+	"AFTER",
+	"AGGREGATE",
+	"ALL",
+	"ALSO",
+	"ALTER",
+	"ALWAYS",
+	"ANALYSE",
+	"ANALYZE",
+	"AND",
+	"ANY",
+	"ARRAY",
+	"AS",
 	"ASC",
+	"ASSERTION",
+	"ASSIGNMENT",
+	"ASYMMETRIC",
+	"AT",
+	"ATTRIBUTE",
+	"AUTHORIZATION",
+	"BACKWARD",
+	"BEFORE",
+	"BEGIN_P",
+	"BETWEEN",
+	"BIGINT",
+	"BINARY",
+	"BIT",
+	"BOOLEAN_P",
+	"BOTH",
+	"BY",
+	"CACHE",
+	"CALLED",
+	"CASCADE",
+	"CASCADED",
+	"CASE",
+	"CAST",
+	"CATALOG_P",
+	"CHAIN",
+	"CHAR_P",
+	"CHARACTER",
+	"CHARACTERISTICS",
+	"CHECK",
+	"CHECKPOINT",
+	"CLASS",
+	"CLOSE",
+	"CLUSTER",
+	"COALESCE",
+	"COLLATE",
+	"COLLATION",
+	"COLUMN",
+	"COMMENT",
+	"COMMENTS",
+	"COMMIT",
+	"COMMITTED",
+	"CONCURRENTLY",
+	"CONFIGURATION",
+	"CONFLICT",
+	"CONNECTION",
+	"CONSTRAINT",
+	"CONSTRAINTS",
+	"CONTENT_P",
+	"CONTINUE_P",
+	"CONVERSION_P",
+	"COPY",
+	"COST",
+	"CREATE",
+	"CROSS",
+	"CSV",
+	"CUBE",
+	"CURRENT_P",
+	"CURRENT_CATALOG",
+	"CURRENT_DATE",
+	"CURRENT_ROLE",
+	"CURRENT_SCHEMA",
+	"CURRENT_TIME",
+	"CURRENT_TIMESTAMP",
+	"CURRENT_USER",
+	"CURSOR",
+	"CYCLE",
+	"DATA_P",
+	"DATABASE",
+	"DAY_P",
+	"DEALLOCATE",
+	"DEC",
+	"DECIMAL_P",
+	"DECLARE",
+	"DEFAULT",
+	"DEFAULTS",
+	"DEFERRABLE",
+	"DEFERRED",
+	"DEFINER",
+	"DELETE_P",
+	"DELIMITER",
+	"DELIMITERS",
 	"DESC",
+	"DICTIONARY",
+	"DISABLE_P",
+	"DISCARD",
+	"DISTINCT",
+	"DO",
+	"DOCUMENT_P",
+	"DOMAIN_P",
+	"DOUBLE_P",
+	"DROP",
+	"EACH",
+	"ELSE",
+	"ENABLE_P",
+	"ENCODING",
+	"ENCRYPTED",
+	"END_P",
+	"ENUM_P",
+	"ESCAPE",
+	"EVENT",
+	"EXCEPT",
+	"EXCLUDE",
+	"EXCLUDING",
+	"EXCLUSIVE",
+	"EXECUTE",
+	"EXISTS",
+	"EXPLAIN",
+	"EXTENSION",
+	"EXTERNAL",
+	"EXTRACT",
+	"FALSE_P",
+	"FAMILY",
+	"FETCH",
+	"FILTER",
+	"FIRST_P",
+	"FLOAT_P",
+	"FOLLOWING",
+	"FOR",
+	"FORCE",
+	"FOREIGN",
+	"FORWARD",
+	"FREEZE",
+	"FROM",
+	"FULL",
+	"FUNCTION",
+	"FUNCTIONS",
+	"GLOBAL",
+	"GRANT",
+	"GRANTED",
+	"GREATEST",
+	"GROUP_P",
+	"GROUPING",
+	"HANDLER",
+	"HAVING",
+	"HEADER_P",
+	"HOLD",
+	"HOUR_P",
+	"IDENTITY_P",
+	"IF_P",
+	"ILIKE",
+	"IMMEDIATE",
+	"IMMUTABLE",
+	"IMPLICIT_P",
+	"IMPORT_P",
+	"IN_P",
+	"INCLUDING",
+	"INCREMENT",
+	"INDEX",
+	"INDEXES",
+	"INHERIT",
+	"INHERITS",
+	"INITIALLY",
+	"INLINE_P",
+	"INNER_P",
+	"INOUT",
+	"INPUT_P",
+	"INSENSITIVE",
+	"INSERT",
+	"INSTEAD",
+	"INT_P",
+	"INTEGER",
+	"INTERSECT",
+	"INTERVAL",
+	"INTO",
+	"INVOKER",
+	"IS",
+	"ISNULL",
+	"ISOLATION",
+	"JOIN",
+	"KEY",
+	"LABEL",
+	"LANGUAGE",
+	"LARGE_P",
+	"LAST_P",
+	"LATERAL_P",
+	"LEADING",
+	"LEAKPROOF",
+	"LEAST",
+	"LEFT",
+	"LEVEL",
+	"LIKE",
+	"LIMIT",
+	"LISTEN",
+	"LOAD",
+	"LOCAL",
+	"LOCALTIME",
+	"LOCALTIMESTAMP",
+	"LOCATION",
+	"LOCK_P",
+	"LOCKED",
+	"LOGGED",
+	"MAPPING",
+	"MATCH",
+	"MATERIALIZED",
+	"MAXVALUE",
+	"MINUTE_P",
+	"MINVALUE",
+	"MODE",
+	"MONTH_P",
+	"MOVE",
+	"NAME_P",
+	"NAMES",
+	"NATIONAL",
+	"NATURAL",
+	"NCHAR",
+	"NEXT",
+	"NO",
+	"NONE",
+	"NOT",
+	"NOTHING",
+	"NOTIFY",
+	"NOTNULL",
+	"NOWAIT",
+	"NULL_P",
+	"NULLIF",
+	"NULLS_P",
+	"NUMERIC",
+	"OBJECT_P",
+	"OF",
+	"OFF",
+	"OFFSET",
+	"OIDS",
+	"ON",
+	"ONLY",
+	"OPERATOR",
+	"OPTION",
+	"OPTIONS",
+	"OR",
+	"ORDER",
+	"ORDINALITY",
+	"OUT_P",
+	"OUTER_P",
+	"OVER",
+	"OVERLAPS",
+	"OVERLAY",
+	"OWNED",
+	"OWNER",
+	"PARSER",
+	"PARTIAL",
+	"PARTITION",
+	"PASSING",
+	"PASSWORD",
+	"PLACING",
+	"PLANS",
+	"POLICY",
+	"POSITION",
+	"PRECEDING",
+	"PRECISION",
+	"PRESERVE",
+	"PREPARE",
+	"PREPARED",
+	"PRIMARY",
+	"PRIOR",
+	"PRIVILEGES",
+	"PROCEDURAL",
+	"PROCEDURE",
+	"PROGRAM",
+	"QUOTE",
+	"RANGE",
+	"READ",
+	"REAL",
+	"REASSIGN",
+	"RECHECK",
+	"RECURSIVE",
+	"REF",
+	"REFERENCES",
+	"REFRESH",
+	"REINDEX",
+	"RELATIVE_P",
+	"RELEASE",
+	"RENAME",
+	"REPEATABLE",
+	"REPLACE",
+	"REPLICA",
+	"RESET",
+	"RESTART",
+	"RESTRICT",
+	"RETURNING",
+	"RETURNS",
+	"REVOKE",
+	"RIGHT",
+	"ROLE",
+	"ROLLBACK",
+	"ROLLUP",
+	"ROW",
+	"ROWS",
+	"RULE",
+	"SAVEPOINT",
+	"SCHEMA",
+	"SCROLL",
+	"SEARCH",
+	"SECOND_P",
+	"SECURITY",
+	"SELECT",
+	"SEQUENCE",
+	"SEQUENCES",
+	"SERIALIZABLE",
+	"SERVER",
+	"SESSION",
+	"SESSION_USER",
+	"SET",
+	"SETS",
+	"SETOF",
+	"SHARE",
+	"SHOW",
+	"SIMILAR",
+	"SIMPLE",
+	"SKIP",
+	"SMALLINT",
+	"SNAPSHOT",
+	"SOME",
+	"SQL_P",
+	"STABLE",
+	"STANDALONE_P",
+	"START",
+	"STATEMENT",
+	"STATISTICS",
+	"STDIN",
+	"STDOUT",
+	"STORAGE",
+	"STRICT_P",
+	"STRIP_P",
+	"SUBSTRING",
+	"SYMMETRIC",
+	"SYSID",
+	"SYSTEM_P",
+	"TABLE",
+	"TABLES",
+	"TABLESAMPLE",
+	"TABLESPACE",
+	"TEMP",
+	"TEMPLATE",
+	"TEMPORARY",
+	"TEXT_P",
+	"THEN",
+	"TIME",
+	"TIMESTAMP",
+	"TO",
+	"TRAILING",
+	"TRANSACTION",
+	"TRANSFORM",
+	"TREAT",
+	"TRIGGER",
+	"TRIM",
+	"TRUE_P",
+	"TRUNCATE",
+	"TRUSTED",
+	"TYPE_P",
+	"TYPES_P",
+	"UNBOUNDED",
+	"UNCOMMITTED",
+	"UNENCRYPTED",
+	"UNION",
+	"UNIQUE",
+	"UNKNOWN",
+	"UNLISTEN",
+	"UNLOGGED",
+	"UNTIL",
+	"UPDATE",
+	"USER",
+	"USING",
+	"VACUUM",
+	"VALID",
+	"VALIDATE",
+	"VALIDATOR",
+	"VALUE_P",
+	"VALUES",
+	"VARCHAR",
+	"VARIADIC",
+	"VARYING",
+	"VERBOSE",
+	"VERSION_P",
+	"VIEW",
+	"VIEWS",
+	"VOLATILE",
+	"WHEN",
+	"WHERE",
+	"WHITESPACE_P",
+	"WINDOW",
+	"WITH",
+	"WITHIN",
+	"WITHOUT",
+	"WORK",
+	"WRAPPER",
+	"WRITE",
+	"XML_P",
+	"XMLATTRIBUTES",
+	"XMLCONCAT",
+	"XMLELEMENT",
+	"XMLEXISTS",
+	"XMLFOREST",
+	"XMLPARSE",
+	"XMLPI",
+	"XMLROOT",
+	"XMLSERIALIZE",
+	"YEAR_P",
+	"YES_P",
+	"ZONE",
 }
 var sqlStatenames = []string{}
 
@@ -63,8 +868,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:238
-
+//line sql.y:332
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
 const eof = 0
@@ -76,73 +880,108 @@ var sqlExca = []int{
 	-2, 0,
 }
 
-const sqlNprod = 37
+const sqlNprod = 40
 const sqlPrivate = 57344
 
 var sqlTokenNames []string
 var sqlStates []string
 
-const sqlLast = 76
+const sqlLast = 428
 
 var sqlAct = []int{
 
-	11, 45, 10, 4, 62, 44, 28, 63, 58, 23,
-	21, 12, 13, 14, 33, 15, 29, 30, 12, 13,
-	14, 17, 15, 16, 24, 27, 34, 39, 41, 27,
-	16, 36, 37, 38, 46, 46, 47, 27, 48, 43,
-	32, 51, 52, 53, 8, 20, 35, 20, 7, 2,
-	25, 64, 54, 55, 4, 61, 42, 26, 59, 8,
-	27, 56, 57, 50, 40, 49, 31, 6, 19, 22,
-	60, 5, 9, 18, 3, 1,
+	12, 13, 14, 12, 13, 14, 67, 28, 49, 68,
+	39, 63, 31, 36, 25, 21, 7, 62, 4, 28,
+	28, 21, 29, 27, 29, 30, 28, 55, 54, 37,
+	11, 50, 10, 18, 29, 29, 2, 6, 57, 24,
+	22, 29, 69, 19, 26, 66, 47, 32, 33, 43,
+	20, 23, 65, 35, 34, 5, 9, 3, 42, 44,
+	45, 46, 1, 0, 0, 0, 0, 51, 51, 52,
+	0, 53, 0, 0, 56, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 59, 60, 0,
+	0, 0, 0, 64, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 58,
+	0, 0, 0, 0, 0, 41, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 61, 0, 0, 0, 0,
+	40, 0, 0, 8, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	16, 0, 0, 16, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 30, 0, 30, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 30, 30, 0, 0, 0,
+	8, 0, 30, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 4, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 38, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 15, 0, 0, 15,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 17, 0, 0, 17, 0, 48,
 }
 var sqlPact = []int{
 
-	50, -1000, -1000, 42, 6, 27, -1000, 6, 6, 2,
-	-1000, 45, -17, -1000, -1000, 6, -1, -1000, 29, -8,
-	7, 24, -1000, 10, 6, 52, -1000, 6, 44, -1000,
-	14, -20, -1000, 6, 6, 6, 56, 54, 6, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, 22, -1000, -1000, 6,
-	6, 51, -1000, -1000, -1000, -1000, -16, 6, 43, 10,
-	-18, -1000, 39, -1000, -1000,
+	-301, -1000, -1000, -132, -1, -239, -1000, -1, -1, -410,
+	-1000, 19, -413, -1000, -1000, -1000, -1, -4, -1000, -233,
+	-411, -13, -69, -1000, 13, -1, 45, -1000, -1, -1,
+	-1, 42, -1000, 0, -419, -1000, -1, -1, -1, -166,
+	-167, -1, -1000, -1000, 2, -228, -1000, -1000, -1000, -1000,
+	-1000, 12, -1000, -1000, -1, -1, -231, -1000, -1000, -1000,
+	-1000, -415, -1, 41, 13, -418, -1000, 38, -1000, -1000,
 }
 var sqlPgo = []int{
 
-	0, 75, 49, 74, 72, 2, 0, 71, 70, 69,
-	67, 1, 21, 68,
+	0, 62, 36, 57, 56, 32, 30, 55, 52, 51,
+	37, 31, 33, 50,
 }
 var sqlR1 = []int{
 
 	0, 1, 2, 2, 2, 2, 3, 4, 4, 5,
 	5, 5, 6, 6, 6, 6, 6, 6, 6, 6,
-	8, 8, 9, 9, 9, 9, 9, 7, 7, 10,
-	11, 11, 11, 12, 12, 13, 13,
+	6, 6, 6, 8, 8, 9, 9, 9, 9, 9,
+	7, 7, 10, 11, 11, 11, 12, 12, 13, 13,
 }
 var sqlR2 = []int{
 
 	0, 1, 1, 3, 4, 2, 2, 1, 3, 1,
-	3, 2, 1, 3, 1, 1, 3, 2, 3, 3,
-	1, 3, 3, 4, 4, 7, 5, 2, 2, 2,
-	1, 2, 2, 0, 1, 3, 3,
+	3, 2, 1, 3, 1, 1, 1, 3, 3, 3,
+	2, 3, 3, 1, 3, 3, 4, 4, 7, 5,
+	2, 2, 2, 1, 2, 2, 0, 1, 3, 3,
 }
 var sqlChk = []int{
 
-	-1000, -1, -2, -3, 4, -7, -10, 6, 17, -4,
-	-5, -6, 12, 13, 14, 16, 24, -12, -10, -13,
-	18, -5, -9, -6, 22, 5, 12, 15, 23, -6,
-	-6, -2, -12, 22, 19, 22, 7, 8, 9, -5,
-	12, -6, 12, 25, 25, -11, -6, -11, -5, 9,
-	9, -5, 20, 21, -5, -5, 10, 11, 24, -6,
-	-8, 12, 22, 25, 12,
+	-1000, -1, -2, -3, 319, -7, -10, 148, 402, -4,
+	-5, -6, 4, 5, 6, 370, 234, 426, -12, -10,
+	-13, 254, -5, -9, -6, 424, 25, 4, 7, 22,
+	253, 425, -6, -6, -2, -12, 424, 42, 424, 79,
+	229, 194, -5, 4, -6, -6, -6, 4, 427, 427,
+	-11, -6, -11, -5, 194, 194, -5, 26, 107, -5,
+	-5, 386, 248, 426, -6, -8, 4, 424, 427, 4,
 }
 var sqlDef = []int{
 
-	0, -2, 1, 2, 0, 33, 5, 0, 0, 6,
-	7, 9, 12, 14, 15, 0, 0, 3, 33, 34,
-	0, 27, 28, 29, 0, 0, 11, 0, 0, 17,
-	0, 0, 4, 0, 0, 0, 0, 0, 0, 8,
-	10, 16, 13, 18, 19, 36, 30, 35, 22, 0,
-	0, 0, 31, 32, 23, 24, 0, 0, 0, 26,
-	0, 20, 0, 25, 21,
+	0, -2, 1, 2, 0, 36, 5, 0, 0, 6,
+	7, 9, 12, 14, 15, 16, 0, 0, 3, 36,
+	37, 0, 30, 31, 32, 0, 0, 11, 0, 0,
+	0, 0, 20, 0, 0, 4, 0, 0, 0, 0,
+	0, 0, 8, 10, 17, 18, 19, 13, 21, 22,
+	39, 33, 38, 25, 0, 0, 0, 34, 35, 26,
+	27, 0, 0, 0, 29, 0, 23, 0, 28, 24,
 }
 var sqlTok1 = []int{
 
@@ -150,15 +989,72 @@ var sqlTok1 = []int{
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	24, 25, 3, 3, 22, 3, 23,
+	426, 427, 3, 3, 424, 3, 425,
 }
 var sqlTok2 = []int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+	22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+	32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
+	42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
+	52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
+	62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
+	72, 73, 74, 75, 76, 77, 78, 79, 80, 81,
+	82, 83, 84, 85, 86, 87, 88, 89, 90, 91,
+	92, 93, 94, 95, 96, 97, 98, 99, 100, 101,
+	102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
+	112, 113, 114, 115, 116, 117, 118, 119, 120, 121,
+	122, 123, 124, 125, 126, 127, 128, 129, 130, 131,
+	132, 133, 134, 135, 136, 137, 138, 139, 140, 141,
+	142, 143, 144, 145, 146, 147, 148, 149, 150, 151,
+	152, 153, 154, 155, 156, 157, 158, 159, 160, 161,
+	162, 163, 164, 165, 166, 167, 168, 169, 170, 171,
+	172, 173, 174, 175, 176, 177, 178, 179, 180, 181,
+	182, 183, 184, 185, 186, 187, 188, 189, 190, 191,
+	192, 193, 194, 195, 196, 197, 198, 199, 200, 201,
+	202, 203, 204, 205, 206, 207, 208, 209, 210, 211,
+	212, 213, 214, 215, 216, 217, 218, 219, 220, 221,
+	222, 223, 224, 225, 226, 227, 228, 229, 230, 231,
+	232, 233, 234, 235, 236, 237, 238, 239, 240, 241,
+	242, 243, 244, 245, 246, 247, 248, 249, 250, 251,
+	252, 253, 254, 255, 256, 257,
 }
 var sqlTok3 = []int{
-	0,
+	57600, 258, 57601, 259, 57602, 260, 57603, 261, 57604, 262,
+	57605, 263, 57606, 264, 57607, 265, 57608, 266, 57609, 267,
+	57610, 268, 57611, 269, 57612, 270, 57613, 271, 57614, 272,
+	57615, 273, 57616, 274, 57617, 275, 57618, 276, 57619, 277,
+	57620, 278, 57621, 279, 57622, 280, 57623, 281, 57624, 282,
+	57625, 283, 57626, 284, 57627, 285, 57628, 286, 57629, 287,
+	57630, 288, 57631, 289, 57632, 290, 57633, 291, 57634, 292,
+	57635, 293, 57636, 294, 57637, 295, 57638, 296, 57639, 297,
+	57640, 298, 57641, 299, 57642, 300, 57643, 301, 57644, 302,
+	57645, 303, 57646, 304, 57647, 305, 57648, 306, 57649, 307,
+	57650, 308, 57651, 309, 57652, 310, 57653, 311, 57654, 312,
+	57655, 313, 57656, 314, 57657, 315, 57658, 316, 57659, 317,
+	57660, 318, 57661, 319, 57662, 320, 57663, 321, 57664, 322,
+	57665, 323, 57666, 324, 57667, 325, 57668, 326, 57669, 327,
+	57670, 328, 57671, 329, 57672, 330, 57673, 331, 57674, 332,
+	57675, 333, 57676, 334, 57677, 335, 57678, 336, 57679, 337,
+	57680, 338, 57681, 339, 57682, 340, 57683, 341, 57684, 342,
+	57685, 343, 57686, 344, 57687, 345, 57688, 346, 57689, 347,
+	57690, 348, 57691, 349, 57692, 350, 57693, 351, 57694, 352,
+	57695, 353, 57696, 354, 57697, 355, 57698, 356, 57699, 357,
+	57700, 358, 57701, 359, 57702, 360, 57703, 361, 57704, 362,
+	57705, 363, 57706, 364, 57707, 365, 57708, 366, 57709, 367,
+	57710, 368, 57711, 369, 57712, 370, 57713, 371, 57714, 372,
+	57715, 373, 57716, 374, 57717, 375, 57718, 376, 57719, 377,
+	57720, 378, 57721, 379, 57722, 380, 57723, 381, 57724, 382,
+	57725, 383, 57726, 384, 57727, 385, 57728, 386, 57729, 387,
+	57730, 388, 57731, 389, 57732, 390, 57733, 391, 57734, 392,
+	57735, 393, 57736, 394, 57737, 395, 57738, 396, 57739, 397,
+	57740, 398, 57741, 399, 57742, 400, 57743, 401, 57744, 402,
+	57745, 403, 57746, 404, 57747, 405, 57748, 406, 57749, 407,
+	57750, 408, 57751, 409, 57752, 410, 57753, 411, 57754, 412,
+	57755, 413, 57756, 414, 57757, 415, 57758, 416, 57759, 417,
+	57760, 418, 57761, 419, 57762, 420, 57763, 421, 57764, 422,
+	57765, 423, 0,
 }
 
 //line yaccpar:1
@@ -387,19 +1283,19 @@ sqldefault:
 	switch sqlnt {
 
 	case 1:
-		//line sql.y:59
+		//line sql.y:141
 		{
 			sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 		}
 	case 2:
-		//line sql.y:65
+		//line sql.y:147
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-0].fields
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 3:
-		//line sql.y:71
+		//line sql.y:153
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-2].fields
@@ -408,7 +1304,7 @@ sqldefault:
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 4:
-		//line sql.y:79
+		//line sql.y:161
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-3].fields
@@ -418,7 +1314,7 @@ sqldefault:
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 5:
-		//line sql.y:88
+		//line sql.y:170
 		{
 			sqlVAL.sqlSelect = &SelectStmt{}
 			sqlVAL.sqlSelect.Fields = sqlS[sqlpt-1].fields
@@ -426,154 +1322,169 @@ sqldefault:
 			sqllex.(*sqlLex).stmt = sqlVAL.sqlSelect
 		}
 	case 6:
-		//line sql.y:97
+		//line sql.y:179
 		{
 			sqlVAL.fields = sqlS[sqlpt-0].fields
 		}
 	case 7:
-		//line sql.y:103
+		//line sql.y:185
 		{
 			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
 	case 8:
-		//line sql.y:107
+		//line sql.y:189
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
 	case 9:
-		//line sql.y:113
+		//line sql.y:195
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 10:
-		//line sql.y:117
+		//line sql.y:199
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
 		}
 	case 11:
-		//line sql.y:121
+		//line sql.y:203
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
 		}
 	case 12:
-		//line sql.y:127
+		//line sql.y:209
 		{
 			sqlVAL.expr = ColumnRef{Column: sqlS[sqlpt-0].src}
 		}
 	case 13:
-		//line sql.y:131
+		//line sql.y:213
 		{
 			sqlVAL.expr = ColumnRef{Table: sqlS[sqlpt-2].src, Column: sqlS[sqlpt-0].src}
 		}
 	case 14:
-		//line sql.y:135
+		//line sql.y:217
 		{
 			sqlVAL.expr = StringLiteral(sqlS[sqlpt-0].src)
 		}
 	case 15:
-		//line sql.y:139
+		//line sql.y:221
 		{
 			sqlVAL.expr = IntegerLiteral(sqlS[sqlpt-0].src)
 		}
 	case 16:
-		//line sql.y:143
+		//line sql.y:225
+		{
+			sqlVAL.expr = ColumnRef{Column: "true"}
+		}
+	case 17:
+		//line sql.y:229
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: sqlS[sqlpt-1].src, Right: sqlS[sqlpt-0].expr}
 		}
-	case 17:
-		//line sql.y:147
+	case 18:
+		//line sql.y:233
+		{
+			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "and", Right: sqlS[sqlpt-0].expr}
+		}
+	case 19:
+		//line sql.y:237
+		{
+			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "or", Right: sqlS[sqlpt-0].expr}
+		}
+	case 20:
+		//line sql.y:241
 		{
 			sqlVAL.expr = NotExpr{Expr: sqlS[sqlpt-0].expr}
 		}
-	case 18:
-		//line sql.y:151
+	case 21:
+		//line sql.y:245
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].expr}
 		}
-	case 19:
-		//line sql.y:155
+	case 22:
+		//line sql.y:249
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].sqlSelect}
 		}
-	case 20:
-		//line sql.y:161
+	case 23:
+		//line sql.y:255
 		{
 			sqlVAL.identifiers = []string{sqlS[sqlpt-0].src}
 		}
-	case 21:
-		//line sql.y:165
+	case 24:
+		//line sql.y:259
 		{
 			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].src)
 		}
-	case 22:
-		//line sql.y:171
+	case 25:
+		//line sql.y:265
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-2].expr, Join: ",", Right: sqlS[sqlpt-0].expr}
 		}
-	case 23:
-		//line sql.y:175
+	case 26:
+		//line sql.y:269
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-3].expr, Join: "cross join", Right: sqlS[sqlpt-0].expr}
 		}
-	case 24:
-		//line sql.y:179
+	case 27:
+		//line sql.y:273
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-3].expr, Join: "natural join", Right: sqlS[sqlpt-0].expr}
 		}
-	case 25:
-		//line sql.y:183
+	case 28:
+		//line sql.y:277
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-6].expr, Join: "join", Right: sqlS[sqlpt-4].expr, Using: sqlS[sqlpt-1].identifiers}
 		}
-	case 26:
-		//line sql.y:187
+	case 29:
+		//line sql.y:281
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-4].expr, Join: "join", Right: sqlS[sqlpt-2].expr, On: sqlS[sqlpt-0].expr}
 		}
-	case 27:
-		//line sql.y:193
+	case 30:
+		//line sql.y:287
 		{
 			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
 		}
-	case 28:
-		//line sql.y:197
+	case 31:
+		//line sql.y:291
 		{
 			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
 		}
-	case 29:
-		//line sql.y:203
+	case 32:
+		//line sql.y:297
 		{
 			sqlVAL.whereClause = &WhereClause{Expr: sqlS[sqlpt-0].expr}
 		}
-	case 30:
-		//line sql.y:209
+	case 33:
+		//line sql.y:303
 		{
 			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-0].expr}
 		}
-	case 31:
-		//line sql.y:213
+	case 34:
+		//line sql.y:307
 		{
-			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-1].expr, Order: sqlS[sqlpt-0].src}
+			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-1].expr, Order: "asc"}
 		}
-	case 32:
-		//line sql.y:217
+	case 35:
+		//line sql.y:311
 		{
-			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-1].expr, Order: sqlS[sqlpt-0].src}
+			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-1].expr, Order: "desc"}
 		}
-	case 33:
-		//line sql.y:223
+	case 36:
+		//line sql.y:317
 		{
 			sqlVAL.orderClause = nil
 		}
-	case 34:
+	case 37:
 		sqlVAL.orderClause = sqlS[sqlpt-0].orderClause
-	case 35:
-		//line sql.y:230
+	case 38:
+		//line sql.y:324
 		{
 			sqlVAL.orderClause = &OrderClause{Exprs: []OrderExpr{sqlS[sqlpt-0].orderExpr}}
 		}
-	case 36:
-		//line sql.y:234
+	case 39:
+		//line sql.y:328
 		{
 			sqlS[sqlpt-2].orderClause.Exprs = append(sqlS[sqlpt-2].orderClause.Exprs, sqlS[sqlpt-0].orderExpr)
 			sqlVAL.orderClause = sqlS[sqlpt-2].orderClause

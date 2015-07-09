@@ -113,38 +113,9 @@ func lexAlphanumeric(l *sqlLex) stateFn {
 
 	t := token{src: l.src[l.start:l.pos]}
 
-	switch {
-	case strings.EqualFold(t.src, "select"):
-		t.typ = SELECT
-	case strings.EqualFold(t.src, "as"):
-		t.typ = AS
-	case strings.EqualFold(t.src, "from"):
-		t.typ = FROM
-	case strings.EqualFold(t.src, "cross"):
-		t.typ = CROSS
-	case strings.EqualFold(t.src, "natural"):
-		t.typ = NATURAL
-	case strings.EqualFold(t.src, "join"):
-		t.typ = JOIN
-	case strings.EqualFold(t.src, "using"):
-		t.typ = USING
-	case strings.EqualFold(t.src, "on"):
-		t.typ = ON
-	case strings.EqualFold(t.src, "not"):
-		t.typ = NOT
-	case strings.EqualFold(t.src, "where"):
-		t.typ = WHERE
-	case strings.EqualFold(t.src, "order"):
-		t.typ = ORDER
-	case strings.EqualFold(t.src, "by"):
-		t.typ = BY
-	case strings.EqualFold(t.src, "asc"):
-		t.typ = ASC
-	case strings.EqualFold(t.src, "desc"):
-		t.typ = DESC
-	case strings.EqualFold(t.src, "and") || strings.EqualFold(t.src, "or"):
-		t.typ = OPERATOR
-	default:
+	if typ, ok := keywords[strings.ToLower(t.src)]; ok {
+		t.typ = typ
+	} else {
 		t.typ = IDENT
 	}
 
@@ -199,7 +170,7 @@ func lexQuotedIdentifier(l *sqlLex) stateFn {
 
 func lexOperator(l *sqlLex) stateFn {
 	l.acceptRunFunc(isOperator)
-	l.tokens <- token{OPERATOR, l.src[l.start:l.pos]}
+	l.tokens <- token{OP, l.src[l.start:l.pos]}
 	l.start = l.pos
 	return blankState
 }

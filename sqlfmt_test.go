@@ -194,7 +194,7 @@ func TestSqlFmt(t *testing.T) {
 
 		output, err := sqlfmt(string(input))
 		if err != nil {
-			t.Errorf("%d. sqfmt failed: %v", i, err)
+			t.Errorf("%d. sqfmt failed with %s: %v", i, tt.inputFile, err)
 			continue
 		}
 
