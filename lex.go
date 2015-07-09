@@ -81,20 +81,14 @@ func blankState(l *sqlLex) stateFn {
 	switch r := l.next(); {
 	case r == 0:
 		return nil
-	case r == ',':
-		return lexComma
-	case r == '.':
-		return lexPeriod
+	case r == ',' || r == '.' || r == '(' || r == ')':
+		return lexSimple
 	case r == '\'':
 		return lexStringLiteral
 	case r == '"':
 		return lexQuotedIdentifier
 	case isOperator(r):
 		return lexOperator
-	case r == '(':
-		return lexLParen
-	case r == ')':
-		return lexRParen
 	case unicode.IsDigit(r):
 		return lexNumber
 	case isWhitespace(r):
@@ -210,26 +204,8 @@ func lexOperator(l *sqlLex) stateFn {
 	return blankState
 }
 
-func lexComma(l *sqlLex) stateFn {
-	l.tokens <- token{',', l.src[l.start:l.pos]}
-	l.start = l.pos
-	return blankState
-}
-
-func lexPeriod(l *sqlLex) stateFn {
-	l.tokens <- token{'.', l.src[l.start:l.pos]}
-	l.start = l.pos
-	return blankState
-}
-
-func lexLParen(l *sqlLex) stateFn {
-	l.tokens <- token{'(', l.src[l.start:l.pos]}
-	l.start = l.pos
-	return blankState
-}
-
-func lexRParen(l *sqlLex) stateFn {
-	l.tokens <- token{')', l.src[l.start:l.pos]}
+func lexSimple(l *sqlLex) stateFn {
+	l.tokens <- token{int(l.src[l.start]), l.src[l.start:l.pos]}
 	l.start = l.pos
 	return blankState
 }
