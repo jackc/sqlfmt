@@ -27,6 +27,7 @@ package main
 %type <expr> joinExpr
 %type <whereClause> whereClause
 %type <orderExpr> orderExpr
+%type <orderClause> optOrderClause
 %type <orderClause> orderClause
 
 %token  <src> COMMA
@@ -70,29 +71,15 @@ selectStatement:
     $$.Fields = $1
     sqllex.(*sqlLex).stmt = $$
   }
-| selectClause fromClause
+| selectClause fromClause optOrderClause
   {
     $$ = &SelectStmt{}
     $$.Fields = $1
     $$.FromClause = $2
+    $$.OrderClause = $3
     sqllex.(*sqlLex).stmt = $$
   }
-| selectClause fromClause whereClause
-  {
-    $$ = &SelectStmt{}
-    $$.Fields = $1
-    $$.FromClause = $2
-    $$.WhereClause = $3
-    sqllex.(*sqlLex).stmt = $$
-  }
-| selectClause whereClause
-  {
-    $$ = &SelectStmt{}
-    $$.Fields = $1
-    $$.WhereClause = $2
-    sqllex.(*sqlLex).stmt = $$
-  }
-| selectClause fromClause whereClause orderClause
+| selectClause fromClause whereClause optOrderClause
   {
     $$ = &SelectStmt{}
     $$.Fields = $1
@@ -101,12 +88,11 @@ selectStatement:
     $$.OrderClause = $4
     sqllex.(*sqlLex).stmt = $$
   }
-| selectClause fromClause orderClause
+| selectClause whereClause
   {
     $$ = &SelectStmt{}
     $$.Fields = $1
-    $$.FromClause = $2
-    $$.OrderClause = $3
+    $$.WhereClause = $2
     sqllex.(*sqlLex).stmt = $$
   }
 
@@ -235,6 +221,13 @@ orderExpr:
   {
     $$ = OrderExpr{Expr: $1, Order: $2}
   }
+
+optOrderClause:
+  /*EMPTY*/
+  {
+    $$ = nil
+  }
+| orderClause
 
 orderClause:
   ORDER BY orderExpr
