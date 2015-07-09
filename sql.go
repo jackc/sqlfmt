@@ -26,7 +26,7 @@ const NATURAL = 57350
 const JOIN = 57351
 const USING = 57352
 const ON = 57353
-const IDENTIFIER = 57354
+const IDENT = 57354
 const STRING_LITERAL = 57355
 const NUMBER_LITERAL = 57356
 const OPERATOR = 57357
@@ -46,7 +46,7 @@ var sqlToknames = []string{
 	"JOIN",
 	"USING",
 	"ON",
-	"IDENTIFIER",
+	"IDENT",
 	"STRING_LITERAL",
 	"NUMBER_LITERAL",
 	"OPERATOR",

@@ -145,7 +145,7 @@ func lexAlphanumeric(l *sqlLex) stateFn {
 	case strings.EqualFold(t.src, "and") || strings.EqualFold(t.src, "or"):
 		t.typ = OPERATOR
 	default:
-		t.typ = IDENTIFIER
+		t.typ = IDENT
 	}
 
 	l.tokens <- t
@@ -188,7 +188,7 @@ func lexQuotedIdentifier(l *sqlLex) stateFn {
 			if r != '"' {
 				l.unnext()
 				t := token{src: l.src[l.start:l.pos]}
-				t.typ = IDENTIFIER
+				t.typ = IDENT
 				l.tokens <- t
 				l.start = l.pos
 				return blankState

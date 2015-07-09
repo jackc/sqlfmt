@@ -38,7 +38,7 @@ package main
 %token  <src> JOIN
 %token  <src> USING
 %token  <src> ON
-%token  <src> IDENTIFIER
+%token  <src> IDENT
 %token  <src> STRING_LITERAL
 %token  <src> NUMBER_LITERAL
 %token  <src> OPERATOR
@@ -113,21 +113,21 @@ aliasableExpr:
   {
     $$ = $1
   }
-| expr AS IDENTIFIER
+| expr AS IDENT
   {
     $$ = AliasedExpr{Expr: $1, Alias: $3}
   }
-| expr IDENTIFIER
+| expr IDENT
   {
     $$ = AliasedExpr{Expr: $1, Alias: $2}
   }
 
 expr:
-  IDENTIFIER
+  IDENT
   {
     $$ = ColumnRef{Column: $1}
   }
-| IDENTIFIER '.' IDENTIFIER
+| IDENT '.' IDENT
   {
     $$ = ColumnRef{Table: $1, Column: $3}
   }
@@ -157,11 +157,11 @@ expr:
   }
 
 identifierSeq:
-  IDENTIFIER
+  IDENT
   {
     $$ = []string{$1}
   }
-| identifierSeq ',' IDENTIFIER
+| identifierSeq ',' IDENT
   {
     $$ = append($1, $3)
   }
