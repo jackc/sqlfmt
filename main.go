@@ -208,12 +208,32 @@ func (e OrderClause) RenderTo(r Renderer) {
 	r.Unindent()
 }
 
+type GroupByClause struct {
+	Exprs []Expr
+}
+
+func (e GroupByClause) RenderTo(r Renderer) {
+	r.Text("group by", "keyword")
+	r.NewLine()
+	r.Indent()
+
+	for i, f := range e.Exprs {
+		f.RenderTo(r)
+		if i < len(e.Exprs)-1 {
+			r.Text(",", "comma")
+		}
+		r.NewLine()
+	}
+	r.Unindent()
+}
+
 type SelectStmt struct {
-	DistinctList []Expr
-	TargetList   []Expr
-	FromClause   *FromClause
-	WhereClause  *WhereClause
-	OrderClause  *OrderClause
+	DistinctList  []Expr
+	TargetList    []Expr
+	FromClause    *FromClause
+	WhereClause   *WhereClause
+	OrderClause   *OrderClause
+	GroupByClause *GroupByClause
 }
 
 func (s SelectStmt) RenderTo(r Renderer) {
@@ -261,5 +281,9 @@ func (s SelectStmt) RenderTo(r Renderer) {
 
 	if s.OrderClause != nil {
 		s.OrderClause.RenderTo(r)
+	}
+
+	if s.GroupByClause != nil {
+		s.GroupByClause.RenderTo(r)
 	}
 }

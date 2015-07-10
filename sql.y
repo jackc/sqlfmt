@@ -14,6 +14,7 @@ package main
   whereClause *WhereClause
   orderExpr OrderExpr
   orderClause *OrderClause
+  groupByClause *GroupByClause
   boolean bool
   placeholder interface{}
 }
@@ -35,12 +36,15 @@ package main
 %type <orderClause> opt_sort_clause sort_clause sortby_list
 %type <src> opt_asc_desc opt_nulls_order
 %type <placeholder> select_limit_value select_offset_value into_clause
-  group_clause
   having_clause
   window_clause
   values_clause
   relation_expr
   qual_all_Op
+
+%type <groupByClause> group_clause
+%type <fields>  group_by_list
+%type <expr> group_by_item
 
 %type <boolean> all_or_distinct
 
@@ -462,6 +466,7 @@ simple_select:
           ss.TargetList = $3
           ss.FromClause = $5
           ss.WhereClause = $6
+          ss.GroupByClause = $7
           $$ = ss
         }
       | SELECT distinct_clause target_list
@@ -473,6 +478,7 @@ simple_select:
           ss.TargetList = $3
           ss.FromClause = $5
           ss.WhereClause = $6
+          ss.GroupByClause = $7
           $$ = ss
         }
 /*      | values_clause
@@ -578,8 +584,26 @@ a_expr USING qual_all_Op opt_nulls_order
  * GroupingSet node of some type.
  */
 group_clause:
-  /* TODO GROUP_P BY group_by_list        { $$ = $3; }
-      |*/ /*EMPTY*/               { $$ = nil }
+  GROUP_P BY group_by_list  { $$ = &GroupByClause{Exprs: $3} }
+| /*EMPTY*/               { $$ = nil }
+
+group_by_list:
+  group_by_item
+  {
+    $$ = []Expr{$1}
+  }
+| group_by_list ',' group_by_item
+  {
+    $$ = append($1, $3)
+  }
+
+group_by_item:
+  a_expr
+/* TODO      | empty_grouping_set          { $$ = $1; }
+      | cube_clause             { $$ = $1; }
+      | rollup_clause             { $$ = $1; }
+      | grouping_sets_clause          { $$ = $1; }
+*/
 
 having_clause:
   HAVING a_expr  { panic("TODO") }

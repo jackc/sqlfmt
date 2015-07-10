@@ -193,6 +193,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "distinct_on.sql",
 			expectedOutputFile: "distinct_on.fmt.sql",
 		},
+		{
+			inputFile:          "group_by.sql",
+			expectedOutputFile: "group_by.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {
