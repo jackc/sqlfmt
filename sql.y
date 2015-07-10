@@ -22,7 +22,7 @@ package main
 %type <fields> opt_target_list target_list
 %type <expr> aliasableExpr
 %type <expr> expr target_el a_expr
-%type <fromClause> fromClause
+%type <fromClause> from_clause
 %type <identifiers> identifierSeq
 %type <expr> joinExpr
 %type <whereClause> where_clause
@@ -151,20 +151,13 @@ top:
   }
 
 selectStatement:
-  selectClause fromClause where_clause optOrderClause
+  selectClause from_clause where_clause optOrderClause
   {
     $$ = &SelectStmt{}
     $$.TargetList = $1
     $$.FromClause = $2
     $$.WhereClause = $3
     $$.OrderClause = $4
-    sqllex.(*sqlLex).stmt = $$
-  }
-| selectClause where_clause
-  {
-    $$ = &SelectStmt{}
-    $$.TargetList = $1
-    $$.WhereClause = $2
     sqllex.(*sqlLex).stmt = $$
   }
 
@@ -268,7 +261,7 @@ joinExpr:
     $$ = JoinExpr{Left: $1, Join: "join", Right: $3, On: $5}
   }
 
-fromClause:
+from_clause:
   FROM aliasableExpr
   {
     $$ = &FromClause{Expr: $2}
@@ -277,6 +270,7 @@ fromClause:
   {
     $$ = &FromClause{Expr: $2}
   }
+| /*EMPTY*/  { $$ = nil }
 
 orderExpr:
   expr
@@ -309,6 +303,20 @@ orderClause:
     $1.Exprs = append($1.Exprs, $3)
     $$ = $1
   }
+
+
+
+
+
+
+/*****************************************************************************
+ *
+ *  clauses common to all Optimizable Stmts:
+ *    from_clause   - allow list of both JOIN expressions and table names
+ *    where_clause  - qualifications for joins or restrictions
+ *
+ *****************************************************************************/
+
 
 
 
