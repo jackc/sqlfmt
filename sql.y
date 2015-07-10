@@ -19,7 +19,7 @@ package main
 }
 
 %type <sqlSelect> top
-%type <sqlSelect> selectStatement
+%type <sqlSelect> SelectStmt
 %type <sqlSelect> select_no_parens
 %type <sqlSelect> select_with_parens
 %type <fields> selectClause
@@ -232,7 +232,7 @@ package main
 %%
 
 top:
-  selectStatement
+  SelectStmt
   {
     $$ = $1
     sqllex.(*sqlLex).stmt = $1
@@ -248,54 +248,6 @@ opt_nulls_order:
 | NULLS_LA LAST_P     { $$ = "last" }
 | /*EMPTY*/           { $$ = "" }
 
-/*****************************************************************************
- *
- *    QUERY:
- *        SELECT STATEMENTS
- *
- *****************************************************************************/
-
-/* A complete SELECT statement looks like this.
- *
- * The rule returns either a single SelectStmt node or a tree of them,
- * representing a set-operation tree.
- *
- * There is an ambiguity when a sub-SELECT is within an a_expr and there
- * are excess parentheses: do the parentheses belong to the sub-SELECT or
- * to the surrounding a_expr?  We don't really care, but bison wants to know.
- * To resolve the ambiguity, we are careful to define the grammar so that
- * the decision is staved off as long as possible: as long as we can keep
- * absorbing parentheses into the sub-SELECT, we will do so, and only when
- * it's no longer possible to do that will we decide that parens belong to
- * the expression.  For example, in "SELECT (((SELECT 2)) + 3)" the extra
- * parentheses are treated as part of the sub-select.  The necessity of doing
- * it that way is shown by "SELECT (((SELECT 2)) UNION SELECT 2)".  Had we
- * parsed "((SELECT 2))" as an a_expr, it'd be too late to go back to the
- * SELECT viewpoint when we see the UNION.
- *
- * This approach is implemented by defining a nonterminal select_with_parens,
- * which represents a SELECT with at least one outer layer of parentheses,
- * and being careful to use select_with_parens, never '(' SelectStmt ')',
- * in the expression grammar.  We will then have shift-reduce conflicts
- * which we can resolve in favor of always treating '(' <select> ')' as
- * a select_with_parens.  To resolve the conflicts, the productions that
- * conflict with the select_with_parens productions are manually given
- * precedences lower than the precedence of ')', thereby ensuring that we
- * shift ')' (and then reduce to select_with_parens) rather than trying to
- * reduce the inner <select> nonterminal to something else.  We use UMINUS
- * precedence for this, which is a fairly arbitrary choice.
- *
- * To be able to define select_with_parens itself without ambiguity, we need
- * a nonterminal select_no_parens that represents a SELECT structure with no
- * outermost parentheses.  This is a little bit tedious, but it works.
- *
- * In non-expression contexts, we use SelectStmt which can represent a SELECT
- * with or without outer parentheses.
- */
-
-selectStatement:
-  select_no_parens   %prec UMINUS
-| select_with_parens %prec UMINUS
 
 selectClause:
   SELECT opt_target_list
@@ -358,7 +310,7 @@ expr:
   {
     $$ = ParenExpr{Expr: $2}
   }
-| '(' selectStatement ')'
+| '(' SelectStmt ')'
   {
     $$ = ParenExpr{Expr: $2}
   }
@@ -419,6 +371,55 @@ expr_list:
   {
     $$ = append($1, $3)
   }
+
+/*****************************************************************************
+ *
+ *    QUERY:
+ *        SELECT STATEMENTS
+ *
+ *****************************************************************************/
+
+/* A complete SELECT statement looks like this.
+ *
+ * The rule returns either a single SelectStmt node or a tree of them,
+ * representing a set-operation tree.
+ *
+ * There is an ambiguity when a sub-SELECT is within an a_expr and there
+ * are excess parentheses: do the parentheses belong to the sub-SELECT or
+ * to the surrounding a_expr?  We don't really care, but bison wants to know.
+ * To resolve the ambiguity, we are careful to define the grammar so that
+ * the decision is staved off as long as possible: as long as we can keep
+ * absorbing parentheses into the sub-SELECT, we will do so, and only when
+ * it's no longer possible to do that will we decide that parens belong to
+ * the expression.  For example, in "SELECT (((SELECT 2)) + 3)" the extra
+ * parentheses are treated as part of the sub-select.  The necessity of doing
+ * it that way is shown by "SELECT (((SELECT 2)) UNION SELECT 2)".  Had we
+ * parsed "((SELECT 2))" as an a_expr, it'd be too late to go back to the
+ * SELECT viewpoint when we see the UNION.
+ *
+ * This approach is implemented by defining a nonterminal select_with_parens,
+ * which represents a SELECT with at least one outer layer of parentheses,
+ * and being careful to use select_with_parens, never '(' SelectStmt ')',
+ * in the expression grammar.  We will then have shift-reduce conflicts
+ * which we can resolve in favor of always treating '(' <select> ')' as
+ * a select_with_parens.  To resolve the conflicts, the productions that
+ * conflict with the select_with_parens productions are manually given
+ * precedences lower than the precedence of ')', thereby ensuring that we
+ * shift ')' (and then reduce to select_with_parens) rather than trying to
+ * reduce the inner <select> nonterminal to something else.  We use UMINUS
+ * precedence for this, which is a fairly arbitrary choice.
+ *
+ * To be able to define select_with_parens itself without ambiguity, we need
+ * a nonterminal select_no_parens that represents a SELECT structure with no
+ * outermost parentheses.  This is a little bit tedious, but it works.
+ *
+ * In non-expression contexts, we use SelectStmt which can represent a SELECT
+ * with or without outer parentheses.
+ */
+
+SelectStmt:
+  select_no_parens   %prec UMINUS
+| select_with_parens %prec UMINUS
 
 
 select_with_parens:
