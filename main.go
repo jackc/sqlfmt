@@ -172,6 +172,7 @@ func (e WhereClause) RenderTo(r Renderer) {
 type OrderExpr struct {
 	Expr  Expr
 	Order string
+	Nulls string
 }
 
 func (e OrderExpr) RenderTo(r Renderer) {
@@ -179,6 +180,12 @@ func (e OrderExpr) RenderTo(r Renderer) {
 	if e.Order != "" {
 		r.Text(" ", "space")
 		r.Text(e.Order, "keyword")
+	}
+	if e.Nulls != "" {
+		r.Text(" ", "space")
+		r.Text("nulls", "keyword")
+		r.Text(" ", "space")
+		r.Text(e.Nulls, "keyword")
 	}
 }
 

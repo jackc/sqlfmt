@@ -34,7 +34,7 @@ package main
 %type <whereClause> where_clause
 %type <orderExpr> sortby
 %type <orderClause> opt_sort_clause sort_clause sortby_list
-%type <src> opt_asc_desc
+%type <src> opt_asc_desc opt_nulls_order
 %type <placeholder> select_limit_value select_offset_value into_clause
   group_clause
   having_clause
@@ -244,9 +244,9 @@ opt_asc_desc:
 | /*EMPTY*/    { $$ = "" }
 
 opt_nulls_order:
-  NULLS_LA FIRST_P    { panic("TODO") }
-| NULLS_LA LAST_P     { panic("TODO") }
-| /*EMPTY*/           {  }
+  NULLS_LA FIRST_P    { $$ = "first" }
+| NULLS_LA LAST_P     { $$ = "last" }
+| /*EMPTY*/           { $$ = "" }
 
 /*****************************************************************************
  *
@@ -559,8 +559,7 @@ a_expr USING qual_all_Op opt_nulls_order
   }
 | a_expr opt_asc_desc opt_nulls_order
   {
-    /* TODO -- handle opt_nulls_order */
-    $$ = OrderExpr{Expr: $1, Order: $2}
+    $$ = OrderExpr{Expr: $1, Order: $2, Nulls: $3}
   }
 
 

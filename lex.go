@@ -47,9 +47,34 @@ func NewSqlLexer(src string) *sqlLex {
 		x.state = x.state(x)
 	}
 
-	x.tokens = append(x.tokens, token{typ: eof})
+	x.append(token{typ: eof})
 
 	return x
+}
+
+func (l *sqlLex) append(t token) {
+	l.tokens = append(l.tokens, t)
+
+	if len(l.tokens) == 1 {
+		return
+	}
+
+	prevToken := &l.tokens[len(l.tokens)-2]
+
+	switch t.typ {
+	case BETWEEN, IN_P, LIKE, ILIKE, SIMILAR:
+		if prevToken.typ == NOT {
+			prevToken.typ = NOT_LA
+		}
+	case FIRST_P, LAST_P:
+		if prevToken.typ == NULLS_P {
+			prevToken.typ = NULLS_LA
+		}
+	case TIME, ORDINALITY:
+		if prevToken.typ == WITH {
+			prevToken.typ = WITH_LA
+		}
+	}
 }
 
 func (l *sqlLex) next() (r rune) {
@@ -104,7 +129,7 @@ func blankState(l *sqlLex) stateFn {
 func lexNumber(l *sqlLex) stateFn {
 	l.acceptRunFunc(unicode.IsDigit)
 	t := token{src: l.src[l.start:l.pos], typ: ICONST}
-	l.tokens = append(l.tokens, t)
+	l.append(t)
 	l.start = l.pos
 	return blankState
 }
@@ -120,7 +145,7 @@ func lexAlphanumeric(l *sqlLex) stateFn {
 		t.typ = IDENT
 	}
 
-	l.tokens = append(l.tokens, t)
+	l.append(t)
 	l.start = l.pos
 	return blankState
 }
@@ -139,7 +164,7 @@ func lexStringLiteral(l *sqlLex) stateFn {
 				l.unnext()
 				t := token{src: l.src[l.start:l.pos]}
 				t.typ = SCONST
-				l.tokens = append(l.tokens, t)
+				l.append(t)
 				l.start = l.pos
 				return blankState
 			}
@@ -161,7 +186,7 @@ func lexQuotedIdentifier(l *sqlLex) stateFn {
 				l.unnext()
 				t := token{src: l.src[l.start:l.pos]}
 				t.typ = IDENT
-				l.tokens = append(l.tokens, t)
+				l.append(t)
 				l.start = l.pos
 				return blankState
 			}
@@ -171,13 +196,13 @@ func lexQuotedIdentifier(l *sqlLex) stateFn {
 
 func lexOperator(l *sqlLex) stateFn {
 	l.acceptRunFunc(isOperator)
-	l.tokens = append(l.tokens, token{OP, l.src[l.start:l.pos]})
+	l.append(token{OP, l.src[l.start:l.pos]})
 	l.start = l.pos
 	return blankState
 }
 
 func lexSimple(l *sqlLex) stateFn {
-	l.tokens = append(l.tokens, token{int(l.src[l.start]), l.src[l.start:l.pos]})
+	l.append(token{int(l.src[l.start]), l.src[l.start:l.pos]})
 	l.start = l.pos
 	return blankState
 }
