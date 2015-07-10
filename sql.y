@@ -21,8 +21,7 @@ package main
 %type <sqlSelect> top
 %type <sqlSelect> SelectStmt
 %type <sqlSelect> select_no_parens
-%type <sqlSelect> select_with_parens
-%type <fields> selectClause
+%type <sqlSelect> select_with_parens select_clause simple_select
 %type <fields> opt_target_list target_list distinct_clause expr_list
 %type <placeholder> opt_all_clause
 
@@ -248,13 +247,6 @@ opt_nulls_order:
 | NULLS_LA LAST_P     { $$ = "last" }
 | /*EMPTY*/           { $$ = "" }
 
-
-selectClause:
-  SELECT opt_target_list
-  {
-    $$ = $2
-  }
-
 aliasableExpr:
   expr
   {
@@ -427,16 +419,12 @@ select_with_parens:
 | '(' select_with_parens ')'      { $$ = $2 }
 
 select_no_parens:
-  selectClause from_clause where_clause opt_sort_clause
+  simple_select
+| select_clause sort_clause
   {
-    ss := &SelectStmt{}
-    ss.TargetList = $1
-    ss.FromClause = $2
-    ss.WhereClause = $3
-    ss.OrderClause = $4
-    $$ = ss
+    $1.OrderClause = $2
+    $$ = $1
   }
-
 
 select_clause:
   simple_select
@@ -470,9 +458,13 @@ simple_select:
       into_clause from_clause where_clause
       group_clause having_clause window_clause
         {
-          panic("TODO")
+          ss := &SelectStmt{}
+          ss.TargetList = $3
+          ss.FromClause = $5
+          ss.WhereClause = $6
+          $$ = ss
         }
-      | SELECT distinct_clause target_list
+/*      | SELECT distinct_clause target_list
       into_clause from_clause where_clause
       group_clause having_clause window_clause
         {
@@ -495,7 +487,7 @@ simple_select:
         {
           panic("TODO")
         }
-
+*/
 
 
 
@@ -563,12 +555,43 @@ a_expr USING qual_all_Op opt_nulls_order
     $$ = OrderExpr{Expr: $1, Order: $2, Nulls: $3}
   }
 
+/*
+ * This syntax for group_clause tries to follow the spec quite closely.
+ * However, the spec allows only column references, not expressions,
+ * which introduces an ambiguity between implicit row constructors
+ * (a,b) and lists of column references.
+ *
+ * We handle this by using the a_expr production for what the spec calls
+ * <ordinary grouping set>, which in the spec represents either one column
+ * reference or a parenthesized list of column references. Then, we check the
+ * top node of the a_expr to see if it's an implicit RowExpr, and if so, just
+ * grab and use the list, discarding the node. (this is done in parse analysis,
+ * not here)
+ *
+ * (we abuse the row_format field of RowExpr to distinguish implicit and
+ * explicit row constructors; it's debatable if anyone sanely wants to use them
+ * in a group clause, but if they have a reason to, we make it possible.)
+ *
+ * Each item in the group_clause list is either an expression tree or a
+ * GroupingSet node of some type.
+ */
+group_clause:
+  /* TODO GROUP_P BY group_by_list        { $$ = $3; }
+      |*/ /*EMPTY*/               { $$ = nil }
+
+having_clause:
+  HAVING a_expr  { panic("TODO") }
+| /*EMPTY*/      { $$ = nil }
+
+/*
+ * Window Definitions
+ */
+window_clause:
+      /* TODO WINDOW window_definition_list     { $$ = $2; }
+      |*/ /*EMPTY*/               { $$ = nil }
+    ;
 
 
-
-group_clause: { panic("TODO") }
-having_clause: { panic("TODO") }
-window_clause: { panic("TODO") }
 values_clause: { panic("TODO") }
 relation_expr: { panic("TODO") }
 qual_all_Op: { panic("TODO") }
