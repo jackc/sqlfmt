@@ -234,6 +234,7 @@ type SelectStmt struct {
 	WhereClause   *WhereClause
 	OrderClause   *OrderClause
 	GroupByClause *GroupByClause
+	HavingClause  Expr
 }
 
 func (s SelectStmt) RenderTo(r Renderer) {
@@ -285,5 +286,13 @@ func (s SelectStmt) RenderTo(r Renderer) {
 
 	if s.GroupByClause != nil {
 		s.GroupByClause.RenderTo(r)
+	}
+
+	if s.HavingClause != nil {
+		r.Text("having", "keyword")
+		r.NewLine()
+		r.Indent()
+		s.HavingClause.RenderTo(r)
+		r.NewLine()
 	}
 }

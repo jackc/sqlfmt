@@ -36,7 +36,6 @@ package main
 %type <orderClause> opt_sort_clause sort_clause sortby_list
 %type <src> opt_asc_desc opt_nulls_order
 %type <placeholder> select_limit_value select_offset_value into_clause
-  having_clause
   window_clause
   values_clause
   relation_expr
@@ -45,6 +44,8 @@ package main
 %type <groupByClause> group_clause
 %type <fields>  group_by_list
 %type <expr> group_by_item
+
+%type <expr> having_clause
 
 %type <boolean> all_or_distinct
 
@@ -467,6 +468,7 @@ simple_select:
           ss.FromClause = $5
           ss.WhereClause = $6
           ss.GroupByClause = $7
+          ss.HavingClause = $8
           $$ = ss
         }
       | SELECT distinct_clause target_list
@@ -479,6 +481,7 @@ simple_select:
           ss.FromClause = $5
           ss.WhereClause = $6
           ss.GroupByClause = $7
+          ss.HavingClause = $8
           $$ = ss
         }
 /*      | values_clause
@@ -606,7 +609,7 @@ group_by_item:
 */
 
 having_clause:
-  HAVING a_expr  { panic("TODO") }
+  HAVING a_expr  { $$ = $2 }
 | /*EMPTY*/      { $$ = nil }
 
 /*

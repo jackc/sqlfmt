@@ -904,7 +904,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:1225
+//line sql.y:1228
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -1093,8 +1093,8 @@ var sqlPgo = []int{
 
 	0, 524, 496, 483, 482, 523, 522, 519, 489, 517,
 	516, 514, 3, 420, 485, 421, 480, 513, 512, 425,
-	476, 512, 511, 510, 509, 424, 509, 509, 486, 422,
-	2, 509, 509, 507, 423, 506, 1, 506, 505, 505,
+	476, 512, 511, 510, 509, 424, 509, 509, 486, 2,
+	509, 509, 507, 423, 506, 1, 422, 506, 505, 505,
 	503, 502, 501, 500, 499, 498, 498, 498, 498, 498,
 	498, 498, 498,
 }
@@ -1106,8 +1106,8 @@ var sqlR1 = []int{
 	16, 16, 16, 10, 10, 2, 2, 4, 4, 3,
 	3, 5, 5, 6, 6, 28, 37, 37, 37, 9,
 	9, 11, 11, 21, 21, 22, 23, 23, 20, 20,
-	34, 34, 35, 35, 36, 29, 29, 30, 31, 32,
-	33, 46, 46, 46, 46, 49, 49, 47, 48, 26,
+	33, 33, 34, 34, 35, 36, 36, 29, 30, 31,
+	32, 46, 46, 46, 46, 49, 49, 47, 48, 26,
 	26, 27, 19, 19, 7, 7, 8, 8, 14, 14,
 	14, 38, 40, 39, 50, 50, 50, 51, 51, 51,
 	52, 52, 52, 52, 41, 41, 41, 41, 41, 42,
@@ -1261,12 +1261,12 @@ var sqlChk = []int{
 	268, 277, 291, 303, 319, 325, 336, 349, 352, 360,
 	363, 364, 370, 378, 379, 385, 386, 394, 401, 402,
 	404, 405, -13, -13, -13, 4, 445, 445, -3, -4,
-	-16, -10, -15, -20, -33, -25, 425, -19, 402, -12,
-	-18, -13, -19, 448, 445, -25, 140, 199, -34, 156,
-	-15, 448, 79, 229, 194, 25, 4, -34, -15, -29,
-	159, 42, -12, 194, 194, -12, 4, -29, -30, -15,
-	-35, -36, -15, -12, -12, 386, 248, -30, 448, 444,
-	-13, -36, -17, 4, 448, 445, 4,
+	-16, -10, -15, -20, -32, -25, 425, -19, 402, -12,
+	-18, -13, -19, 448, 445, -25, 140, 199, -33, 156,
+	-15, 448, 79, 229, 194, 25, 4, -33, -15, -36,
+	159, 42, -12, 194, 194, -12, 4, -36, -29, -15,
+	-34, -35, -15, -12, -12, 386, 248, -29, 448, 444,
+	-13, -35, -17, 4, 448, 445, 4,
 }
 var sqlDef = []int{
 
@@ -1633,170 +1633,170 @@ sqldefault:
 	switch sqlnt {
 
 	case 1:
-		//line sql.y:239
+		//line sql.y:240
 		{
 			sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 			sqllex.(*sqlLex).stmt = sqlS[sqlpt-0].sqlSelect
 		}
 	case 2:
-		//line sql.y:245
+		//line sql.y:246
 		{
 			sqlVAL.src = "asc"
 		}
 	case 3:
-		//line sql.y:246
+		//line sql.y:247
 		{
 			sqlVAL.src = "desc"
 		}
 	case 4:
-		//line sql.y:247
+		//line sql.y:248
 		{
 			sqlVAL.src = ""
 		}
 	case 5:
-		//line sql.y:250
+		//line sql.y:251
 		{
 			sqlVAL.src = "first"
 		}
 	case 6:
-		//line sql.y:251
+		//line sql.y:252
 		{
 			sqlVAL.src = "last"
 		}
 	case 7:
-		//line sql.y:252
+		//line sql.y:253
 		{
 			sqlVAL.src = ""
 		}
 	case 8:
-		//line sql.y:256
+		//line sql.y:257
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 9:
-		//line sql.y:260
+		//line sql.y:261
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
 		}
 	case 10:
-		//line sql.y:264
+		//line sql.y:265
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
 		}
 	case 11:
-		//line sql.y:270
+		//line sql.y:271
 		{
 			sqlVAL.expr = ColumnRef{Column: sqlS[sqlpt-0].src}
 		}
 	case 12:
-		//line sql.y:274
+		//line sql.y:275
 		{
 			sqlVAL.expr = ColumnRef{Table: sqlS[sqlpt-2].src, Column: sqlS[sqlpt-0].src}
 		}
 	case 13:
-		//line sql.y:278
+		//line sql.y:279
 		{
 			sqlVAL.expr = StringLiteral(sqlS[sqlpt-0].src)
 		}
 	case 14:
-		//line sql.y:282
+		//line sql.y:283
 		{
 			sqlVAL.expr = IntegerLiteral(sqlS[sqlpt-0].src)
 		}
 	case 15:
-		//line sql.y:286
+		//line sql.y:287
 		{
 			sqlVAL.expr = ColumnRef{Column: "true"}
 		}
 	case 16:
-		//line sql.y:290
+		//line sql.y:291
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: sqlS[sqlpt-1].src, Right: sqlS[sqlpt-0].expr}
 		}
 	case 17:
-		//line sql.y:294
+		//line sql.y:295
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "and", Right: sqlS[sqlpt-0].expr}
 		}
 	case 18:
-		//line sql.y:298
+		//line sql.y:299
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "or", Right: sqlS[sqlpt-0].expr}
 		}
 	case 19:
-		//line sql.y:302
+		//line sql.y:303
 		{
 			sqlVAL.expr = NotExpr{Expr: sqlS[sqlpt-0].expr}
 		}
 	case 20:
-		//line sql.y:306
+		//line sql.y:307
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].expr}
 		}
 	case 21:
-		//line sql.y:310
+		//line sql.y:311
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].sqlSelect}
 		}
 	case 22:
 		sqlVAL.expr = sqlS[sqlpt-0].expr
 	case 23:
-		//line sql.y:318
+		//line sql.y:319
 		{
 			sqlVAL.identifiers = []string{sqlS[sqlpt-0].src}
 		}
 	case 24:
-		//line sql.y:322
+		//line sql.y:323
 		{
 			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].src)
 		}
 	case 25:
-		//line sql.y:328
+		//line sql.y:329
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-2].expr, Join: ",", Right: sqlS[sqlpt-0].expr}
 		}
 	case 26:
-		//line sql.y:332
+		//line sql.y:333
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-3].expr, Join: "cross join", Right: sqlS[sqlpt-0].expr}
 		}
 	case 27:
-		//line sql.y:336
+		//line sql.y:337
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-3].expr, Join: "natural join", Right: sqlS[sqlpt-0].expr}
 		}
 	case 28:
-		//line sql.y:340
+		//line sql.y:341
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-6].expr, Join: "join", Right: sqlS[sqlpt-4].expr, Using: sqlS[sqlpt-1].identifiers}
 		}
 	case 29:
-		//line sql.y:344
+		//line sql.y:345
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-4].expr, Join: "join", Right: sqlS[sqlpt-2].expr, On: sqlS[sqlpt-0].expr}
 		}
 	case 30:
-		//line sql.y:350
+		//line sql.y:351
 		{
 			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
 		}
 	case 31:
-		//line sql.y:354
+		//line sql.y:355
 		{
 			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
 		}
 	case 32:
-		//line sql.y:357
+		//line sql.y:358
 		{
 			sqlVAL.fromClause = nil
 		}
 	case 33:
-		//line sql.y:363
+		//line sql.y:364
 		{
 			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
 	case 34:
-		//line sql.y:367
+		//line sql.y:368
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
@@ -1805,19 +1805,19 @@ sqldefault:
 	case 36:
 		sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 	case 37:
-		//line sql.y:422
+		//line sql.y:423
 		{
 			sqlVAL.sqlSelect = sqlS[sqlpt-1].sqlSelect
 		}
 	case 38:
-		//line sql.y:423
+		//line sql.y:424
 		{
 			sqlVAL.sqlSelect = sqlS[sqlpt-1].sqlSelect
 		}
 	case 39:
 		sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 	case 40:
-		//line sql.y:428
+		//line sql.y:429
 		{
 			sqlS[sqlpt-1].sqlSelect.OrderClause = sqlS[sqlpt-0].orderClause
 			sqlVAL.sqlSelect = sqlS[sqlpt-1].sqlSelect
@@ -1827,17 +1827,18 @@ sqldefault:
 	case 42:
 		sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 	case 43:
-		//line sql.y:464
+		//line sql.y:465
 		{
 			ss := &SelectStmt{}
 			ss.TargetList = sqlS[sqlpt-6].fields
 			ss.FromClause = sqlS[sqlpt-4].fromClause
 			ss.WhereClause = sqlS[sqlpt-3].whereClause
 			ss.GroupByClause = sqlS[sqlpt-2].groupByClause
+			ss.HavingClause = sqlS[sqlpt-1].expr
 			sqlVAL.sqlSelect = ss
 		}
 	case 44:
-		//line sql.y:475
+		//line sql.y:477
 		{
 			ss := &SelectStmt{}
 			ss.DistinctList = sqlS[sqlpt-7].fields
@@ -1845,228 +1846,229 @@ sqldefault:
 			ss.FromClause = sqlS[sqlpt-4].fromClause
 			ss.WhereClause = sqlS[sqlpt-3].whereClause
 			ss.GroupByClause = sqlS[sqlpt-2].groupByClause
+			ss.HavingClause = sqlS[sqlpt-1].expr
 			sqlVAL.sqlSelect = ss
 		}
 	case 45:
-		//line sql.y:518
+		//line sql.y:521
 		{
 			sqlVAL.placeholder = nil
 		}
 	case 46:
-		//line sql.y:523
+		//line sql.y:526
 		{
 			sqlVAL.boolean = true
 		}
 	case 47:
-		//line sql.y:524
+		//line sql.y:527
 		{
 			sqlVAL.boolean = false
 		}
 	case 48:
-		//line sql.y:525
+		//line sql.y:528
 		{
 			sqlVAL.boolean = false
 		}
 	case 49:
-		//line sql.y:530
+		//line sql.y:533
 		{
 			sqlVAL.fields = make([]Expr, 0)
 		}
 	case 50:
-		//line sql.y:531
+		//line sql.y:534
 		{
 			sqlVAL.fields = sqlS[sqlpt-1].fields
 		}
 	case 51:
-		//line sql.y:534
+		//line sql.y:537
 		{
 			sqlVAL.placeholder = nil
 		}
 	case 52:
-		//line sql.y:535
+		//line sql.y:538
 		{
 			sqlVAL.placeholder = nil
 		}
 	case 53:
-		//line sql.y:538
+		//line sql.y:541
 		{
 			sqlVAL.orderClause = sqlS[sqlpt-0].orderClause
 		}
 	case 54:
-		//line sql.y:539
+		//line sql.y:542
 		{
 			sqlVAL.orderClause = nil
 		}
 	case 55:
-		//line sql.y:542
+		//line sql.y:545
 		{
 			sqlVAL.orderClause = sqlS[sqlpt-0].orderClause
 		}
 	case 56:
-		//line sql.y:546
+		//line sql.y:549
 		{
 			sqlVAL.orderClause = &OrderClause{Exprs: []OrderExpr{sqlS[sqlpt-0].orderExpr}}
 		}
 	case 57:
-		//line sql.y:550
+		//line sql.y:553
 		{
 			sqlS[sqlpt-2].orderClause.Exprs = append(sqlS[sqlpt-2].orderClause.Exprs, sqlS[sqlpt-0].orderExpr)
 			sqlVAL.orderClause = sqlS[sqlpt-2].orderClause
 		}
 	case 58:
-		//line sql.y:558
+		//line sql.y:561
 		{
 			panic("TODO")
 		}
 	case 59:
-		//line sql.y:562
+		//line sql.y:565
 		{
 			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-2].expr, Order: sqlS[sqlpt-1].src, Nulls: sqlS[sqlpt-0].src}
 		}
 	case 60:
-		//line sql.y:587
+		//line sql.y:590
 		{
 			sqlVAL.groupByClause = &GroupByClause{Exprs: sqlS[sqlpt-0].fields}
 		}
 	case 61:
-		//line sql.y:588
+		//line sql.y:591
 		{
 			sqlVAL.groupByClause = nil
 		}
 	case 62:
-		//line sql.y:592
+		//line sql.y:595
 		{
 			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
 	case 63:
-		//line sql.y:596
+		//line sql.y:599
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
 	case 64:
 		sqlVAL.expr = sqlS[sqlpt-0].expr
 	case 65:
-		//line sql.y:609
+		//line sql.y:612
 		{
-			panic("TODO")
+			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 66:
-		//line sql.y:610
+		//line sql.y:613
 		{
-			sqlVAL.placeholder = nil
+			sqlVAL.expr = nil
 		}
 	case 67:
-		//line sql.y:617
+		//line sql.y:620
 		{
 			sqlVAL.placeholder = nil
 		}
 	case 68:
-		//line sql.y:621
+		//line sql.y:624
 		{
 			panic("TODO")
 		}
 	case 69:
-		//line sql.y:622
+		//line sql.y:625
 		{
 			panic("TODO")
 		}
 	case 70:
-		//line sql.y:623
+		//line sql.y:626
 		{
 			panic("TODO")
 		}
 	case 71:
-		//line sql.y:631
-		{
-			panic("TODO")
-		}
-	case 72:
-		//line sql.y:632
-		{
-			panic("TODO")
-		}
-	case 73:
-		//line sql.y:633
-		{
-			panic("TODO")
-		}
-	case 74:
 		//line sql.y:634
 		{
 			panic("TODO")
 		}
+	case 72:
+		//line sql.y:635
+		{
+			panic("TODO")
+		}
+	case 73:
+		//line sql.y:636
+		{
+			panic("TODO")
+		}
+	case 74:
+		//line sql.y:637
+		{
+			panic("TODO")
+		}
 	case 75:
-		//line sql.y:638
+		//line sql.y:641
 		{
 			panic("TODO")
 		}
 	case 76:
-		//line sql.y:639
+		//line sql.y:642
 		{
 			panic("TODO")
 		}
 	case 77:
-		//line sql.y:643
+		//line sql.y:646
 		{
 			panic("TODO")
 		}
 	case 78:
-		//line sql.y:650
+		//line sql.y:653
 		{
 			panic("TODO")
 		}
 	case 79:
-		//line sql.y:656
+		//line sql.y:659
 		{
 			sqlVAL.placeholder = sqlS[sqlpt-0].expr
 		}
 	case 80:
-		//line sql.y:658
+		//line sql.y:661
 		{
 			panic("TODO")
 		}
 	case 81:
-		//line sql.y:663
+		//line sql.y:666
 		{
 			sqlVAL.placeholder = sqlS[sqlpt-0].expr
 		}
 	case 82:
-		//line sql.y:679
+		//line sql.y:682
 		{
 			sqlVAL.whereClause = &WhereClause{Expr: sqlS[sqlpt-0].expr}
 		}
 	case 83:
-		//line sql.y:680
+		//line sql.y:683
 		{
 			sqlVAL.whereClause = nil
 		}
 	case 84:
-		//line sql.y:690
+		//line sql.y:693
 		{
 			sqlVAL.fields = sqlS[sqlpt-0].fields
 		}
 	case 85:
-		//line sql.y:691
+		//line sql.y:694
 		{
 			sqlVAL.fields = nil
 		}
 	case 86:
-		//line sql.y:694
+		//line sql.y:697
 		{
 			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
 	case 87:
-		//line sql.y:696
+		//line sql.y:699
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
 	case 88:
-		//line sql.y:702
+		//line sql.y:705
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
 		}
 	case 89:
-		//line sql.y:706
+		//line sql.y:709
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
 		}
@@ -2077,32 +2079,32 @@ sqldefault:
 	case 92:
 		sqlVAL.src = sqlS[sqlpt-0].src
 	case 93:
-		//line sql.y:718
+		//line sql.y:721
 		{
 			sqlVAL.src = sqlS[sqlpt-0].src
 		}
 	case 104:
-		//line sql.y:761
-		{
-			sqlVAL.src = sqlS[sqlpt-0].src
-		}
-	case 105:
-		//line sql.y:762
-		{
-			sqlVAL.src = sqlS[sqlpt-0].src
-		}
-	case 106:
-		//line sql.y:763
-		{
-			sqlVAL.src = sqlS[sqlpt-0].src
-		}
-	case 107:
 		//line sql.y:764
 		{
 			sqlVAL.src = sqlS[sqlpt-0].src
 		}
-	case 108:
+	case 105:
 		//line sql.y:765
+		{
+			sqlVAL.src = sqlS[sqlpt-0].src
+		}
+	case 106:
+		//line sql.y:766
+		{
+			sqlVAL.src = sqlS[sqlpt-0].src
+		}
+	case 107:
+		//line sql.y:767
+		{
+			sqlVAL.src = sqlS[sqlpt-0].src
+		}
+	case 108:
+		//line sql.y:768
 		{
 			sqlVAL.src = sqlS[sqlpt-0].src
 		}
