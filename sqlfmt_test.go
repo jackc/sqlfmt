@@ -177,6 +177,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "order_multiple.sql",
 			expectedOutputFile: "order_multiple.fmt.sql",
 		},
+		{
+			inputFile:          "select_wrapped_by_parens.sql",
+			expectedOutputFile: "select_wrapped_by_parens.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

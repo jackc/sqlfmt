@@ -19,6 +19,7 @@ package main
 %type <sqlSelect> top
 %type <sqlSelect> selectStatement
 %type <sqlSelect> select_no_parens
+%type <sqlSelect> select_with_parens
 %type <fields> selectClause
 %type <fields> opt_target_list target_list
 %type <expr> aliasableExpr
@@ -139,9 +140,71 @@ package main
 
 
 %left OP
-%left AND
-%left OR
-%left NOT
+
+
+/* Precedence: lowest to highest */
+%nonassoc SET       /* see relation_expr_opt_alias */
+%left   UNION EXCEPT
+%left   INTERSECT
+%left   OR
+%left   AND
+%right    NOT
+%nonassoc IS ISNULL NOTNULL /* IS sets precedence for IS NULL, etc */
+%nonassoc '<' '>' '=' LESS_EQUALS GREATER_EQUALS NOT_EQUALS
+%nonassoc BETWEEN IN_P LIKE ILIKE SIMILAR NOT_LA
+%nonassoc ESCAPE      /* ESCAPE must be just above LIKE/ILIKE/SIMILAR */
+%nonassoc OVERLAPS
+%left   POSTFIXOP   /* dummy for postfix Op rules */
+/*
+ * To support target_el without AS, we must give IDENT an explicit priority
+ * between POSTFIXOP and Op.  We can safely assign the same priority to
+ * various unreserved keywords as needed to resolve ambiguities (this can't
+ * have any bad effects since obviously the keywords will still behave the
+ * same as if they weren't keywords).  We need to do this for PARTITION,
+ * RANGE, ROWS to support opt_existing_window_name; and for RANGE, ROWS
+ * so that they can follow a_expr without creating postfix-operator problems;
+ * and for NULL so that it can follow b_expr in ColQualList without creating
+ * postfix-operator problems.
+ *
+ * To support CUBE and ROLLUP in GROUP BY without reserving them, we give them
+ * an explicit priority lower than '(', so that a rule with CUBE '(' will shift
+ * rather than reducing a conflicting rule that takes CUBE as a function name.
+ * Using the same precedence as IDENT seems right for the reasons given above.
+ *
+ * The frame_bound productions UNBOUNDED PRECEDING and UNBOUNDED FOLLOWING
+ * are even messier: since UNBOUNDED is an unreserved keyword (per spec!),
+ * there is no principled way to distinguish these from the productions
+ * a_expr PRECEDING/FOLLOWING.  We hack this up by giving UNBOUNDED slightly
+ * lower precedence than PRECEDING and FOLLOWING.  At present this doesn't
+ * appear to cause UNBOUNDED to be treated differently from other unreserved
+ * keywords anywhere else in the grammar, but it's definitely risky.  We can
+ * blame any funny behavior of UNBOUNDED on the SQL standard, though.
+ */
+%nonassoc UNBOUNDED   /* ideally should have same precedence as IDENT */
+%nonassoc IDENT NULL_P PARTITION RANGE ROWS PRECEDING FOLLOWING CUBE ROLLUP
+%left   Op OPERATOR   /* multi-character ops and user-defined operators */
+%left   '+' '-'
+%left   '*' '/' '%'
+%left   '^'
+/* Unary Operators */
+%left   AT        /* sets precedence for AT TIME ZONE */
+%left   COLLATE
+%right    UMINUS
+%left   '[' ']'
+%left   '(' ')'
+%left   TYPECAST
+%left   '.'
+/*
+ * These might seem to be low-precedence, but actually they are not part
+ * of the arithmetic hierarchy at all in their use as JOIN operators.
+ * We make them high-precedence to support their use as function names.
+ * They wouldn't be given a precedence at all, were it not that we need
+ * left-associativity among the JOIN rules themselves.
+ */
+%left   JOIN CROSS LEFT FULL RIGHT INNER_P NATURAL
+/* kluge to keep xml_whitespace_option from causing shift/reduce conflicts */
+%right    PRESERVE STRIP_P
+
 
 %%
 
@@ -149,14 +212,57 @@ top:
   selectStatement
   {
     $$ = $1
-  }
-
-selectStatement:
-  select_no_parens
-  {
-    $$ = $1
     sqllex.(*sqlLex).stmt = $1
   }
+
+/*****************************************************************************
+ *
+ *    QUERY:
+ *        SELECT STATEMENTS
+ *
+ *****************************************************************************/
+
+/* A complete SELECT statement looks like this.
+ *
+ * The rule returns either a single SelectStmt node or a tree of them,
+ * representing a set-operation tree.
+ *
+ * There is an ambiguity when a sub-SELECT is within an a_expr and there
+ * are excess parentheses: do the parentheses belong to the sub-SELECT or
+ * to the surrounding a_expr?  We don't really care, but bison wants to know.
+ * To resolve the ambiguity, we are careful to define the grammar so that
+ * the decision is staved off as long as possible: as long as we can keep
+ * absorbing parentheses into the sub-SELECT, we will do so, and only when
+ * it's no longer possible to do that will we decide that parens belong to
+ * the expression.  For example, in "SELECT (((SELECT 2)) + 3)" the extra
+ * parentheses are treated as part of the sub-select.  The necessity of doing
+ * it that way is shown by "SELECT (((SELECT 2)) UNION SELECT 2)".  Had we
+ * parsed "((SELECT 2))" as an a_expr, it'd be too late to go back to the
+ * SELECT viewpoint when we see the UNION.
+ *
+ * This approach is implemented by defining a nonterminal select_with_parens,
+ * which represents a SELECT with at least one outer layer of parentheses,
+ * and being careful to use select_with_parens, never '(' SelectStmt ')',
+ * in the expression grammar.  We will then have shift-reduce conflicts
+ * which we can resolve in favor of always treating '(' <select> ')' as
+ * a select_with_parens.  To resolve the conflicts, the productions that
+ * conflict with the select_with_parens productions are manually given
+ * precedences lower than the precedence of ')', thereby ensuring that we
+ * shift ')' (and then reduce to select_with_parens) rather than trying to
+ * reduce the inner <select> nonterminal to something else.  We use UMINUS
+ * precedence for this, which is a fairly arbitrary choice.
+ *
+ * To be able to define select_with_parens itself without ambiguity, we need
+ * a nonterminal select_no_parens that represents a SELECT structure with no
+ * outermost parentheses.  This is a little bit tedious, but it works.
+ *
+ * In non-expression contexts, we use SelectStmt which can represent a SELECT
+ * with or without outer parentheses.
+ */
+
+selectStatement:
+  select_no_parens   %prec UMINUS
+| select_with_parens %prec UMINUS
 
 selectClause:
   SELECT opt_target_list
@@ -302,6 +408,10 @@ orderClause:
   }
 
 
+
+select_with_parens:
+  '(' select_no_parens ')'        { $$ = $2 }
+| '(' select_with_parens ')'      { $$ = $2 }
 
 select_no_parens:
   selectClause from_clause where_clause optOrderClause
