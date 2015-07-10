@@ -25,7 +25,7 @@ package main
 %type <fromClause> fromClause
 %type <identifiers> identifierSeq
 %type <expr> joinExpr
-%type <whereClause> whereClause
+%type <whereClause> where_clause
 %type <orderExpr> orderExpr
 %type <orderClause> optOrderClause
 %type <orderClause> orderClause
@@ -151,21 +151,7 @@ top:
   }
 
 selectStatement:
-  selectClause
-  {
-    $$ = &SelectStmt{}
-    $$.TargetList = $1
-    sqllex.(*sqlLex).stmt = $$
-  }
-| selectClause fromClause optOrderClause
-  {
-    $$ = &SelectStmt{}
-    $$.TargetList = $1
-    $$.FromClause = $2
-    $$.OrderClause = $3
-    sqllex.(*sqlLex).stmt = $$
-  }
-| selectClause fromClause whereClause optOrderClause
+  selectClause fromClause where_clause optOrderClause
   {
     $$ = &SelectStmt{}
     $$.TargetList = $1
@@ -174,7 +160,7 @@ selectStatement:
     $$.OrderClause = $4
     sqllex.(*sqlLex).stmt = $$
   }
-| selectClause whereClause
+| selectClause where_clause
   {
     $$ = &SelectStmt{}
     $$.TargetList = $1
@@ -292,12 +278,6 @@ fromClause:
     $$ = &FromClause{Expr: $2}
   }
 
-whereClause:
-  WHERE expr
-  {
-    $$ = &WhereClause{Expr: $2}
-  }
-
 orderExpr:
   expr
   {
@@ -332,9 +312,9 @@ orderClause:
 
 
 
-
-
-
+where_clause:
+  WHERE a_expr   { $$ = &WhereClause{Expr: $2} }
+| /*EMPTY*/      { $$ = nil }
 
 
 /*****************************************************************************
@@ -367,7 +347,6 @@ target_el:
 /* TODO
       | '*'
 */
-
 
 Iconst:   ICONST
 Sconst:   SCONST
