@@ -102,7 +102,7 @@ func blankState(l *sqlLex) stateFn {
 
 func lexNumber(l *sqlLex) stateFn {
 	l.acceptRunFunc(unicode.IsDigit)
-	t := token{src: l.src[l.start:l.pos], typ: NUMBER_LITERAL}
+	t := token{src: l.src[l.start:l.pos], typ: ICONST}
 	l.tokens <- t
 	l.start = l.pos
 	return blankState
@@ -137,7 +137,7 @@ func lexStringLiteral(l *sqlLex) stateFn {
 			if r != '\'' {
 				l.unnext()
 				t := token{src: l.src[l.start:l.pos]}
-				t.typ = STRING_LITERAL
+				t.typ = SCONST
 				l.tokens <- t
 				l.start = l.pos
 				return blankState

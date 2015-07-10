@@ -202,7 +202,7 @@ func (e OrderClause) RenderTo(r Renderer) {
 }
 
 type SelectStmt struct {
-	Fields      []Expr
+	TargetList  []Expr
 	FromClause  *FromClause
 	WhereClause *WhereClause
 	OrderClause *OrderClause
@@ -212,9 +212,9 @@ func (s SelectStmt) RenderTo(r Renderer) {
 	r.Text("select", "keyword")
 	r.NewLine()
 	r.Indent()
-	for i, f := range s.Fields {
+	for i, f := range s.TargetList {
 		f.RenderTo(r)
-		if i < len(s.Fields)-1 {
+		if i < len(s.TargetList)-1 {
 			r.Text(",", "comma")
 		}
 		r.NewLine()

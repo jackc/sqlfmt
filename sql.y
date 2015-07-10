@@ -9,7 +9,6 @@ package main
   fields []Expr
   expr Expr
   src string
-  keyword string
   identifiers []string
   fromClause *FromClause
   whereClause *WhereClause
@@ -20,9 +19,9 @@ package main
 %type <sqlSelect> top
 %type <sqlSelect> selectStatement
 %type <fields> selectClause
-%type <fields> selectExprSeq
+%type <fields> opt_target_list target_list
 %type <expr> aliasableExpr
-%type <expr> expr
+%type <expr> expr target_el a_expr
 %type <fromClause> fromClause
 %type <identifiers> identifierSeq
 %type <expr> joinExpr
@@ -31,14 +30,23 @@ package main
 %type <orderClause> optOrderClause
 %type <orderClause> orderClause
 
-%token  <src> IDENT
-%token  <src> STRING_LITERAL
-%token  <src> NUMBER_LITERAL
+%type <src>  Iconst SignedIconst Sconst
+
+%type <src>
+  ColLabel
+  unreserved_keyword
+  col_name_keyword
+  type_func_name_keyword
+  reserved_keyword
+
+
+
+%token  <src> IDENT ICONST SCONST
 %token  <src> OP
 
 
 /* ordinary key words in alphabetical order */
-%token <keyword> ABORT_P ABSOLUTE_P ACCESS ACTION ADD_P ADMIN AFTER
+%token <src> ABORT_P ABSOLUTE_P ACCESS ACTION ADD_P ADMIN AFTER
   AGGREGATE ALL ALSO ALTER ALWAYS ANALYSE ANALYZE AND ANY ARRAY AS ASC
   ASSERTION ASSIGNMENT ASYMMETRIC AT ATTRIBUTE AUTHORIZATION
 
@@ -146,13 +154,13 @@ selectStatement:
   selectClause
   {
     $$ = &SelectStmt{}
-    $$.Fields = $1
+    $$.TargetList = $1
     sqllex.(*sqlLex).stmt = $$
   }
 | selectClause fromClause optOrderClause
   {
     $$ = &SelectStmt{}
-    $$.Fields = $1
+    $$.TargetList = $1
     $$.FromClause = $2
     $$.OrderClause = $3
     sqllex.(*sqlLex).stmt = $$
@@ -160,7 +168,7 @@ selectStatement:
 | selectClause fromClause whereClause optOrderClause
   {
     $$ = &SelectStmt{}
-    $$.Fields = $1
+    $$.TargetList = $1
     $$.FromClause = $2
     $$.WhereClause = $3
     $$.OrderClause = $4
@@ -169,25 +177,15 @@ selectStatement:
 | selectClause whereClause
   {
     $$ = &SelectStmt{}
-    $$.Fields = $1
+    $$.TargetList = $1
     $$.WhereClause = $2
     sqllex.(*sqlLex).stmt = $$
   }
 
 selectClause:
-  SELECT selectExprSeq
+  SELECT opt_target_list
   {
     $$ = $2
-  }
-
-selectExprSeq:
-  aliasableExpr
-  {
-    $$ = []Expr{$1}
-  }
-| selectExprSeq ',' aliasableExpr
-  {
-    $$ = append($1, $3)
   }
 
 aliasableExpr:
@@ -213,11 +211,11 @@ expr:
   {
     $$ = ColumnRef{Table: $1, Column: $3}
   }
-| STRING_LITERAL
+| Sconst
   {
     $$ = StringLiteral($1)
   }
-| NUMBER_LITERAL
+| Iconst
   {
     $$ = IntegerLiteral($1)
   }
@@ -249,6 +247,8 @@ expr:
   {
     $$ = ParenExpr{Expr: $2}
   }
+
+a_expr: expr
 
 identifierSeq:
   IDENT
@@ -329,6 +329,557 @@ orderClause:
     $1.Exprs = append($1.Exprs, $3)
     $$ = $1
   }
+
+
+
+
+
+
+
+
+/*****************************************************************************
+ *
+ *  target list for SELECT
+ *
+ *****************************************************************************/
+
+opt_target_list:
+  target_list  { $$ = $1 }
+| /* EMPTY */  { $$ = nil }
+
+target_list:
+  target_el    { $$ = []Expr{$1} }
+| target_list ',' target_el
+  {
+    $$ = append($1, $3)
+  }
+
+target_el:
+  a_expr AS ColLabel
+  {
+    $$ = AliasedExpr{Expr: $1, Alias: $3}
+  }
+| a_expr IDENT
+  {
+    $$ = AliasedExpr{Expr: $1, Alias: $2}
+  }
+| a_expr
+/* TODO
+      | '*'
+*/
+
+
+Iconst:   ICONST
+Sconst:   SCONST
+
+SignedIconst:
+  Iconst      { $$ = $1 }
+/* TODO - determine what to do with numbers
+| '+' Iconst  { $$ = + $2 }
+| '-' Iconst  { $$ = - $2 }
+*/
+
+/*
+ * Name classification hierarchy.
+ *
+ * IDENT is the lexeme returned by the lexer for identifiers that match
+ * no known keyword.  In most cases, we can accept certain keywords as
+ * names, not only IDENTs.  We prefer to accept as many such keywords
+ * as possible to minimize the impact of "reserved words" on programmers.
+ * So, we divide names into several possible classes.  The classification
+ * is chosen in part to make keywords acceptable as names wherever possible.
+ */
+
+/* Column identifier --- names that can be column, table, etc names.
+ */
+ColId:
+  IDENT
+| unreserved_keyword
+| col_name_keyword
+
+/* Type/function identifier --- names that can be type or function names.
+ */
+type_function_name:
+  IDENT
+| unreserved_keyword
+| type_func_name_keyword
+
+/* Any not-fully-reserved word --- these names can be, eg, role names.
+ */
+NonReservedWord:
+  IDENT
+| unreserved_keyword
+| col_name_keyword
+| type_func_name_keyword
+
+/* Column label --- allowed labels in "AS" clauses.
+ * This presently includes *all* Postgres keywords.
+ */
+ColLabel:
+  IDENT                   { $$ = $1 }
+| unreserved_keyword      { $$ = $1 }
+| col_name_keyword        { $$ = $1 }
+| type_func_name_keyword  { $$ = $1 }
+| reserved_keyword        { $$ = $1 }
+
+/*
+ * Keyword category lists.  Generally, every keyword present in
+ * the Postgres grammar should appear in exactly one of these lists.
+ */
+
+/* "Unreserved" keywords --- available for use as any kind of name.
+ */
+unreserved_keyword:
+  ABORT_P
+| ABSOLUTE_P
+| ACCESS
+| ACTION
+| ADD_P
+| ADMIN
+| AFTER
+| AGGREGATE
+| ALSO
+| ALTER
+| ALWAYS
+| ASSERTION
+| ASSIGNMENT
+| AT
+| ATTRIBUTE
+| BACKWARD
+| BEFORE
+| BEGIN_P
+| BY
+| CACHE
+| CALLED
+| CASCADE
+| CASCADED
+| CATALOG_P
+| CHAIN
+| CHARACTERISTICS
+| CHECKPOINT
+| CLASS
+| CLOSE
+| CLUSTER
+| COMMENT
+| COMMENTS
+| COMMIT
+| COMMITTED
+| CONFIGURATION
+| CONFLICT
+| CONNECTION
+| CONSTRAINTS
+| CONTENT_P
+| CONTINUE_P
+| CONVERSION_P
+| COPY
+| COST
+| CSV
+| CUBE
+| CURRENT_P
+| CURSOR
+| CYCLE
+| DATA_P
+| DATABASE
+| DAY_P
+| DEALLOCATE
+| DECLARE
+| DEFAULTS
+| DEFERRED
+| DEFINER
+| DELETE_P
+| DELIMITER
+| DELIMITERS
+| DICTIONARY
+| DISABLE_P
+| DISCARD
+| DOCUMENT_P
+| DOMAIN_P
+| DOUBLE_P
+| DROP
+| EACH
+| ENABLE_P
+| ENCODING
+| ENCRYPTED
+| ENUM_P
+| ESCAPE
+| EVENT
+| EXCLUDE
+| EXCLUDING
+| EXCLUSIVE
+| EXECUTE
+| EXPLAIN
+| EXTENSION
+| EXTERNAL
+| FAMILY
+| FILTER
+| FIRST_P
+| FOLLOWING
+| FORCE
+| FORWARD
+| FUNCTION
+| FUNCTIONS
+| GLOBAL
+| GRANTED
+| HANDLER
+| HEADER_P
+| HOLD
+| HOUR_P
+| IDENTITY_P
+| IF_P
+| IMMEDIATE
+| IMMUTABLE
+| IMPLICIT_P
+| IMPORT_P
+| INCLUDING
+| INCREMENT
+| INDEX
+| INDEXES
+| INHERIT
+| INHERITS
+| INLINE_P
+| INPUT_P
+| INSENSITIVE
+| INSERT
+| INSTEAD
+| INVOKER
+| ISOLATION
+| KEY
+| LABEL
+| LANGUAGE
+| LARGE_P
+| LAST_P
+| LEAKPROOF
+| LEVEL
+| LISTEN
+| LOAD
+| LOCAL
+| LOCATION
+| LOCK_P
+| LOCKED
+| LOGGED
+| MAPPING
+| MATCH
+| MATERIALIZED
+| MAXVALUE
+| MINUTE_P
+| MINVALUE
+| MODE
+| MONTH_P
+| MOVE
+| NAME_P
+| NAMES
+| NEXT
+| NO
+| NOTHING
+| NOTIFY
+| NOWAIT
+| NULLS_P
+| OBJECT_P
+| OF
+| OFF
+| OIDS
+| OPERATOR
+| OPTION
+| OPTIONS
+| ORDINALITY
+| OVER
+| OWNED
+| OWNER
+| PARSER
+| PARTIAL
+| PARTITION
+| PASSING
+| PASSWORD
+| PLANS
+| POLICY
+| PRECEDING
+| PREPARE
+| PREPARED
+| PRESERVE
+| PRIOR
+| PRIVILEGES
+| PROCEDURAL
+| PROCEDURE
+| PROGRAM
+| QUOTE
+| RANGE
+| READ
+| REASSIGN
+| RECHECK
+| RECURSIVE
+| REF
+| REFRESH
+| REINDEX
+| RELATIVE_P
+| RELEASE
+| RENAME
+| REPEATABLE
+| REPLACE
+| REPLICA
+| RESET
+| RESTART
+| RESTRICT
+| RETURNS
+| REVOKE
+| ROLE
+| ROLLBACK
+| ROLLUP
+| ROWS
+| RULE
+| SAVEPOINT
+| SCHEMA
+| SCROLL
+| SEARCH
+| SECOND_P
+| SECURITY
+| SEQUENCE
+| SEQUENCES
+| SERIALIZABLE
+| SERVER
+| SESSION
+| SET
+| SETS
+| SHARE
+| SHOW
+| SIMPLE
+| SKIP
+| SNAPSHOT
+| SQL_P
+| STABLE
+| STANDALONE_P
+| START
+| STATEMENT
+| STATISTICS
+| STDIN
+| STDOUT
+| STORAGE
+| STRICT_P
+| STRIP_P
+| SYSID
+| SYSTEM_P
+| TABLES
+| TABLESPACE
+| TEMP
+| TEMPLATE
+| TEMPORARY
+| TEXT_P
+| TRANSACTION
+| TRANSFORM
+| TRIGGER
+| TRUNCATE
+| TRUSTED
+| TYPE_P
+| TYPES_P
+| UNBOUNDED
+| UNCOMMITTED
+| UNENCRYPTED
+| UNKNOWN
+| UNLISTEN
+| UNLOGGED
+| UNTIL
+| UPDATE
+| VACUUM
+| VALID
+| VALIDATE
+| VALIDATOR
+| VALUE_P
+| VARYING
+| VERSION_P
+| VIEW
+| VIEWS
+| VOLATILE
+| WHITESPACE_P
+| WITHIN
+| WITHOUT
+| WORK
+| WRAPPER
+| WRITE
+| XML_P
+| YEAR_P
+| YES_P
+| ZONE
+
+
+/* Column identifier --- keywords that can be column, table, etc names.
+ *
+ * Many of these keywords will in fact be recognized as type or function
+ * names too; but they have special productions for the purpose, and so
+ * can't be treated as "generic" type or function names.
+ *
+ * The type names appearing here are not usable as function names
+ * because they can be followed by '(' in typename productions, which
+ * looks too much like a function call for an LR(1) parser.
+ */
+col_name_keyword:
+  BETWEEN
+| BIGINT
+| BIT
+| BOOLEAN_P
+| CHAR_P
+| CHARACTER
+| COALESCE
+| DEC
+| DECIMAL_P
+| EXISTS
+| EXTRACT
+| FLOAT_P
+| GREATEST
+| GROUPING
+| INOUT
+| INT_P
+| INTEGER
+| INTERVAL
+| LEAST
+| NATIONAL
+| NCHAR
+| NONE
+| NULLIF
+| NUMERIC
+| OUT_P
+| OVERLAY
+| POSITION
+| PRECISION
+| REAL
+| ROW
+| SETOF
+| SMALLINT
+| SUBSTRING
+| TIME
+| TIMESTAMP
+| TREAT
+| TRIM
+| VALUES
+| VARCHAR
+| XMLATTRIBUTES
+| XMLCONCAT
+| XMLELEMENT
+| XMLEXISTS
+| XMLFOREST
+| XMLPARSE
+| XMLPI
+| XMLROOT
+| XMLSERIALIZE
+
+/* Type/function identifier --- keywords that can be type or function names.
+ *
+ * Most of these are keywords that are used as operators in expressions;
+ * in general such keywords can't be column names because they would be
+ * ambiguous with variables, but they are unambiguous as function identifiers.
+ *
+ * Do not include POSITION, SUBSTRING, etc here since they have explicit
+ * productions in a_expr to support the goofy SQL9x argument syntax.
+ * - thomas 2000-11-28
+ */
+type_func_name_keyword:
+  AUTHORIZATION
+| BINARY
+| COLLATION
+| CONCURRENTLY
+| CROSS
+| CURRENT_SCHEMA
+| FREEZE
+| FULL
+| ILIKE
+| INNER_P
+| IS
+| ISNULL
+| JOIN
+| LEFT
+| LIKE
+| NATURAL
+| NOTNULL
+| OUTER_P
+| OVERLAPS
+| RIGHT
+| SIMILAR
+| TABLESAMPLE
+| VERBOSE
+
+/* Reserved keyword --- these keywords are usable only as a ColLabel.
+ *
+ * Keywords appear here if they could not be distinguished from variable,
+ * type, or function names in some contexts.  Don't put things here unless
+ * forced to.
+ */
+reserved_keyword:
+  ALL
+| ANALYSE
+| ANALYZE
+| AND
+| ANY
+| ARRAY
+| AS
+| ASC
+| ASYMMETRIC
+| BOTH
+| CASE
+| CAST
+| CHECK
+| COLLATE
+| COLUMN
+| CONSTRAINT
+| CREATE
+| CURRENT_CATALOG
+| CURRENT_DATE
+| CURRENT_ROLE
+| CURRENT_TIME
+| CURRENT_TIMESTAMP
+| CURRENT_USER
+| DEFAULT
+| DEFERRABLE
+| DESC
+| DISTINCT
+| DO
+| ELSE
+| END_P
+| EXCEPT
+| FALSE_P
+| FETCH
+| FOR
+| FOREIGN
+| FROM
+| GRANT
+| GROUP_P
+| HAVING
+| IN_P
+| INITIALLY
+| INTERSECT
+| INTO
+| LATERAL_P
+| LEADING
+| LIMIT
+| LOCALTIME
+| LOCALTIMESTAMP
+| NOT
+| NULL_P
+| OFFSET
+| ON
+| ONLY
+| OR
+| ORDER
+| PLACING
+| PRIMARY
+| REFERENCES
+| RETURNING
+| SELECT
+| SESSION_USER
+| SOME
+| SYMMETRIC
+| TABLE
+| THEN
+| TO
+| TRAILING
+| TRUE_P
+| UNION
+| UNIQUE
+| USER
+| USING
+| VARIADIC
+| WHEN
+| WHERE
+| WINDOW
+| WITH
+
 %%
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
