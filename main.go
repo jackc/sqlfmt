@@ -222,6 +222,22 @@ func (s SelectStmt) RenderTo(r Renderer) {
 	if s.DistinctList != nil {
 		r.Text(" ", "space")
 		r.Text("distinct", "keyword")
+
+		if len(s.DistinctList) > 0 {
+			r.Text(" ", "space")
+			r.Text("on", "keyword")
+			r.Text("(", "lparen")
+
+			for i, f := range s.DistinctList {
+				f.RenderTo(r)
+				if i < len(s.DistinctList)-1 {
+					r.Text(",", "comma")
+					r.Text(" ", "space")
+				}
+			}
+			r.Text(")", "rparen")
+		}
+
 	}
 
 	r.NewLine()
