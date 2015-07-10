@@ -16,6 +16,8 @@ type sqlSymType struct {
 	whereClause *WhereClause
 	orderExpr   OrderExpr
 	orderClause *OrderClause
+	boolean     bool
+	placeholder interface{}
 }
 
 const IDENT = 57346
@@ -438,14 +440,16 @@ const XMLSERIALIZE = 57762
 const YEAR_P = 57763
 const YES_P = 57764
 const ZONE = 57765
-const LESS_EQUALS = 57766
-const GREATER_EQUALS = 57767
-const NOT_EQUALS = 57768
-const NOT_LA = 57769
-const POSTFIXOP = 57770
-const Op = 57771
-const UMINUS = 57772
-const TYPECAST = 57773
+const NOT_LA = 57766
+const NULLS_LA = 57767
+const WITH_LA = 57768
+const LESS_EQUALS = 57769
+const GREATER_EQUALS = 57770
+const NOT_EQUALS = 57771
+const POSTFIXOP = 57772
+const Op = 57773
+const UMINUS = 57774
+const TYPECAST = 57775
 
 var sqlToknames = []string{
 	"IDENT",
@@ -868,13 +872,15 @@ var sqlToknames = []string{
 	"YEAR_P",
 	"YES_P",
 	"ZONE",
+	"NOT_LA",
+	"NULLS_LA",
+	"WITH_LA",
 	"'<'",
 	"'>'",
 	"'='",
 	"LESS_EQUALS",
 	"GREATER_EQUALS",
 	"NOT_EQUALS",
-	"NOT_LA",
 	"POSTFIXOP",
 	"Op",
 	"'+'",
@@ -897,7 +903,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:986
+//line sql.y:1175
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -910,17 +916,17 @@ var sqlExca = []int{
 	-2, 0,
 }
 
-const sqlNprod = 483
+const sqlNprod = 525
 const sqlPrivate = 57344
 
 var sqlTokenNames []string
 var sqlStates []string
 
-const sqlLast = 919
+const sqlLast = 920
 
 var sqlAct = []int{
 
-	55, 491, 484, 32, 60, 61, 62, 63, 64, 65,
+	55, 506, 491, 497, 60, 61, 62, 63, 64, 65,
 	66, 67, 399, 68, 69, 70, 400, 401, 402, 403,
 	404, 405, 406, 71, 72, 407, 73, 74, 376, 75,
 	76, 77, 328, 329, 377, 330, 331, 408, 78, 79,
@@ -962,23 +968,23 @@ var sqlAct = []int{
 	471, 313, 398, 314, 315, 316, 317, 472, 473, 318,
 	474, 475, 319, 320, 321, 322, 323, 324, 367, 368,
 	369, 370, 371, 372, 373, 374, 375, 325, 326, 327,
-	29, 27, 48, 35, 17, 24, 23, 505, 16, 31,
-	504, 17, 24, 23, 38, 30, 481, 7, 36, 500,
-	26, 497, 39, 40, 35, 35, 36, 16, 45, 52,
-	488, 487, 35, 16, 9, 4, 476, 477, 478, 36,
-	36, 3, 11, 40, 498, 485, 14, 36, 10, 486,
-	51, 34, 489, 15, 36, 506, 503, 490, 479, 41,
-	2, 59, 58, 57, 56, 54, 18, 493, 19, 44,
-	43, 25, 33, 28, 502, 8, 13, 12, 483, 53,
-	46, 5, 1, 0, 482, 0, 0, 0, 0, 0,
+	16, 15, 27, 48, 17, 24, 23, 32, 514, 35,
+	29, 513, 17, 24, 23, 38, 31, 30, 481, 7,
+	507, 502, 39, 40, 36, 26, 496, 500, 46, 35,
+	45, 52, 36, 511, 35, 487, 476, 477, 478, 486,
+	9, 484, 14, 40, 36, 34, 36, 4, 29, 36,
+	485, 29, 51, 488, 11, 3, 515, 509, 489, 479,
+	41, 2, 10, 59, 58, 57, 33, 56, 54, 18,
+	19, 505, 499, 490, 44, 53, 43, 25, 28, 508,
+	504, 8, 13, 12, 5, 1, 0, 510, 0, 0,
+	483, 0, 512, 0, 0, 0, 0, 0, 482, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 501, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 50, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 50, 0, 0,
-	0, 0, 0, 0, 0, 499, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	6, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 49, 0, 0, 0, 0, 0, 0, 496,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 6, 0, 0, 0, 0, 0,
+	0, 0, 0, 49, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 495, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -986,11 +992,11 @@ var sqlAct = []int{
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 21, 0, 0, 0, 0, 0,
-	0, 21, 0, 0, 0, 0, 0, 0, 0, 37,
-	0, 0, 0, 0, 0, 0, 0, 37, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	37, 37, 0, 0, 0, 0, 0, 0, 37, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 21, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 37, 0, 0, 0, 0,
+	0, 0, 0, 37, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 37, 0, 0, 0, 0,
+	37, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 7,
@@ -998,29 +1004,29 @@ var sqlAct = []int{
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 47,
-	20, 0, 0, 0, 0, 0, 0, 20, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	20, 0, 47, 0, 0, 0, 0, 0, 20, 0,
+	0, 0, 0, 0, 0, 0, 0, 498, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 480,
-	0, 0, 42, 0, 0, 0, 0, 0, 0, 22,
+	0, 0, 0, 0, 42, 0, 0, 480, 0, 0,
+	0, 0, 22, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 492, 492, 0, 0, 494,
-	495, 0, 0, 0, 0, 0, 0, 0, 501,
+	0, 0, 0, 0, 0, 0, 492, 29, 29, 493,
+	494, 0, 0, 0, 0, 0, 0, 503, 0, 492,
 }
 var sqlPact = []int{
 
-	118, -1000, -1000, -1000, -1000, 306, 118, 427, 38, 427,
-	-8, -14, -1000, -443, -1000, 467, 437, -11, -1000, -1000,
-	-1000, 427, 420, -1000, -1000, 194, 427, 343, -1000, 445,
-	-1000, -1000, 427, -4, -1000, 427, 427, 427, 474, -1000,
-	416, -7, 420, -1000, -444, 423, -1000, 427, 257, 256,
-	427, 473, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	120, -1000, -1000, -1000, -1000, 312, 120, 428, 43, 428,
+	-8, -9, -1000, -21, -1000, 461, 442, -12, -1000, -1000,
+	-1000, 428, 420, -1000, -1000, 196, 428, 344, -1000, 447,
+	-1000, -1000, 428, -4, -1000, 428, 428, 428, 475, -1000,
+	422, -7, 420, -1000, -1000, 419, -1000, 428, 265, 261,
+	428, 474, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
@@ -1062,76 +1068,88 @@ var sqlPact = []int{
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, 424, -1000, 452, -1000,
-	-1000, -1000, -8, -14, 427, 427, -1000, 427, 427, 193,
-	-1000, -1000, 438, -1000, -1000, -1000, -3, 427, -1000, -1000,
-	472, 437, -16, -1000, 471, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, 430, -1000, 444, -1000,
+	-1000, -1000, -8, -9, 428, -1000, 428, 428, 198, -1000,
+	-445, -1000, 421, -1000, -1000, -3, 428, 428, -1000, 15,
+	-1000, -1000, 473, 442, -1000, 15, -1000, 313, -17, -1000,
+	-1000, -1000, -1000, 472, -1000, -1000,
 }
 var sqlPgo = []int{
 
-	0, 502, 479, 461, 455, 501, 497, 496, 421, 420,
-	466, 473, 495, 494, 493, 491, 1, 490, 489, 488,
-	488, 486, 485, 484, 483, 482, 481, 481, 481, 481,
+	0, 505, 480, 475, 467, 504, 503, 502, 502, 502,
+	502, 422, 420, 462, 421, 501, 499, 498, 497, 2,
+	496, 494, 493, 492, 492, 492, 492, 492, 492, 492,
+	492, 492, 491, 491, 490, 490, 489, 488, 487, 485,
+	484, 483, 1, 483, 483, 483, 483, 483, 483, 483,
+	483, 483,
 }
 var sqlR1 = []int{
 
-	0, 1, 2, 2, 5, 8, 8, 8, 9, 9,
-	9, 9, 9, 9, 9, 9, 9, 9, 9, 11,
-	13, 13, 14, 14, 14, 14, 14, 12, 12, 12,
-	16, 16, 16, 17, 17, 18, 18, 4, 4, 3,
-	15, 15, 6, 6, 7, 7, 10, 10, 10, 19,
-	21, 20, 27, 27, 27, 28, 28, 28, 29, 29,
-	29, 29, 22, 22, 22, 22, 22, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 23, 23, 24, 24, 24, 24, 24,
-	24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
-	24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
-	24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
-	24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
-	24, 24, 24, 25, 25, 25, 25, 25, 25, 25,
-	25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
-	25, 25, 25, 25, 25, 25, 26, 26, 26, 26,
-	26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
-	26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
-	26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
-	26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
-	26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
-	26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
-	26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
-	26, 26, 26,
+	0, 1, 23, 23, 23, 42, 42, 42, 2, 2,
+	5, 11, 11, 11, 12, 12, 12, 12, 12, 12,
+	12, 12, 12, 12, 12, 14, 16, 16, 17, 17,
+	17, 17, 17, 15, 15, 15, 9, 9, 4, 4,
+	3, 43, 43, 44, 44, 44, 44, 44, 44, 44,
+	26, 33, 33, 33, 8, 8, 10, 10, 20, 20,
+	21, 22, 22, 19, 19, 27, 28, 29, 30, 31,
+	32, 45, 45, 45, 45, 48, 48, 46, 47, 24,
+	24, 25, 18, 18, 6, 6, 7, 7, 13, 13,
+	13, 34, 36, 35, 49, 49, 49, 50, 50, 50,
+	51, 51, 51, 51, 37, 37, 37, 37, 37, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 38, 38, 38,
+	38, 38, 38, 38, 38, 38, 38, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 40, 40, 40, 40, 40,
+	40, 40, 40, 40, 40, 40, 40, 40, 40, 40,
+	40, 40, 40, 40, 40, 40, 40, 40, 41, 41,
+	41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+	41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+	41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+	41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+	41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+	41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+	41, 41, 41, 41, 41, 41, 41, 41, 41, 41,
+	41, 41, 41, 41, 41,
 }
 var sqlR2 = []int{
 
-	0, 1, 1, 1, 2, 1, 3, 2, 1, 3,
-	1, 1, 1, 3, 3, 3, 2, 3, 3, 1,
-	1, 3, 3, 4, 4, 7, 5, 2, 2, 0,
-	1, 2, 2, 0, 1, 3, 3, 3, 3, 4,
-	2, 0, 1, 0, 1, 3, 3, 2, 1, 1,
+	0, 1, 1, 1, 0, 2, 2, 0, 1, 1,
+	2, 1, 3, 2, 1, 3, 1, 1, 1, 3,
+	3, 3, 2, 3, 3, 1, 1, 3, 3, 4,
+	4, 7, 5, 2, 2, 0, 1, 3, 3, 3,
+	4, 1, 1, 9, 9, 1, 2, 4, 4, 4,
+	0, 1, 1, 0, 1, 5, 1, 0, 1, 0,
+	3, 1, 3, 4, 3, 0, 0, 0, 0, 0,
+	0, 2, 2, 1, 1, 1, 0, 2, 2, 1,
+	1, 1, 2, 0, 1, 0, 1, 3, 3, 2,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -1175,16 +1193,16 @@ var sqlR2 = []int{
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1,
+	1, 1, 1, 1, 1,
 }
 var sqlChk = []int{
 
-	-1000, -1, -2, -3, -4, -5, 442, 319, -12, 148,
-	-3, -4, -6, -7, -10, -11, -9, 4, -21, -19,
-	370, 234, 442, 6, 5, -15, 402, -8, -14, -9,
-	443, 443, 446, 25, 4, 7, 22, 253, 445, -9,
-	-9, -2, 442, -17, -18, 254, -11, 446, 79, 229,
-	194, 25, 4, -10, -22, 4, -23, -24, -25, -26,
+	-1000, -1, -2, -3, -4, -5, 444, 319, -15, 148,
+	-3, -4, -6, -7, -13, -14, -12, 4, -36, -34,
+	370, 234, 444, 6, 5, -18, 402, -11, -17, -12,
+	445, 445, 448, 25, 4, 7, 22, 253, 447, -12,
+	-12, -2, 444, -20, -21, 254, -14, 448, 79, 229,
+	194, 25, 4, -13, -37, 4, -38, -39, -40, -41,
 	8, 9, 10, 11, 12, 13, 14, 15, 17, 18,
 	19, 27, 28, 30, 31, 33, 34, 35, 42, 43,
 	44, 45, 46, 49, 50, 53, 55, 56, 57, 58,
@@ -1226,77 +1244,79 @@ var sqlChk = []int{
 	187, 189, 200, 201, 207, 211, 212, 234, 239, 246,
 	248, 249, 253, 254, 268, 277, 291, 303, 319, 325,
 	336, 349, 352, 360, 363, 364, 370, 378, 379, 385,
-	386, 394, 401, 402, 404, 405, -9, -9, -9, 4,
-	443, 443, -3, -4, 446, 42, -8, 194, 194, -8,
-	4, -16, -9, -16, -8, -8, 386, 248, 26, 107,
-	442, -9, -13, 4, 446, 443, 4,
+	386, 394, 401, 402, 404, 405, -12, -12, -12, 4,
+	445, 445, -3, -4, 42, -11, 194, 194, -11, 4,
+	-22, -19, -14, -11, -11, 386, 248, 448, 386, -23,
+	26, 107, 444, -12, -19, -32, -42, 425, -16, 4,
+	-42, 140, 199, 448, 445, 4,
 }
 var sqlDef = []int{
 
-	0, -2, 1, 2, 3, 29, 0, 43, 41, 0,
-	0, 0, 4, 42, 44, 48, 19, 8, 10, 11,
-	12, 0, 0, 50, 49, 33, 0, 27, 28, 5,
-	37, 38, 0, 0, 47, 0, 0, 0, 0, 16,
-	0, 0, 0, 39, 34, 0, 40, 0, 0, 0,
-	0, 0, 7, 45, 46, 62, 63, 64, 65, 66,
-	67, 68, 69, 70, 71, 72, 73, 74, 75, 76,
-	77, 78, 79, 80, 81, 82, 83, 84, 85, 86,
-	87, 88, 89, 90, 91, 92, 93, 94, 95, 96,
-	97, 98, 99, 100, 101, 102, 103, 104, 105, 106,
-	107, 108, 109, 110, 111, 112, 113, 114, 115, 116,
-	117, 118, 119, 120, 121, 122, 123, 124, 125, 126,
-	127, 128, 129, 130, 131, 132, 133, 134, 135, 136,
-	137, 138, 139, 140, 141, 142, 143, 144, 145, 146,
-	147, 148, 149, 150, 151, 152, 153, 154, 155, 156,
-	157, 158, 159, 160, 161, 162, 163, 164, 165, 166,
-	167, 168, 169, 170, 171, 172, 173, 174, 175, 176,
-	177, 178, 179, 180, 181, 182, 183, 184, 185, 186,
-	187, 188, 189, 190, 191, 192, 193, 194, 195, 196,
-	197, 198, 199, 200, 201, 202, 203, 204, 205, 206,
-	207, 208, 209, 210, 211, 212, 213, 214, 215, 216,
-	217, 218, 219, 220, 221, 222, 223, 224, 225, 226,
-	227, 228, 229, 230, 231, 232, 233, 234, 235, 236,
-	237, 238, 239, 240, 241, 242, 243, 244, 245, 246,
-	247, 248, 249, 250, 251, 252, 253, 254, 255, 256,
-	257, 258, 259, 260, 261, 262, 263, 264, 265, 266,
-	267, 268, 269, 270, 271, 272, 273, 274, 275, 276,
-	277, 278, 279, 280, 281, 282, 283, 284, 285, 286,
-	287, 288, 289, 290, 291, 292, 293, 294, 295, 296,
-	297, 298, 299, 300, 301, 302, 303, 304, 305, 306,
-	307, 308, 309, 310, 311, 312, 313, 314, 315, 316,
-	317, 318, 319, 320, 321, 322, 323, 324, 325, 326,
-	327, 328, 329, 330, 331, 332, 333, 334, 335, 336,
-	337, 338, 339, 340, 341, 342, 343, 344, 345, 346,
-	347, 348, 349, 350, 351, 352, 353, 354, 355, 356,
-	357, 358, 359, 360, 361, 362, 363, 364, 365, 366,
-	367, 368, 369, 370, 371, 372, 373, 374, 375, 376,
-	377, 378, 379, 380, 381, 382, 383, 384, 385, 386,
-	387, 388, 389, 390, 391, 392, 393, 394, 395, 396,
-	397, 398, 399, 400, 401, 402, 403, 404, 405, 406,
-	407, 408, 409, 410, 411, 412, 413, 414, 415, 416,
-	417, 418, 419, 420, 421, 422, 423, 424, 425, 426,
-	427, 428, 429, 430, 431, 432, 433, 434, 435, 436,
-	437, 438, 439, 440, 441, 442, 443, 444, 445, 446,
-	447, 448, 449, 450, 451, 452, 453, 454, 455, 456,
-	457, 458, 459, 460, 461, 462, 463, 464, 465, 466,
-	467, 468, 469, 470, 471, 472, 473, 474, 475, 476,
-	477, 478, 479, 480, 481, 482, 13, 14, 15, 9,
-	17, 18, 0, 0, 0, 0, 22, 0, 0, 0,
-	6, 36, 30, 35, 23, 24, 0, 0, 31, 32,
-	0, 26, 0, 20, 0, 25, 21,
+	0, -2, 1, 8, 9, 35, 0, 85, 83, 0,
+	0, 0, 10, 84, 86, 90, 25, 14, 16, 17,
+	18, 0, 0, 92, 91, 59, 0, 33, 34, 11,
+	38, 39, 0, 0, 89, 0, 0, 0, 0, 22,
+	0, 0, 0, 40, 58, 0, 82, 0, 0, 0,
+	0, 0, 13, 87, 88, 104, 105, 106, 107, 108,
+	109, 110, 111, 112, 113, 114, 115, 116, 117, 118,
+	119, 120, 121, 122, 123, 124, 125, 126, 127, 128,
+	129, 130, 131, 132, 133, 134, 135, 136, 137, 138,
+	139, 140, 141, 142, 143, 144, 145, 146, 147, 148,
+	149, 150, 151, 152, 153, 154, 155, 156, 157, 158,
+	159, 160, 161, 162, 163, 164, 165, 166, 167, 168,
+	169, 170, 171, 172, 173, 174, 175, 176, 177, 178,
+	179, 180, 181, 182, 183, 184, 185, 186, 187, 188,
+	189, 190, 191, 192, 193, 194, 195, 196, 197, 198,
+	199, 200, 201, 202, 203, 204, 205, 206, 207, 208,
+	209, 210, 211, 212, 213, 214, 215, 216, 217, 218,
+	219, 220, 221, 222, 223, 224, 225, 226, 227, 228,
+	229, 230, 231, 232, 233, 234, 235, 236, 237, 238,
+	239, 240, 241, 242, 243, 244, 245, 246, 247, 248,
+	249, 250, 251, 252, 253, 254, 255, 256, 257, 258,
+	259, 260, 261, 262, 263, 264, 265, 266, 267, 268,
+	269, 270, 271, 272, 273, 274, 275, 276, 277, 278,
+	279, 280, 281, 282, 283, 284, 285, 286, 287, 288,
+	289, 290, 291, 292, 293, 294, 295, 296, 297, 298,
+	299, 300, 301, 302, 303, 304, 305, 306, 307, 308,
+	309, 310, 311, 312, 313, 314, 315, 316, 317, 318,
+	319, 320, 321, 322, 323, 324, 325, 326, 327, 328,
+	329, 330, 331, 332, 333, 334, 335, 336, 337, 338,
+	339, 340, 341, 342, 343, 344, 345, 346, 347, 348,
+	349, 350, 351, 352, 353, 354, 355, 356, 357, 358,
+	359, 360, 361, 362, 363, 364, 365, 366, 367, 368,
+	369, 370, 371, 372, 373, 374, 375, 376, 377, 378,
+	379, 380, 381, 382, 383, 384, 385, 386, 387, 388,
+	389, 390, 391, 392, 393, 394, 395, 396, 397, 398,
+	399, 400, 401, 402, 403, 404, 405, 406, 407, 408,
+	409, 410, 411, 412, 413, 414, 415, 416, 417, 418,
+	419, 420, 421, 422, 423, 424, 425, 426, 427, 428,
+	429, 430, 431, 432, 433, 434, 435, 436, 437, 438,
+	439, 440, 441, 442, 443, 444, 445, 446, 447, 448,
+	449, 450, 451, 452, 453, 454, 455, 456, 457, 458,
+	459, 460, 461, 462, 463, 464, 465, 466, 467, 468,
+	469, 470, 471, 472, 473, 474, 475, 476, 477, 478,
+	479, 480, 481, 482, 483, 484, 485, 486, 487, 488,
+	489, 490, 491, 492, 493, 494, 495, 496, 497, 498,
+	499, 500, 501, 502, 503, 504, 505, 506, 507, 508,
+	509, 510, 511, 512, 513, 514, 515, 516, 517, 518,
+	519, 520, 521, 522, 523, 524, 19, 20, 21, 15,
+	23, 24, 0, 0, 0, 28, 0, 0, 0, 12,
+	60, 61, 4, 29, 30, 0, 0, 0, 70, 7,
+	2, 3, 0, 32, 62, 7, 64, 0, 0, 26,
+	63, 5, 6, 0, 31, 27,
 }
 var sqlTok1 = []int{
 
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 437, 3, 3,
-	442, 443, 435, 433, 446, 434, 445, 436, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 439, 3, 3,
+	444, 445, 437, 435, 448, 436, 447, 438, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	424, 426, 425, 3, 3, 3, 3, 3, 3, 3,
+	427, 429, 428, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 440, 3, 441, 438,
+	3, 442, 3, 443, 440,
 }
 var sqlTok2 = []int{
 
@@ -1361,8 +1381,9 @@ var sqlTok3 = []int{
 	57750, 408, 57751, 409, 57752, 410, 57753, 411, 57754, 412,
 	57755, 413, 57756, 414, 57757, 415, 57758, 416, 57759, 417,
 	57760, 418, 57761, 419, 57762, 420, 57763, 421, 57764, 422,
-	57765, 423, 57766, 427, 57767, 428, 57768, 429, 57769, 430,
-	57770, 431, 57771, 432, 57772, 439, 57773, 444, 0,
+	57765, 423, 57766, 424, 57767, 425, 57768, 426, 57769, 430,
+	57770, 431, 57771, 432, 57772, 433, 57773, 434, 57774, 441,
+	57775, 446, 0,
 }
 
 //line yaccpar:1
@@ -1591,187 +1612,193 @@ sqldefault:
 	switch sqlnt {
 
 	case 1:
-		//line sql.y:213
+		//line sql.y:236
 		{
 			sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 			sqllex.(*sqlLex).stmt = sqlS[sqlpt-0].sqlSelect
 		}
 	case 2:
-		sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
+		//line sql.y:242
+		{
+			sqlVAL.src = "asc"
+		}
 	case 3:
-		sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
+		//line sql.y:243
+		{
+			sqlVAL.src = "desc"
+		}
 	case 4:
-		//line sql.y:269
+		//line sql.y:244
+		{
+			sqlVAL.src = ""
+		}
+	case 5:
+		//line sql.y:247
+		{
+			panic("TODO")
+		}
+	case 6:
+		//line sql.y:248
+		{
+			panic("TODO")
+		}
+	case 7:
+		//line sql.y:249
+		{
+		}
+	case 8:
+		sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
+	case 9:
+		sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
+	case 10:
+		//line sql.y:302
 		{
 			sqlVAL.fields = sqlS[sqlpt-0].fields
 		}
-	case 5:
-		//line sql.y:275
+	case 11:
+		//line sql.y:308
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
-	case 6:
-		//line sql.y:279
+	case 12:
+		//line sql.y:312
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
 		}
-	case 7:
-		//line sql.y:283
+	case 13:
+		//line sql.y:316
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
 		}
-	case 8:
-		//line sql.y:289
+	case 14:
+		//line sql.y:322
 		{
 			sqlVAL.expr = ColumnRef{Column: sqlS[sqlpt-0].src}
 		}
-	case 9:
-		//line sql.y:293
+	case 15:
+		//line sql.y:326
 		{
 			sqlVAL.expr = ColumnRef{Table: sqlS[sqlpt-2].src, Column: sqlS[sqlpt-0].src}
 		}
-	case 10:
-		//line sql.y:297
+	case 16:
+		//line sql.y:330
 		{
 			sqlVAL.expr = StringLiteral(sqlS[sqlpt-0].src)
 		}
-	case 11:
-		//line sql.y:301
+	case 17:
+		//line sql.y:334
 		{
 			sqlVAL.expr = IntegerLiteral(sqlS[sqlpt-0].src)
 		}
-	case 12:
-		//line sql.y:305
+	case 18:
+		//line sql.y:338
 		{
 			sqlVAL.expr = ColumnRef{Column: "true"}
 		}
-	case 13:
-		//line sql.y:309
+	case 19:
+		//line sql.y:342
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: sqlS[sqlpt-1].src, Right: sqlS[sqlpt-0].expr}
 		}
-	case 14:
-		//line sql.y:313
+	case 20:
+		//line sql.y:346
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "and", Right: sqlS[sqlpt-0].expr}
 		}
-	case 15:
-		//line sql.y:317
+	case 21:
+		//line sql.y:350
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "or", Right: sqlS[sqlpt-0].expr}
 		}
-	case 16:
-		//line sql.y:321
+	case 22:
+		//line sql.y:354
 		{
 			sqlVAL.expr = NotExpr{Expr: sqlS[sqlpt-0].expr}
 		}
-	case 17:
-		//line sql.y:325
+	case 23:
+		//line sql.y:358
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].expr}
 		}
-	case 18:
-		//line sql.y:329
+	case 24:
+		//line sql.y:362
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].sqlSelect}
 		}
-	case 19:
+	case 25:
 		sqlVAL.expr = sqlS[sqlpt-0].expr
-	case 20:
-		//line sql.y:337
+	case 26:
+		//line sql.y:370
 		{
 			sqlVAL.identifiers = []string{sqlS[sqlpt-0].src}
 		}
-	case 21:
-		//line sql.y:341
+	case 27:
+		//line sql.y:374
 		{
 			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].src)
 		}
-	case 22:
-		//line sql.y:347
+	case 28:
+		//line sql.y:380
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-2].expr, Join: ",", Right: sqlS[sqlpt-0].expr}
 		}
-	case 23:
-		//line sql.y:351
+	case 29:
+		//line sql.y:384
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-3].expr, Join: "cross join", Right: sqlS[sqlpt-0].expr}
 		}
-	case 24:
-		//line sql.y:355
+	case 30:
+		//line sql.y:388
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-3].expr, Join: "natural join", Right: sqlS[sqlpt-0].expr}
 		}
-	case 25:
-		//line sql.y:359
+	case 31:
+		//line sql.y:392
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-6].expr, Join: "join", Right: sqlS[sqlpt-4].expr, Using: sqlS[sqlpt-1].identifiers}
 		}
-	case 26:
-		//line sql.y:363
+	case 32:
+		//line sql.y:396
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-4].expr, Join: "join", Right: sqlS[sqlpt-2].expr, On: sqlS[sqlpt-0].expr}
 		}
-	case 27:
-		//line sql.y:369
+	case 33:
+		//line sql.y:402
 		{
 			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
 		}
-	case 28:
-		//line sql.y:373
+	case 34:
+		//line sql.y:406
 		{
 			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
 		}
-	case 29:
-		//line sql.y:376
+	case 35:
+		//line sql.y:409
 		{
 			sqlVAL.fromClause = nil
 		}
-	case 30:
-		//line sql.y:380
-		{
-			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-0].expr}
-		}
-	case 31:
-		//line sql.y:384
-		{
-			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-1].expr, Order: "asc"}
-		}
-	case 32:
-		//line sql.y:388
-		{
-			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-1].expr, Order: "desc"}
-		}
-	case 33:
-		//line sql.y:394
-		{
-			sqlVAL.orderClause = nil
-		}
-	case 34:
-		sqlVAL.orderClause = sqlS[sqlpt-0].orderClause
-	case 35:
-		//line sql.y:401
-		{
-			sqlVAL.orderClause = &OrderClause{Exprs: []OrderExpr{sqlS[sqlpt-0].orderExpr}}
-		}
 	case 36:
-		//line sql.y:405
+		//line sql.y:415
 		{
-			sqlS[sqlpt-2].orderClause.Exprs = append(sqlS[sqlpt-2].orderClause.Exprs, sqlS[sqlpt-0].orderExpr)
-			sqlVAL.orderClause = sqlS[sqlpt-2].orderClause
+			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
 	case 37:
-		//line sql.y:413
+		//line sql.y:419
 		{
-			sqlVAL.sqlSelect = sqlS[sqlpt-1].sqlSelect
+			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
 	case 38:
-		//line sql.y:414
+		//line sql.y:425
 		{
 			sqlVAL.sqlSelect = sqlS[sqlpt-1].sqlSelect
 		}
 	case 39:
-		//line sql.y:418
+		//line sql.y:426
+		{
+			sqlVAL.sqlSelect = sqlS[sqlpt-1].sqlSelect
+		}
+	case 40:
+		//line sql.y:430
 		{
 			ss := &SelectStmt{}
 			ss.TargetList = sqlS[sqlpt-3].fields
@@ -1780,166 +1807,274 @@ sqldefault:
 			ss.OrderClause = sqlS[sqlpt-0].orderClause
 			sqlVAL.sqlSelect = ss
 		}
-	case 40:
-		//line sql.y:440
+	case 43:
+		//line sql.y:471
+		{
+			panic("TODO")
+		}
+	case 44:
+		//line sql.y:477
+		{
+			panic("TODO")
+		}
+	case 46:
+		//line sql.y:482
+		{
+			panic("TODO")
+		}
+	case 47:
+		//line sql.y:486
+		{
+			panic("TODO")
+		}
+	case 48:
+		//line sql.y:490
+		{
+			panic("TODO")
+		}
+	case 49:
+		//line sql.y:494
+		{
+			panic("TODO")
+		}
+	case 50:
+		//line sql.y:514
+		{
+			sqlVAL.placeholder = nil
+		}
+	case 51:
+		//line sql.y:519
+		{
+			sqlVAL.boolean = true
+		}
+	case 52:
+		//line sql.y:520
+		{
+			sqlVAL.boolean = false
+		}
+	case 53:
+		//line sql.y:521
+		{
+			sqlVAL.boolean = false
+		}
+	case 54:
+		//line sql.y:528
+		{
+			panic("TODO")
+		}
+	case 55:
+		//line sql.y:529
+		{
+			sqlVAL.fields = sqlS[sqlpt-1].fields
+		}
+	case 56:
+		//line sql.y:533
+		{
+			sqlVAL.placeholder = nil
+		}
+	case 57:
+		//line sql.y:534
+		{
+			sqlVAL.placeholder = nil
+		}
+	case 58:
+		//line sql.y:537
+		{
+			sqlVAL.orderClause = sqlS[sqlpt-0].orderClause
+		}
+	case 59:
+		//line sql.y:538
+		{
+			sqlVAL.orderClause = nil
+		}
+	case 60:
+		//line sql.y:541
+		{
+			sqlVAL.orderClause = sqlS[sqlpt-0].orderClause
+		}
+	case 61:
+		//line sql.y:545
+		{
+			sqlVAL.orderClause = &OrderClause{Exprs: []OrderExpr{sqlS[sqlpt-0].orderExpr}}
+		}
+	case 62:
+		//line sql.y:549
+		{
+			sqlS[sqlpt-2].orderClause.Exprs = append(sqlS[sqlpt-2].orderClause.Exprs, sqlS[sqlpt-0].orderExpr)
+			sqlVAL.orderClause = sqlS[sqlpt-2].orderClause
+		}
+	case 63:
+		//line sql.y:557
+		{
+			panic("TODO")
+		}
+	case 64:
+		//line sql.y:561
+		{
+			/* TODO -- handle opt_nulls_order */
+			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-2].expr, Order: sqlS[sqlpt-1].src}
+		}
+	case 65:
+		//line sql.y:568
+		{
+			panic("TODO")
+		}
+	case 66:
+		//line sql.y:569
+		{
+			panic("TODO")
+		}
+	case 67:
+		//line sql.y:570
+		{
+			panic("TODO")
+		}
+	case 68:
+		//line sql.y:571
+		{
+			panic("TODO")
+		}
+	case 69:
+		//line sql.y:572
+		{
+			panic("TODO")
+		}
+	case 70:
+		//line sql.y:573
+		{
+			panic("TODO")
+		}
+	case 71:
+		//line sql.y:581
+		{
+			panic("TODO")
+		}
+	case 72:
+		//line sql.y:582
+		{
+			panic("TODO")
+		}
+	case 73:
+		//line sql.y:583
+		{
+			panic("TODO")
+		}
+	case 74:
+		//line sql.y:584
+		{
+			panic("TODO")
+		}
+	case 75:
+		//line sql.y:588
+		{
+			panic("TODO")
+		}
+	case 76:
+		//line sql.y:589
+		{
+			panic("TODO")
+		}
+	case 77:
+		//line sql.y:593
+		{
+			panic("TODO")
+		}
+	case 78:
+		//line sql.y:600
+		{
+			panic("TODO")
+		}
+	case 79:
+		//line sql.y:606
+		{
+			sqlVAL.placeholder = sqlS[sqlpt-0].expr
+		}
+	case 80:
+		//line sql.y:608
+		{
+			panic("TODO")
+		}
+	case 81:
+		//line sql.y:613
+		{
+			sqlVAL.placeholder = sqlS[sqlpt-0].expr
+		}
+	case 82:
+		//line sql.y:629
 		{
 			sqlVAL.whereClause = &WhereClause{Expr: sqlS[sqlpt-0].expr}
 		}
-	case 41:
-		//line sql.y:441
+	case 83:
+		//line sql.y:630
 		{
 			sqlVAL.whereClause = nil
 		}
-	case 42:
-		//line sql.y:451
+	case 84:
+		//line sql.y:640
 		{
 			sqlVAL.fields = sqlS[sqlpt-0].fields
 		}
-	case 43:
-		//line sql.y:452
+	case 85:
+		//line sql.y:641
 		{
 			sqlVAL.fields = nil
 		}
-	case 44:
-		//line sql.y:455
+	case 86:
+		//line sql.y:644
 		{
 			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
-	case 45:
-		//line sql.y:457
+	case 87:
+		//line sql.y:646
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
-	case 46:
-		//line sql.y:463
+	case 88:
+		//line sql.y:652
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
 		}
-	case 47:
-		//line sql.y:467
+	case 89:
+		//line sql.y:656
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
 		}
-	case 48:
-		sqlVAL.expr = sqlS[sqlpt-0].expr
-	case 49:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 50:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 51:
-		//line sql.y:479
-		{
-			sqlVAL.src = sqlS[sqlpt-0].src
-		}
-	case 62:
-		//line sql.y:522
-		{
-			sqlVAL.src = sqlS[sqlpt-0].src
-		}
-	case 63:
-		//line sql.y:523
-		{
-			sqlVAL.src = sqlS[sqlpt-0].src
-		}
-	case 64:
-		//line sql.y:524
-		{
-			sqlVAL.src = sqlS[sqlpt-0].src
-		}
-	case 65:
-		//line sql.y:525
-		{
-			sqlVAL.src = sqlS[sqlpt-0].src
-		}
-	case 66:
-		//line sql.y:526
-		{
-			sqlVAL.src = sqlS[sqlpt-0].src
-		}
-	case 67:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 68:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 69:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 70:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 71:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 72:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 73:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 74:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 75:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 76:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 77:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 78:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 79:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 80:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 81:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 82:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 83:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 84:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 85:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 86:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 87:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 88:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 89:
-		sqlVAL.src = sqlS[sqlpt-0].src
 	case 90:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.expr = sqlS[sqlpt-0].expr
 	case 91:
 		sqlVAL.src = sqlS[sqlpt-0].src
 	case 92:
 		sqlVAL.src = sqlS[sqlpt-0].src
 	case 93:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 94:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 95:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 96:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 97:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 98:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 99:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 100:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 101:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 102:
-		sqlVAL.src = sqlS[sqlpt-0].src
-	case 103:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		//line sql.y:668
+		{
+			sqlVAL.src = sqlS[sqlpt-0].src
+		}
 	case 104:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		//line sql.y:711
+		{
+			sqlVAL.src = sqlS[sqlpt-0].src
+		}
 	case 105:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		//line sql.y:712
+		{
+			sqlVAL.src = sqlS[sqlpt-0].src
+		}
 	case 106:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		//line sql.y:713
+		{
+			sqlVAL.src = sqlS[sqlpt-0].src
+		}
 	case 107:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		//line sql.y:714
+		{
+			sqlVAL.src = sqlS[sqlpt-0].src
+		}
 	case 108:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		//line sql.y:715
+		{
+			sqlVAL.src = sqlS[sqlpt-0].src
+		}
 	case 109:
 		sqlVAL.src = sqlS[sqlpt-0].src
 	case 110:
@@ -2687,6 +2822,90 @@ sqldefault:
 	case 481:
 		sqlVAL.src = sqlS[sqlpt-0].src
 	case 482:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 483:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 484:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 485:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 486:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 487:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 488:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 489:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 490:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 491:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 492:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 493:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 494:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 495:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 496:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 497:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 498:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 499:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 500:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 501:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 502:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 503:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 504:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 505:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 506:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 507:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 508:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 509:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 510:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 511:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 512:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 513:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 514:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 515:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 516:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 517:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 518:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 519:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 520:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 521:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 522:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 523:
+		sqlVAL.src = sqlS[sqlpt-0].src
+	case 524:
 		sqlVAL.src = sqlS[sqlpt-0].src
 	}
 	goto sqlstack /* stack new state and value */

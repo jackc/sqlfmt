@@ -14,6 +14,8 @@ package main
   whereClause *WhereClause
   orderExpr OrderExpr
   orderClause *OrderClause
+  boolean bool
+  placeholder interface{}
 }
 
 %type <sqlSelect> top
@@ -21,16 +23,27 @@ package main
 %type <sqlSelect> select_no_parens
 %type <sqlSelect> select_with_parens
 %type <fields> selectClause
-%type <fields> opt_target_list target_list
+%type <fields> opt_target_list target_list distinct_clause expr_list
+%type <placeholder> opt_all_clause
+
 %type <expr> aliasableExpr
 %type <expr> expr target_el a_expr
 %type <fromClause> from_clause
 %type <identifiers> identifierSeq
 %type <expr> joinExpr
 %type <whereClause> where_clause
-%type <orderExpr> orderExpr
-%type <orderClause> optOrderClause
-%type <orderClause> orderClause
+%type <orderExpr> sortby
+%type <orderClause> opt_sort_clause sort_clause sortby_list
+%type <src> opt_asc_desc
+%type <placeholder> select_limit_value select_offset_value into_clause
+  group_clause
+  having_clause
+  window_clause
+  values_clause
+  relation_expr
+  qual_all_Op
+
+%type <boolean> all_or_distinct
 
 %type <src>  Iconst SignedIconst Sconst
 
@@ -137,7 +150,17 @@ package main
 
   ZONE
 
-
+/*
+ * The grammar thinks these are keywords, but they are not in the kwlist.h
+ * list and so can never be entered directly.  The filter in parser.c
+ * creates these tokens when required (based on looking one token ahead).
+ *
+ * NOT_LA exists so that productions such as NOT LIKE can be given the same
+ * precedence as LIKE; otherwise they'd effectively have the same precedence
+ * as NOT, at least with respect to their left-hand subexpression.
+ * NULLS_LA and WITH_LA are needed to make the grammar LALR(1).
+ */
+%token    NOT_LA NULLS_LA WITH_LA
 
 %left OP
 
@@ -214,6 +237,16 @@ top:
     $$ = $1
     sqllex.(*sqlLex).stmt = $1
   }
+
+opt_asc_desc:
+  ASC          { $$ = "asc" }
+| DESC         { $$ = "desc" }
+| /*EMPTY*/    { $$ = "" }
+
+opt_nulls_order:
+  NULLS_LA FIRST_P    { panic("TODO") }
+| NULLS_LA LAST_P     { panic("TODO") }
+| /*EMPTY*/           {  }
 
 /*****************************************************************************
  *
@@ -375,38 +408,17 @@ from_clause:
   }
 | /*EMPTY*/  { $$ = nil }
 
-orderExpr:
-  expr
-  {
-    $$ = OrderExpr{Expr: $1}
-  }
-| expr ASC
-  {
-    $$ = OrderExpr{Expr: $1, Order: "asc"}
-  }
-| expr DESC
-  {
-    $$ = OrderExpr{Expr: $1, Order: "desc"}
-  }
 
-optOrderClause:
-  /*EMPTY*/
-  {
-    $$ = nil
-  }
-| orderClause
 
-orderClause:
-  ORDER BY orderExpr
+expr_list:
+  a_expr
   {
-    $$ = &OrderClause{Exprs: []OrderExpr{$3}}
+    $$ = []Expr{$1}
   }
-| orderClause ',' orderExpr
+| expr_list ',' a_expr
   {
-    $1.Exprs = append($1.Exprs, $3)
-    $$ = $1
+    $$ = append($1, $3)
   }
-
 
 
 select_with_parens:
@@ -414,7 +426,7 @@ select_with_parens:
 | '(' select_with_parens ')'      { $$ = $2 }
 
 select_no_parens:
-  selectClause from_clause where_clause optOrderClause
+  selectClause from_clause where_clause opt_sort_clause
   {
     ss := &SelectStmt{}
     ss.TargetList = $1
@@ -423,6 +435,184 @@ select_no_parens:
     ss.OrderClause = $4
     $$ = ss
   }
+
+
+select_clause:
+  simple_select
+| select_with_parens
+
+/*
+ * This rule parses SELECT statements that can appear within set operations,
+ * including UNION, INTERSECT and EXCEPT.  '(' and ')' can be used to specify
+ * the ordering of the set operations.  Without '(' and ')' we want the
+ * operations to be ordered per the precedence specs at the head of this file.
+ *
+ * As with select_no_parens, simple_select cannot have outer parentheses,
+ * but can have parenthesized subclauses.
+ *
+ * Note that sort clauses cannot be included at this level --- SQL requires
+ *    SELECT foo UNION SELECT bar ORDER BY baz
+ * to be parsed as
+ *    (SELECT foo UNION SELECT bar) ORDER BY baz
+ * not
+ *    SELECT foo UNION (SELECT bar ORDER BY baz)
+ * Likewise for WITH, FOR UPDATE and LIMIT.  Therefore, those clauses are
+ * described as part of the select_no_parens production, not simple_select.
+ * This does not limit functionality, because you can reintroduce these
+ * clauses inside parentheses.
+ *
+ * NOTE: only the leftmost component SelectStmt should have INTO.
+ * However, this is not checked by the grammar; parse analysis must check it.
+ */
+simple_select:
+      SELECT opt_all_clause opt_target_list
+      into_clause from_clause where_clause
+      group_clause having_clause window_clause
+        {
+          panic("TODO")
+        }
+      | SELECT distinct_clause target_list
+      into_clause from_clause where_clause
+      group_clause having_clause window_clause
+        {
+          panic("TODO")
+        }
+      | values_clause
+      | TABLE relation_expr
+        {
+          panic("TODO")
+        }
+      | select_clause UNION all_or_distinct select_clause
+        {
+          panic("TODO")
+        }
+      | select_clause INTERSECT all_or_distinct select_clause
+        {
+          panic("TODO")
+        }
+      | select_clause EXCEPT all_or_distinct select_clause
+        {
+          panic("TODO")
+        }
+
+
+
+
+into_clause:
+/* TODO      INTO OptTempTableName
+        {
+          $$ = makeNode(IntoClause);
+          $$->rel = $2;
+          $$->colNames = NIL;
+          $$->options = NIL;
+          $$->onCommit = ONCOMMIT_NOOP;
+          $$->tableSpaceName = NULL;
+          $$->viewQuery = NULL;
+          $$->skipData = false;
+        }
+      | */ /*EMPTY*/
+        { $$ = nil }
+
+
+
+all_or_distinct:
+  ALL                   { $$ = true }
+      | DISTINCT                { $$ = false }
+      | /*EMPTY*/               { $$ = false }
+    ;
+
+/* We use (NIL) as a placeholder to indicate that all target expressions
+ * should be placed in the DISTINCT list during parsetree analysis.
+ */
+distinct_clause:
+      DISTINCT                { panic("TODO") }
+      | DISTINCT ON '(' expr_list ')'     { $$ = $4; }
+    ;
+
+opt_all_clause:
+  ALL        { $$ = nil }
+| /*EMPTY*/  { $$ = nil }
+
+opt_sort_clause:
+  sort_clause  { $$ = $1 }
+| /*EMPTY*/    { $$ = nil }
+
+sort_clause:
+  ORDER BY sortby_list  { $$ = $3 }
+
+sortby_list:
+  sortby
+  {
+    $$ = &OrderClause{Exprs: []OrderExpr{$1}}
+  }
+| sortby_list ',' sortby
+  {
+    $1.Exprs = append($1.Exprs, $3)
+    $$ = $1
+  }
+
+
+sortby:
+a_expr USING qual_all_Op opt_nulls_order
+  {
+    panic("TODO")
+  }
+| a_expr opt_asc_desc opt_nulls_order
+  {
+    /* TODO -- handle opt_nulls_order */
+    $$ = OrderExpr{Expr: $1, Order: $2}
+  }
+
+
+
+
+group_clause: { panic("TODO") }
+having_clause: { panic("TODO") }
+window_clause: { panic("TODO") }
+values_clause: { panic("TODO") }
+relation_expr: { panic("TODO") }
+qual_all_Op: { panic("TODO") }
+
+
+
+
+
+
+select_limit:
+      limit_clause offset_clause      { panic("TODO") }
+      | offset_clause limit_clause    { panic("TODO") }
+      | limit_clause            { panic("TODO") }
+      | offset_clause           { panic("TODO") }
+    ;
+
+opt_select_limit:
+  select_limit  { panic("TODO") }
+| /* EMPTY */   { panic("TODO") }
+
+limit_clause:
+  LIMIT select_limit_value
+  {
+    panic("TODO")
+  }
+  /* TODO SQL:2008 syntax */
+
+offset_clause:
+  OFFSET select_offset_value
+  {
+    panic("TODO")
+  }
+  /* TODO SQL:2008 syntax */
+
+select_limit_value:
+  a_expr      { $$ = $1; }
+| ALL
+  {
+    panic("TODO")
+  }
+
+select_offset_value:
+  a_expr   { $$ = $1 }
+
 
 
 /*****************************************************************************
