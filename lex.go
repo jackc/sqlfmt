@@ -20,23 +20,16 @@ type sqlLex struct {
 	pos    int
 	width  int
 	state  stateFn
-	tokens chan token
+	tokens []token
 	stmt   *SelectStmt
 }
 
 func (x *sqlLex) Lex(yylval *sqlSymType) int {
-	for {
-		select {
-		case token := <-x.tokens:
-			yylval.src = token.src
-			return token.typ
-		default:
-			x.state = x.state(x)
-			if x.state == nil {
-				return eof
-			}
-		}
-	}
+	token := x.tokens[0]
+	x.tokens = x.tokens[1:]
+
+	yylval.src = token.src
+	return token.typ
 }
 
 // The parser calls this method on a parse error.
@@ -45,10 +38,18 @@ func (x *sqlLex) Error(s string) {
 }
 
 func NewSqlLexer(src string) *sqlLex {
-	return &sqlLex{src: src,
-		tokens: make(chan token, 2),
+	x := &sqlLex{src: src,
+		tokens: make([]token, 0),
 		state:  blankState,
 	}
+
+	for x.state != nil {
+		x.state = x.state(x)
+	}
+
+	x.tokens = append(x.tokens, token{typ: eof})
+
+	return x
 }
 
 func (l *sqlLex) next() (r rune) {
@@ -103,7 +104,7 @@ func blankState(l *sqlLex) stateFn {
 func lexNumber(l *sqlLex) stateFn {
 	l.acceptRunFunc(unicode.IsDigit)
 	t := token{src: l.src[l.start:l.pos], typ: ICONST}
-	l.tokens <- t
+	l.tokens = append(l.tokens, t)
 	l.start = l.pos
 	return blankState
 }
@@ -119,7 +120,7 @@ func lexAlphanumeric(l *sqlLex) stateFn {
 		t.typ = IDENT
 	}
 
-	l.tokens <- t
+	l.tokens = append(l.tokens, t)
 	l.start = l.pos
 	return blankState
 }
@@ -138,7 +139,7 @@ func lexStringLiteral(l *sqlLex) stateFn {
 				l.unnext()
 				t := token{src: l.src[l.start:l.pos]}
 				t.typ = SCONST
-				l.tokens <- t
+				l.tokens = append(l.tokens, t)
 				l.start = l.pos
 				return blankState
 			}
@@ -160,7 +161,7 @@ func lexQuotedIdentifier(l *sqlLex) stateFn {
 				l.unnext()
 				t := token{src: l.src[l.start:l.pos]}
 				t.typ = IDENT
-				l.tokens <- t
+				l.tokens = append(l.tokens, t)
 				l.start = l.pos
 				return blankState
 			}
@@ -170,13 +171,13 @@ func lexQuotedIdentifier(l *sqlLex) stateFn {
 
 func lexOperator(l *sqlLex) stateFn {
 	l.acceptRunFunc(isOperator)
-	l.tokens <- token{OP, l.src[l.start:l.pos]}
+	l.tokens = append(l.tokens, token{OP, l.src[l.start:l.pos]})
 	l.start = l.pos
 	return blankState
 }
 
 func lexSimple(l *sqlLex) stateFn {
-	l.tokens <- token{int(l.src[l.start]), l.src[l.start:l.pos]}
+	l.tokens = append(l.tokens, token{int(l.src[l.start]), l.src[l.start:l.pos]})
 	l.start = l.pos
 	return blankState
 }
