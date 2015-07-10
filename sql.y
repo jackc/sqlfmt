@@ -464,13 +464,18 @@ simple_select:
           ss.WhereClause = $6
           $$ = ss
         }
-/*      | SELECT distinct_clause target_list
+      | SELECT distinct_clause target_list
       into_clause from_clause where_clause
       group_clause having_clause window_clause
         {
-          panic("TODO")
+          ss := &SelectStmt{}
+          ss.DistinctList = $2
+          ss.TargetList = $3
+          ss.FromClause = $5
+          ss.WhereClause = $6
+          $$ = ss
         }
-      | values_clause
+/*      | values_clause
       | TABLE relation_expr
         {
           panic("TODO")
@@ -514,13 +519,10 @@ all_or_distinct:
       | /*EMPTY*/               { $$ = false }
     ;
 
-/* We use (NIL) as a placeholder to indicate that all target expressions
- * should be placed in the DISTINCT list during parsetree analysis.
- */
+
 distinct_clause:
-      DISTINCT                { panic("TODO") }
-      | DISTINCT ON '(' expr_list ')'     { $$ = $4; }
-    ;
+  DISTINCT { $$ = make([]Expr, 0) }
+| DISTINCT ON '(' expr_list ')'     { $$ = $4; }
 
 opt_all_clause:
   ALL        { $$ = nil }

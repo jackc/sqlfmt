@@ -209,14 +209,21 @@ func (e OrderClause) RenderTo(r Renderer) {
 }
 
 type SelectStmt struct {
-	TargetList  []Expr
-	FromClause  *FromClause
-	WhereClause *WhereClause
-	OrderClause *OrderClause
+	DistinctList []Expr
+	TargetList   []Expr
+	FromClause   *FromClause
+	WhereClause  *WhereClause
+	OrderClause  *OrderClause
 }
 
 func (s SelectStmt) RenderTo(r Renderer) {
 	r.Text("select", "keyword")
+
+	if s.DistinctList != nil {
+		r.Text(" ", "space")
+		r.Text("distinct", "keyword")
+	}
+
 	r.NewLine()
 	r.Indent()
 	for i, f := range s.TargetList {
