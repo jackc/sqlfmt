@@ -18,6 +18,7 @@ package main
 
 %type <sqlSelect> top
 %type <sqlSelect> selectStatement
+%type <sqlSelect> select_no_parens
 %type <fields> selectClause
 %type <fields> opt_target_list target_list
 %type <expr> aliasableExpr
@@ -151,14 +152,10 @@ top:
   }
 
 selectStatement:
-  selectClause from_clause where_clause optOrderClause
+  select_no_parens
   {
-    $$ = &SelectStmt{}
-    $$.TargetList = $1
-    $$.FromClause = $2
-    $$.WhereClause = $3
-    $$.OrderClause = $4
-    sqllex.(*sqlLex).stmt = $$
+    $$ = $1
+    sqllex.(*sqlLex).stmt = $1
   }
 
 selectClause:
@@ -306,7 +303,16 @@ orderClause:
 
 
 
-
+select_no_parens:
+  selectClause from_clause where_clause optOrderClause
+  {
+    ss := &SelectStmt{}
+    ss.TargetList = $1
+    ss.FromClause = $2
+    ss.WhereClause = $3
+    ss.OrderClause = $4
+    $$ = ss
+  }
 
 
 /*****************************************************************************
