@@ -21,6 +21,8 @@ package main
   boolean bool
   placeholder interface{}
   columnRef ColumnRef
+  whenClauses []WhenClause
+  whenClause WhenClause
 }
 
 %type <sqlSelect> top
@@ -68,6 +70,10 @@ package main
 %type <boolean> all_or_distinct
 
 %type <str>  Iconst SignedIconst Sconst
+
+%type <expr> case_expr case_arg case_default
+%type <whenClauses> when_clause_list
+%type <whenClause> when_clause
 
 %type <columnRef> columnref
 
@@ -500,9 +506,8 @@ c_expr:
   {
     $$ = ParenExpr{Expr: $2}
   }
+| case_expr { $$ = $1 }
 /*
-| case_expr
-  { $$ = $1; }
 | func_expr
   { $$ = $1; }
   */
@@ -984,6 +989,44 @@ qual_all_Op:
   all_Op { $$ = string($1) }
 | OPERATOR '(' any_operator ')' { $$ = $3 }
 
+
+/*
+ * Define SQL-style CASE clause.
+ * - Full specification
+ *  CASE WHEN a = b THEN c ... ELSE d END
+ * - Implicit argument
+ *  CASE a WHEN b THEN c ... ELSE d END
+ */
+case_expr:
+  CASE case_arg when_clause_list case_default END_P
+  {
+    $$ = CaseExpr{CaseArg: $2, WhenClauses: $3, Default: $4}
+  }
+
+when_clause_list:
+  /* There must be at least one */
+  when_clause
+  {
+    $$ = []WhenClause{$1}
+  }
+| when_clause_list when_clause
+  {
+    $$ = append($1, $2)
+  }
+
+when_clause:
+  WHEN a_expr THEN a_expr
+  {
+    $$ = WhenClause{When: $2, Then: $4}
+  }
+
+case_default:
+  ELSE a_expr   { $$ = $2 }
+| /*EMPTY*/     { $$ = nil }
+
+case_arg:
+  a_expr        { $$ = $1 }
+| /*EMPTY*/     { $$ = nil }
 
 columnref:
 ColId

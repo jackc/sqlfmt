@@ -253,6 +253,14 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "select_table_dot_star.sql",
 			expectedOutputFile: "select_table_dot_star.fmt.sql",
 		},
+		{
+			inputFile:          "case_full.sql",
+			expectedOutputFile: "case_full.fmt.sql",
+		},
+		{
+			inputFile:          "case_implicit.sql",
+			expectedOutputFile: "case_implicit.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

@@ -64,6 +64,57 @@ func (e BinaryExpr) RenderTo(r Renderer) {
 	e.Right.RenderTo(r)
 }
 
+type WhenClause struct {
+	When Expr
+	Then Expr
+}
+
+func (w WhenClause) RenderTo(r Renderer) {
+	r.Text("when", "keyword")
+	r.Text(" ", "space")
+	w.When.RenderTo(r)
+	r.Text(" ", "space")
+	r.Text("then", "keyword")
+	r.NewLine()
+	r.Indent()
+	w.Then.RenderTo(r)
+	r.NewLine()
+	r.Unindent()
+}
+
+type CaseExpr struct {
+	CaseArg     Expr
+	WhenClauses []WhenClause
+	Default     Expr
+}
+
+func (c CaseExpr) RenderTo(r Renderer) {
+	r.Text("case", "keyword")
+
+	if c.CaseArg != nil {
+		r.Text(" ", "space")
+		c.CaseArg.RenderTo(r)
+	}
+
+	r.NewLine()
+
+	for _, w := range c.WhenClauses {
+		w.RenderTo(r)
+	}
+
+	if c.Default != nil {
+		r.Text("else", "keyword")
+		r.NewLine()
+		r.Indent()
+		c.Default.RenderTo(r)
+		r.NewLine()
+		r.Unindent()
+	}
+
+	r.Text("end", "keyword")
+	r.NewLine()
+}
+
 type ParenExpr struct {
 	Expr Expr
 }
