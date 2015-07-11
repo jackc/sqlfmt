@@ -1,5 +1,6 @@
 select
   not foo,
-  not true
+  not true,
+  not false
 from
   t

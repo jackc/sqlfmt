@@ -541,13 +541,6 @@ interval_second
  */
 a_expr:
   c_expr
-
-/* TODO - replace these placeholders as more PostgreSQL grammer is ported */
-| TRUE_P /* temp hack while integrating PostgreSQL keywords */
-  {
-    $$ = ColumnRef{Column: "true"}
-  }
-
 | a_expr TYPECAST Typename
   {
     $$ = TypecastExpr{Expr: $1, Typename: $3}
@@ -1487,8 +1480,16 @@ Iconst
 | ConstTypename Sconst
 | ConstInterval Sconst opt_interval
 | ConstInterval '(' Iconst ')' Sconst
+*/
 | TRUE_P
+  {
+    $$ = BoolLiteral(true)
+  }
 | FALSE_P
+  {
+    $$ = BoolLiteral(false)
+    }
+/* TODO
 | NULL_P
 */
 

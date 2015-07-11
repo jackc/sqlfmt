@@ -58,6 +58,16 @@ func (s IntegerLiteral) RenderTo(r Renderer) {
 	r.Text(string(s), "integerLiteral")
 }
 
+type BoolLiteral bool
+
+func (b BoolLiteral) RenderTo(r Renderer) {
+	if b {
+		r.Text("true", "boolLiteral")
+	} else {
+		r.Text("false", "boolLiteral")
+	}
+}
+
 type BinaryExpr struct {
 	Left     Expr
 	Operator string

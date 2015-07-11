@@ -1,1 +1,1 @@
-select not foo, not true from t
+select not foo, not true, not false from t
