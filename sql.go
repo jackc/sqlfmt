@@ -10,7 +10,6 @@ type sqlSymType struct {
 	sqlSelect     *SelectStmt
 	fields        []Expr
 	expr          Expr
-	src           string
 	str           string
 	identifiers   []string
 	fromClause    *FromClause
@@ -924,7 +923,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:1485
+//line sql.y:1484
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -1760,220 +1759,220 @@ sqldefault:
 	switch sqlnt {
 
 	case 1:
-		//line sql.y:273
+		//line sql.y:272
 		{
 			sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 			sqllex.(*sqlLex).stmt = sqlS[sqlpt-0].sqlSelect
 		}
 	case 2:
-		//line sql.y:279
+		//line sql.y:278
 		{
-			sqlVAL.src = "asc"
+			sqlVAL.str = "asc"
 		}
 	case 3:
-		//line sql.y:280
+		//line sql.y:279
 		{
-			sqlVAL.src = "desc"
+			sqlVAL.str = "desc"
 		}
 	case 4:
-		//line sql.y:281
+		//line sql.y:280
 		{
-			sqlVAL.src = ""
+			sqlVAL.str = ""
 		}
 	case 5:
-		//line sql.y:284
+		//line sql.y:283
 		{
-			sqlVAL.src = "first"
+			sqlVAL.str = "first"
 		}
 	case 6:
-		//line sql.y:285
+		//line sql.y:284
 		{
-			sqlVAL.src = "last"
+			sqlVAL.str = "last"
 		}
 	case 7:
-		//line sql.y:286
+		//line sql.y:285
 		{
-			sqlVAL.src = ""
+			sqlVAL.str = ""
 		}
 	case 8:
-		//line sql.y:290
+		//line sql.y:289
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 9:
-		//line sql.y:294
+		//line sql.y:293
 		{
-			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
+			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].str}
 		}
 	case 10:
-		//line sql.y:298
+		//line sql.y:297
 		{
-			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
+			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].str}
 		}
 	case 11:
-		//line sql.y:304
+		//line sql.y:303
 		{
-			sqlVAL.expr = ColumnRef{Column: sqlS[sqlpt-0].src}
+			sqlVAL.expr = ColumnRef{Column: sqlS[sqlpt-0].str}
 		}
 	case 12:
-		//line sql.y:308
+		//line sql.y:307
 		{
-			sqlVAL.expr = ColumnRef{Table: sqlS[sqlpt-2].src, Column: sqlS[sqlpt-0].src}
+			sqlVAL.expr = ColumnRef{Table: sqlS[sqlpt-2].str, Column: sqlS[sqlpt-0].str}
 		}
 	case 13:
-		//line sql.y:312
+		//line sql.y:311
 		{
-			sqlVAL.expr = StringLiteral(sqlS[sqlpt-0].src)
+			sqlVAL.expr = StringLiteral(sqlS[sqlpt-0].str)
 		}
 	case 14:
-		//line sql.y:316
+		//line sql.y:315
 		{
-			sqlVAL.expr = IntegerLiteral(sqlS[sqlpt-0].src)
+			sqlVAL.expr = IntegerLiteral(sqlS[sqlpt-0].str)
 		}
 	case 15:
-		//line sql.y:320
+		//line sql.y:319
 		{
 			sqlVAL.expr = ColumnRef{Column: "true"}
 		}
 	case 16:
-		//line sql.y:324
+		//line sql.y:323
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "+", Right: sqlS[sqlpt-0].expr}
 		}
 	case 17:
-		//line sql.y:328
+		//line sql.y:327
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "-", Right: sqlS[sqlpt-0].expr}
 		}
 	case 18:
-		//line sql.y:332
+		//line sql.y:331
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "*", Right: sqlS[sqlpt-0].expr}
 		}
 	case 19:
-		//line sql.y:336
+		//line sql.y:335
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "/", Right: sqlS[sqlpt-0].expr}
 		}
 	case 20:
-		//line sql.y:340
+		//line sql.y:339
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "=", Right: sqlS[sqlpt-0].expr}
 		}
 	case 21:
-		//line sql.y:344
+		//line sql.y:343
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "<", Right: sqlS[sqlpt-0].expr}
 		}
 	case 22:
-		//line sql.y:348
+		//line sql.y:347
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: ">", Right: sqlS[sqlpt-0].expr}
 		}
 	case 23:
-		//line sql.y:352
+		//line sql.y:351
 		{
-			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: sqlS[sqlpt-1].src, Right: sqlS[sqlpt-0].expr}
+			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: sqlS[sqlpt-1].str, Right: sqlS[sqlpt-0].expr}
 		}
 	case 24:
-		//line sql.y:356
+		//line sql.y:355
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "and", Right: sqlS[sqlpt-0].expr}
 		}
 	case 25:
-		//line sql.y:360
+		//line sql.y:359
 		{
 			sqlVAL.expr = BinaryExpr{Left: sqlS[sqlpt-2].expr, Operator: "or", Right: sqlS[sqlpt-0].expr}
 		}
 	case 26:
-		//line sql.y:364
+		//line sql.y:363
 		{
 			sqlVAL.expr = NotExpr{Expr: sqlS[sqlpt-0].expr}
 		}
 	case 27:
-		//line sql.y:368
+		//line sql.y:367
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].expr}
 		}
 	case 28:
-		//line sql.y:372
+		//line sql.y:371
 		{
 			sqlVAL.expr = ParenExpr{Expr: sqlS[sqlpt-1].sqlSelect}
 		}
 	case 29:
 		sqlVAL.expr = sqlS[sqlpt-0].expr
 	case 30:
-		//line sql.y:380
+		//line sql.y:379
 		{
-			sqlVAL.identifiers = []string{sqlS[sqlpt-0].src}
+			sqlVAL.identifiers = []string{sqlS[sqlpt-0].str}
 		}
 	case 31:
-		//line sql.y:384
+		//line sql.y:383
 		{
-			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].src)
+			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].str)
 		}
 	case 32:
-		//line sql.y:390
+		//line sql.y:389
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-2].expr, Join: ",", Right: sqlS[sqlpt-0].expr}
 		}
 	case 33:
-		//line sql.y:394
+		//line sql.y:393
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-3].expr, Join: "cross join", Right: sqlS[sqlpt-0].expr}
 		}
 	case 34:
-		//line sql.y:398
+		//line sql.y:397
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-3].expr, Join: "natural join", Right: sqlS[sqlpt-0].expr}
 		}
 	case 35:
-		//line sql.y:402
+		//line sql.y:401
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-6].expr, Join: "join", Right: sqlS[sqlpt-4].expr, Using: sqlS[sqlpt-1].identifiers}
 		}
 	case 36:
-		//line sql.y:406
+		//line sql.y:405
 		{
 			sqlVAL.expr = JoinExpr{Left: sqlS[sqlpt-4].expr, Join: "join", Right: sqlS[sqlpt-2].expr, On: sqlS[sqlpt-0].expr}
 		}
 	case 37:
-		//line sql.y:412
+		//line sql.y:411
 		{
 			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
 		}
 	case 38:
-		//line sql.y:416
+		//line sql.y:415
 		{
 			sqlVAL.fromClause = &FromClause{Expr: sqlS[sqlpt-0].expr}
 		}
 	case 39:
-		//line sql.y:419
+		//line sql.y:418
 		{
 			sqlVAL.fromClause = nil
 		}
 	case 40:
-		//line sql.y:423
+		//line sql.y:422
 		{
-			sqlVAL.src = "nowait"
+			sqlVAL.str = "nowait"
 		}
 	case 41:
-		//line sql.y:424
+		//line sql.y:423
 		{
-			sqlVAL.src = "skip locked"
+			sqlVAL.str = "skip locked"
 		}
 	case 42:
-		//line sql.y:425
+		//line sql.y:424
 		{
-			sqlVAL.src = ""
+			sqlVAL.str = ""
 		}
 	case 43:
-		//line sql.y:430
+		//line sql.y:429
 		{
 			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
 	case 44:
-		//line sql.y:434
+		//line sql.y:433
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
@@ -1982,25 +1981,25 @@ sqldefault:
 	case 46:
 		sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 	case 47:
-		//line sql.y:490
+		//line sql.y:489
 		{
 			sqlVAL.sqlSelect = sqlS[sqlpt-1].sqlSelect
 		}
 	case 48:
-		//line sql.y:491
+		//line sql.y:490
 		{
 			sqlVAL.sqlSelect = sqlS[sqlpt-1].sqlSelect
 		}
 	case 49:
 		sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 	case 50:
-		//line sql.y:496
+		//line sql.y:495
 		{
 			sqlS[sqlpt-1].sqlSelect.OrderClause = sqlS[sqlpt-0].orderClause
 			sqlVAL.sqlSelect = sqlS[sqlpt-1].sqlSelect
 		}
 	case 51:
-		//line sql.y:501
+		//line sql.y:500
 		{
 			sqlS[sqlpt-3].sqlSelect.OrderClause = sqlS[sqlpt-2].orderClause
 			sqlS[sqlpt-3].sqlSelect.LockingClause = sqlS[sqlpt-1].lockingClause
@@ -2008,7 +2007,7 @@ sqldefault:
 			sqlVAL.sqlSelect = sqlS[sqlpt-3].sqlSelect
 		}
 	case 52:
-		//line sql.y:508
+		//line sql.y:507
 		{
 			sqlS[sqlpt-3].sqlSelect.OrderClause = sqlS[sqlpt-2].orderClause
 			sqlS[sqlpt-3].sqlSelect.LimitClause = sqlS[sqlpt-1].limitClause
@@ -2020,7 +2019,7 @@ sqldefault:
 	case 54:
 		sqlVAL.sqlSelect = sqlS[sqlpt-0].sqlSelect
 	case 55:
-		//line sql.y:546
+		//line sql.y:545
 		{
 			ss := &SelectStmt{}
 			ss.TargetList = sqlS[sqlpt-6].fields
@@ -2031,7 +2030,7 @@ sqldefault:
 			sqlVAL.sqlSelect = ss
 		}
 	case 56:
-		//line sql.y:558
+		//line sql.y:557
 		{
 			ss := &SelectStmt{}
 			ss.DistinctList = sqlS[sqlpt-7].fields
@@ -2043,1305 +2042,1305 @@ sqldefault:
 			sqlVAL.sqlSelect = ss
 		}
 	case 57:
-		//line sql.y:602
+		//line sql.y:601
 		{
 			sqlVAL.placeholder = nil
 		}
 	case 58:
-		//line sql.y:607
+		//line sql.y:606
 		{
 			sqlVAL.boolean = true
 		}
 	case 59:
-		//line sql.y:608
+		//line sql.y:607
 		{
 			sqlVAL.boolean = false
 		}
 	case 60:
-		//line sql.y:609
+		//line sql.y:608
 		{
 			sqlVAL.boolean = false
 		}
 	case 61:
-		//line sql.y:614
+		//line sql.y:613
 		{
 			sqlVAL.fields = make([]Expr, 0)
 		}
 	case 62:
-		//line sql.y:615
+		//line sql.y:614
 		{
 			sqlVAL.fields = sqlS[sqlpt-1].fields
 		}
 	case 63:
-		//line sql.y:618
+		//line sql.y:617
 		{
 			sqlVAL.placeholder = nil
 		}
 	case 64:
-		//line sql.y:619
+		//line sql.y:618
 		{
 			sqlVAL.placeholder = nil
 		}
 	case 65:
-		//line sql.y:622
+		//line sql.y:621
 		{
 			sqlVAL.orderClause = sqlS[sqlpt-0].orderClause
 		}
 	case 66:
-		//line sql.y:623
+		//line sql.y:622
 		{
 			sqlVAL.orderClause = nil
 		}
 	case 67:
-		//line sql.y:626
+		//line sql.y:625
 		{
 			sqlVAL.orderClause = sqlS[sqlpt-0].orderClause
 		}
 	case 68:
-		//line sql.y:630
+		//line sql.y:629
 		{
 			sqlVAL.orderClause = &OrderClause{Exprs: []OrderExpr{sqlS[sqlpt-0].orderExpr}}
 		}
 	case 69:
-		//line sql.y:634
+		//line sql.y:633
 		{
 			sqlS[sqlpt-2].orderClause.Exprs = append(sqlS[sqlpt-2].orderClause.Exprs, sqlS[sqlpt-0].orderExpr)
 			sqlVAL.orderClause = sqlS[sqlpt-2].orderClause
 		}
 	case 70:
-		//line sql.y:642
+		//line sql.y:641
 		{
-			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-3].expr, Using: sqlS[sqlpt-1].src, Nulls: sqlS[sqlpt-0].src}
+			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-3].expr, Using: sqlS[sqlpt-1].str, Nulls: sqlS[sqlpt-0].str}
 		}
 	case 71:
-		//line sql.y:646
+		//line sql.y:645
 		{
-			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-2].expr, Order: sqlS[sqlpt-1].src, Nulls: sqlS[sqlpt-0].src}
+			sqlVAL.orderExpr = OrderExpr{Expr: sqlS[sqlpt-2].expr, Order: sqlS[sqlpt-1].str, Nulls: sqlS[sqlpt-0].str}
 		}
 	case 72:
-		//line sql.y:671
+		//line sql.y:670
 		{
 			sqlVAL.groupByClause = &GroupByClause{Exprs: sqlS[sqlpt-0].fields}
 		}
 	case 73:
-		//line sql.y:672
+		//line sql.y:671
 		{
 			sqlVAL.groupByClause = nil
 		}
 	case 74:
-		//line sql.y:676
+		//line sql.y:675
 		{
 			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
 	case 75:
-		//line sql.y:680
+		//line sql.y:679
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
 	case 76:
 		sqlVAL.expr = sqlS[sqlpt-0].expr
 	case 77:
-		//line sql.y:693
+		//line sql.y:692
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 78:
-		//line sql.y:694
+		//line sql.y:693
 		{
 			sqlVAL.expr = nil
 		}
 	case 79:
-		//line sql.y:697
+		//line sql.y:696
 		{
 			sqlVAL.lockingClause = sqlS[sqlpt-0].lockingClause
 		}
 	case 80:
-		//line sql.y:698
+		//line sql.y:697
 		{
 			sqlVAL.lockingClause = nil
 		}
 	case 81:
-		//line sql.y:701
+		//line sql.y:700
 		{
 			sqlVAL.lockingClause = sqlS[sqlpt-0].lockingClause
 		}
 	case 82:
-		//line sql.y:702
+		//line sql.y:701
 		{
 			sqlVAL.lockingClause = nil
 		}
 	case 83:
-		//line sql.y:706
+		//line sql.y:705
 		{
 			sqlVAL.lockingClause = &LockingClause{Locks: []LockingItem{sqlS[sqlpt-0].lockingItem}}
 		}
 	case 84:
-		//line sql.y:710
+		//line sql.y:709
 		{
 			sqlS[sqlpt-1].lockingClause.Locks = append(sqlS[sqlpt-1].lockingClause.Locks, sqlS[sqlpt-0].lockingItem)
 			sqlVAL.lockingClause = sqlS[sqlpt-1].lockingClause
 		}
 	case 85:
-		//line sql.y:717
+		//line sql.y:716
 		{
-			sqlVAL.lockingItem = LockingItem{Strength: sqlS[sqlpt-2].src, LockedRels: sqlS[sqlpt-1].identifiers, WaitPolicy: sqlS[sqlpt-0].src}
+			sqlVAL.lockingItem = LockingItem{Strength: sqlS[sqlpt-2].str, LockedRels: sqlS[sqlpt-1].identifiers, WaitPolicy: sqlS[sqlpt-0].str}
 		}
 	case 86:
-		//line sql.y:722
+		//line sql.y:721
 		{
-			sqlVAL.src = "update"
+			sqlVAL.str = "update"
 		}
 	case 87:
-		//line sql.y:723
+		//line sql.y:722
 		{
-			sqlVAL.src = "no key update"
+			sqlVAL.str = "no key update"
 		}
 	case 88:
-		//line sql.y:724
+		//line sql.y:723
 		{
-			sqlVAL.src = "share"
+			sqlVAL.str = "share"
 		}
 	case 89:
-		//line sql.y:725
+		//line sql.y:724
 		{
-			sqlVAL.src = "key share"
+			sqlVAL.str = "key share"
 		}
 	case 90:
-		//line sql.y:728
+		//line sql.y:727
 		{
 			sqlVAL.identifiers = sqlS[sqlpt-0].identifiers
 		}
 	case 91:
-		//line sql.y:729
+		//line sql.y:728
 		{
 			sqlVAL.identifiers = nil
 		}
 	case 92:
-		//line sql.y:737
+		//line sql.y:736
 		{
 			sqlVAL.placeholder = nil
 		}
 	case 93:
-		//line sql.y:741
+		//line sql.y:740
 		{
 			panic("TODO")
 		}
 	case 94:
-		//line sql.y:742
+		//line sql.y:741
 		{
 			panic("TODO")
 		}
 	case 95:
-		//line sql.y:748
+		//line sql.y:747
 		{
 			sqlVAL.limitClause = &LimitClause{Limit: sqlS[sqlpt-1].expr, Offset: sqlS[sqlpt-0].expr}
 		}
 	case 96:
-		//line sql.y:752
+		//line sql.y:751
 		{
 			sqlVAL.limitClause = &LimitClause{Limit: sqlS[sqlpt-0].expr, Offset: sqlS[sqlpt-1].expr}
 		}
 	case 97:
-		//line sql.y:756
+		//line sql.y:755
 		{
 			sqlVAL.limitClause = &LimitClause{Limit: sqlS[sqlpt-0].expr}
 		}
 	case 98:
-		//line sql.y:760
+		//line sql.y:759
 		{
 			sqlVAL.limitClause = &LimitClause{Offset: sqlS[sqlpt-0].expr}
 		}
 	case 99:
 		sqlVAL.limitClause = sqlS[sqlpt-0].limitClause
 	case 100:
-		//line sql.y:767
+		//line sql.y:766
 		{
 			sqlVAL.limitClause = nil
 		}
 	case 101:
-		//line sql.y:771
+		//line sql.y:770
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 102:
-		//line sql.y:778
+		//line sql.y:777
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 103:
-		//line sql.y:784
+		//line sql.y:783
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 104:
-		//line sql.y:786
+		//line sql.y:785
 		{
 			sqlVAL.expr = nil
 		}
 	case 105:
-		//line sql.y:791
+		//line sql.y:790
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 106:
-		//line sql.y:807
+		//line sql.y:806
 		{
 			sqlVAL.whereClause = &WhereClause{Expr: sqlS[sqlpt-0].expr}
 		}
 	case 107:
-		//line sql.y:808
+		//line sql.y:807
 		{
 			sqlVAL.whereClause = nil
 		}
 	case 108:
-		//line sql.y:813
+		//line sql.y:812
 		{
-			sqlVAL.src = string(sqlS[sqlpt-0].src)
+			sqlVAL.str = string(sqlS[sqlpt-0].str)
 		}
 	case 109:
-		//line sql.y:814
+		//line sql.y:813
 		{
-			sqlVAL.src = string(sqlS[sqlpt-0].src)
+			sqlVAL.str = string(sqlS[sqlpt-0].str)
 		}
 	case 110:
-		//line sql.y:817
+		//line sql.y:816
 		{
-			sqlVAL.src = "+"
+			sqlVAL.str = "+"
 		}
 	case 111:
-		//line sql.y:818
+		//line sql.y:817
 		{
-			sqlVAL.src = "-"
+			sqlVAL.str = "-"
 		}
 	case 112:
-		//line sql.y:819
+		//line sql.y:818
 		{
-			sqlVAL.src = "*"
+			sqlVAL.str = "*"
 		}
 	case 113:
-		//line sql.y:820
+		//line sql.y:819
 		{
-			sqlVAL.src = "/"
+			sqlVAL.str = "/"
 		}
 	case 114:
-		//line sql.y:821
+		//line sql.y:820
 		{
-			sqlVAL.src = "%"
+			sqlVAL.str = "%"
 		}
 	case 115:
-		//line sql.y:822
+		//line sql.y:821
 		{
-			sqlVAL.src = "^"
+			sqlVAL.str = "^"
 		}
 	case 116:
-		//line sql.y:823
+		//line sql.y:822
 		{
-			sqlVAL.src = "<"
+			sqlVAL.str = "<"
 		}
 	case 117:
-		//line sql.y:824
+		//line sql.y:823
 		{
-			sqlVAL.src = ">"
+			sqlVAL.str = ">"
 		}
 	case 118:
-		//line sql.y:825
+		//line sql.y:824
 		{
-			sqlVAL.src = "="
+			sqlVAL.str = "="
 		}
 	case 119:
-		//line sql.y:826
+		//line sql.y:825
 		{
-			sqlVAL.src = "<="
+			sqlVAL.str = "<="
 		}
 	case 120:
-		//line sql.y:827
+		//line sql.y:826
 		{
-			sqlVAL.src = ">="
+			sqlVAL.str = ">="
 		}
 	case 121:
-		//line sql.y:828
+		//line sql.y:827
 		{
-			sqlVAL.src = "<>"
+			sqlVAL.str = "<>"
 		}
 	case 122:
-		//line sql.y:831
+		//line sql.y:830
 		{
-			sqlVAL.src = string(sqlS[sqlpt-0].src)
+			sqlVAL.str = string(sqlS[sqlpt-0].str)
 		}
 	case 123:
-		//line sql.y:832
+		//line sql.y:831
 		{
-			sqlVAL.src = sqlS[sqlpt-1].src
+			sqlVAL.str = sqlS[sqlpt-1].str
 		}
 	case 124:
-		//line sql.y:835
+		//line sql.y:834
 		{
-			sqlVAL.src = string(sqlS[sqlpt-0].src)
+			sqlVAL.str = string(sqlS[sqlpt-0].str)
 		}
 	case 125:
-		//line sql.y:836
+		//line sql.y:835
 		{
-			sqlVAL.src = sqlS[sqlpt-1].src
+			sqlVAL.str = sqlS[sqlpt-1].str
 		}
 	case 126:
-		//line sql.y:842
+		//line sql.y:841
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 127:
-		//line sql.y:865
+		//line sql.y:864
 		{
-			sqlVAL.identifiers = []string{sqlS[sqlpt-0].src}
+			sqlVAL.identifiers = []string{sqlS[sqlpt-0].str}
 		}
 	case 128:
-		//line sql.y:866
+		//line sql.y:865
 		{
-			sqlVAL.identifiers = append(sqlS[sqlpt-1].identifiers, sqlS[sqlpt-0].src)
+			sqlVAL.identifiers = append(sqlS[sqlpt-1].identifiers, sqlS[sqlpt-0].str)
 		}
 	case 129:
-		//line sql.y:877
+		//line sql.y:876
 		{
 			sqlVAL.fields = sqlS[sqlpt-0].fields
 		}
 	case 130:
-		//line sql.y:878
+		//line sql.y:877
 		{
 			sqlVAL.fields = nil
 		}
 	case 131:
-		//line sql.y:881
+		//line sql.y:880
 		{
 			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
 	case 132:
-		//line sql.y:883
+		//line sql.y:882
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
 	case 133:
-		//line sql.y:889
+		//line sql.y:888
 		{
-			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].src}
+			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].str}
 		}
 	case 134:
-		//line sql.y:893
+		//line sql.y:892
 		{
-			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].src}
+			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].str}
 		}
 	case 135:
 		sqlVAL.expr = sqlS[sqlpt-0].expr
 	case 136:
-		//line sql.y:898
+		//line sql.y:897
 		{
 			sqlVAL.expr = ColumnRef{Column: "*"}
 		}
 	case 137:
-		//line sql.y:912
+		//line sql.y:911
 		{
-			sqlVAL.identifiers = []string{sqlS[sqlpt-0].src}
+			sqlVAL.identifiers = []string{sqlS[sqlpt-0].str}
 		}
 	case 138:
-		//line sql.y:916
+		//line sql.y:915
 		{
-			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].src)
+			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].str)
 		}
 	case 139:
-		//line sql.y:929
+		//line sql.y:928
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 140:
-		//line sql.y:961
+		//line sql.y:960
 		{
-			sqlVAL.identifiers = []string{sqlS[sqlpt-0].src}
+			sqlVAL.identifiers = []string{sqlS[sqlpt-0].str}
 		}
 	case 141:
-		//line sql.y:963
+		//line sql.y:962
 		{
-			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].src)
+			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].str)
 		}
 	case 142:
-		//line sql.y:968
+		//line sql.y:967
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 143:
-		//line sql.y:971
+		//line sql.y:970
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 144:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 145:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 146:
-		//line sql.y:978
+		//line sql.y:977
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 147:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 148:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 149:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 157:
-		//line sql.y:1021
+		//line sql.y:1020
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 158:
-		//line sql.y:1022
+		//line sql.y:1021
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 159:
-		//line sql.y:1023
+		//line sql.y:1022
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 160:
-		//line sql.y:1024
+		//line sql.y:1023
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 161:
-		//line sql.y:1025
+		//line sql.y:1024
 		{
-			sqlVAL.src = sqlS[sqlpt-0].src
+			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 162:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 163:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 164:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 165:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 166:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 167:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 168:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 169:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 170:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 171:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 172:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 173:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 174:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 175:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 176:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 177:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 178:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 179:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 180:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 181:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 182:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 183:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 184:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 185:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 186:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 187:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 188:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 189:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 190:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 191:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 192:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 193:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 194:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 195:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 196:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 197:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 198:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 199:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 200:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 201:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 202:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 203:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 204:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 205:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 206:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 207:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 208:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 209:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 210:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 211:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 212:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 213:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 214:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 215:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 216:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 217:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 218:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 219:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 220:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 221:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 222:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 223:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 224:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 225:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 226:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 227:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 228:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 229:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 230:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 231:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 232:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 233:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 234:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 235:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 236:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 237:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 238:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 239:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 240:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 241:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 242:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 243:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 244:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 245:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 246:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 247:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 248:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 249:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 250:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 251:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 252:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 253:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 254:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 255:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 256:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 257:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 258:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 259:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 260:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 261:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 262:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 263:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 264:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 265:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 266:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 267:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 268:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 269:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 270:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 271:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 272:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 273:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 274:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 275:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 276:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 277:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 278:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 279:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 280:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 281:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 282:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 283:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 284:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 285:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 286:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 287:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 288:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 289:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 290:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 291:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 292:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 293:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 294:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 295:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 296:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 297:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 298:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 299:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 300:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 301:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 302:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 303:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 304:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 305:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 306:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 307:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 308:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 309:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 310:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 311:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 312:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 313:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 314:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 315:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 316:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 317:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 318:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 319:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 320:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 321:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 322:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 323:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 324:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 325:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 326:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 327:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 328:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 329:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 330:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 331:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 332:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 333:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 334:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 335:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 336:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 337:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 338:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 339:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 340:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 341:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 342:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 343:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 344:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 345:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 346:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 347:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 348:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 349:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 350:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 351:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 352:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 353:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 354:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 355:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 356:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 357:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 358:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 359:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 360:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 361:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 362:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 363:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 364:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 365:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 366:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 367:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 368:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 369:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 370:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 371:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 372:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 373:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 374:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 375:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 376:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 377:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 378:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 379:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 380:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 381:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 382:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 383:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 384:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 385:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 386:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 387:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 388:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 389:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 390:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 391:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 392:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 393:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 394:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 395:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 396:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 397:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 398:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 399:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 400:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 401:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 402:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 403:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 404:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 405:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 406:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 407:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 408:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 409:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 410:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 411:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 412:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 413:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 414:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 415:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 416:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 417:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 418:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 419:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 420:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 421:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 422:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 423:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 424:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 425:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 426:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 427:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 428:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 429:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 430:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 431:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 432:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 433:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 434:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 435:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 436:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 437:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 438:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 439:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 440:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 441:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 442:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 443:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 444:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 445:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 446:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 447:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 448:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 449:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 450:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 451:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 452:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 453:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 454:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 455:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 456:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 457:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 458:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 459:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 460:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 461:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 462:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 463:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 464:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 465:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 466:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 467:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 468:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 469:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 470:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 471:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 472:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 473:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 474:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 475:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 476:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 477:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 478:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 479:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 480:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 481:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 482:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 483:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 484:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 485:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 486:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 487:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 488:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 489:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 490:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 491:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 492:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 493:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 494:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 495:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 496:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 497:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 498:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 499:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 500:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 501:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 502:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 503:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 504:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 505:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 506:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 507:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 508:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 509:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 510:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 511:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 512:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 513:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 514:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 515:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 516:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 517:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 518:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 519:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 520:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 521:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 522:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 523:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 524:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 525:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 526:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 527:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 528:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 529:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 530:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 531:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 532:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 533:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 534:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 535:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 536:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 537:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 538:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 539:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 540:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 541:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 542:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 543:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 544:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 545:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 546:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 547:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 548:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 549:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 550:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 551:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 552:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 553:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 554:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 555:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 556:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 557:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 558:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 559:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 560:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 561:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 562:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 563:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 564:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 565:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 566:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 567:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 568:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 569:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 570:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 571:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 572:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 573:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 574:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 575:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 576:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	case 577:
-		sqlVAL.src = sqlS[sqlpt-0].src
+		sqlVAL.str = sqlS[sqlpt-0].str
 	}
 	goto sqlstack /* stack new state and value */
 }

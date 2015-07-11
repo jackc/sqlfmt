@@ -28,7 +28,7 @@ func (x *sqlLex) Lex(yylval *sqlSymType) int {
 	token := x.tokens[0]
 	x.tokens = x.tokens[1:]
 
-	yylval.src = token.src
+	yylval.str = token.src
 	return token.typ
 }
 

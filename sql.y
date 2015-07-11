@@ -8,7 +8,6 @@ package main
   sqlSelect *SelectStmt
   fields []Expr
   expr Expr
-  src string
   str string
   identifiers []string
   fromClause *FromClause
@@ -38,7 +37,7 @@ package main
 %type <whereClause> where_clause
 %type <orderExpr> sortby
 %type <orderClause> opt_sort_clause sort_clause sortby_list
-%type <src> opt_asc_desc opt_nulls_order
+%type <str> opt_asc_desc opt_nulls_order
 %type <placeholder> into_clause
   window_clause
   values_clause
@@ -51,13 +50,13 @@ package main
 
 %type <lockingClause> opt_for_locking_clause for_locking_clause for_locking_items
 %type <lockingItem> for_locking_item
-%type <src> for_locking_strength opt_nowait_or_skip
+%type <str> for_locking_strength opt_nowait_or_skip
 
 %type <identifiers> locked_rels_list qualified_name_list indirection name_list
 
-%type <src> indirection_el attr_name qualified_name ColId name
+%type <str> indirection_el attr_name qualified_name ColId name
 
-%type <src> MathOp qual_Op qual_all_Op all_Op
+%type <str> MathOp qual_Op qual_all_Op all_Op
 
 %type <groupByClause> group_clause
 %type <fields>  group_by_list
@@ -67,9 +66,9 @@ package main
 
 %type <boolean> all_or_distinct
 
-%type <src>  Iconst SignedIconst Sconst
+%type <str>  Iconst SignedIconst Sconst
 
-%type <src>
+%type <str>
   ColLabel
   unreserved_keyword
   col_name_keyword
@@ -78,7 +77,7 @@ package main
 
 
 
-%token  <src> OP any_operator
+%token  <str> OP any_operator
 
 
 /*
@@ -90,15 +89,15 @@ package main
  * DOT_DOT is unused in the core SQL grammar, and so will always provoke
  * parse errors.  It is needed by PL/pgsql.
  */
-%token <src>  IDENT FCONST SCONST BCONST XCONST Op
+%token <str>  IDENT FCONST SCONST BCONST XCONST Op
 /* ival in PostgreSQL */
-%token <src> ICONST PARAM
+%token <str> ICONST PARAM
 %token      TYPECAST DOT_DOT COLON_EQUALS EQUALS_GREATER
 %token      LESS_EQUALS GREATER_EQUALS NOT_EQUALS
 
 
 /* ordinary key words in alphabetical order */
-%token <src> ABORT_P ABSOLUTE_P ACCESS ACTION ADD_P ADMIN AFTER
+%token <str> ABORT_P ABSOLUTE_P ACCESS ACTION ADD_P ADMIN AFTER
   AGGREGATE ALL ALSO ALTER ALWAYS ANALYSE ANALYZE AND ANY ARRAY AS ASC
   ASSERTION ASSIGNMENT ASYMMETRIC AT ATTRIBUTE AUTHORIZATION
 
