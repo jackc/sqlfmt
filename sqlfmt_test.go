@@ -201,6 +201,46 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "having.sql",
 			expectedOutputFile: "having.fmt.sql",
 		},
+		{
+			inputFile:          "limit.sql",
+			expectedOutputFile: "limit.fmt.sql",
+		},
+		{
+			inputFile:          "offset.sql",
+			expectedOutputFile: "offset.fmt.sql",
+		},
+		{
+			inputFile:          "limit_offset.sql",
+			expectedOutputFile: "limit_offset.fmt.sql",
+		},
+		{
+			inputFile:          "offset_limit.sql",
+			expectedOutputFile: "limit_offset.fmt.sql",
+		},
+		{
+			inputFile:          "select_for_update.sql",
+			expectedOutputFile: "select_for_update.fmt.sql",
+		},
+		{
+			inputFile:          "select_for_no_key_update.sql",
+			expectedOutputFile: "select_for_no_key_update.fmt.sql",
+		},
+		{
+			inputFile:          "select_for_share.sql",
+			expectedOutputFile: "select_for_share.fmt.sql",
+		},
+		{
+			inputFile:          "select_for_key_share.sql",
+			expectedOutputFile: "select_for_key_share.fmt.sql",
+		},
+		{
+			inputFile:          "select_for_update_of.sql",
+			expectedOutputFile: "select_for_update_of.fmt.sql",
+		},
+		{
+			inputFile:          "select_for_update_nowait.sql",
+			expectedOutputFile: "select_for_update_nowait.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

@@ -227,6 +227,69 @@ func (e GroupByClause) RenderTo(r Renderer) {
 	r.Unindent()
 }
 
+type LimitClause struct {
+	Limit  Expr
+	Offset Expr
+}
+
+func (e LimitClause) RenderTo(r Renderer) {
+	if e.Limit != nil {
+		r.Text("limit", "keyword")
+		r.Text(" ", "space")
+		e.Limit.RenderTo(r)
+		r.NewLine()
+	}
+	if e.Offset != nil {
+		r.Text("offset", "keyword")
+		r.Text(" ", "space")
+		e.Offset.RenderTo(r)
+		r.NewLine()
+	}
+}
+
+type LockingItem struct {
+	Strength   string
+	LockedRels []string
+	WaitPolicy string
+}
+
+func (li LockingItem) RenderTo(r Renderer) {
+	r.Text("for", "keyword")
+	r.Text(" ", "space")
+	r.Text(li.Strength, "keyword")
+
+	if li.LockedRels != nil {
+		r.Text(" ", "space")
+		r.Text("of", "keyword")
+		r.Text(" ", "space")
+
+		for i, lr := range li.LockedRels {
+			r.Text(lr, "identifier")
+			if i < len(li.LockedRels)-1 {
+				r.Text(",", "comma")
+				r.Text(" ", "space")
+			}
+		}
+	}
+
+	if li.WaitPolicy != "" {
+		r.Text(" ", "space")
+		r.Text(li.WaitPolicy, "keyword")
+	}
+
+	r.NewLine()
+}
+
+type LockingClause struct {
+	Locks []LockingItem
+}
+
+func (lc LockingClause) RenderTo(r Renderer) {
+	for _, li := range lc.Locks {
+		li.RenderTo(r)
+	}
+}
+
 type SelectStmt struct {
 	DistinctList  []Expr
 	TargetList    []Expr
@@ -235,6 +298,8 @@ type SelectStmt struct {
 	OrderClause   *OrderClause
 	GroupByClause *GroupByClause
 	HavingClause  Expr
+	LimitClause   *LimitClause
+	LockingClause *LockingClause
 }
 
 func (s SelectStmt) RenderTo(r Renderer) {
@@ -280,10 +345,6 @@ func (s SelectStmt) RenderTo(r Renderer) {
 		s.WhereClause.RenderTo(r)
 	}
 
-	if s.OrderClause != nil {
-		s.OrderClause.RenderTo(r)
-	}
-
 	if s.GroupByClause != nil {
 		s.GroupByClause.RenderTo(r)
 	}
@@ -294,5 +355,17 @@ func (s SelectStmt) RenderTo(r Renderer) {
 		r.Indent()
 		s.HavingClause.RenderTo(r)
 		r.NewLine()
+	}
+
+	if s.OrderClause != nil {
+		s.OrderClause.RenderTo(r)
+	}
+
+	if s.LimitClause != nil {
+		s.LimitClause.RenderTo(r)
+	}
+
+	if s.LockingClause != nil {
+		s.LockingClause.RenderTo(r)
 	}
 }

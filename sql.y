@@ -15,6 +15,9 @@ package main
   orderExpr OrderExpr
   orderClause *OrderClause
   groupByClause *GroupByClause
+  limitClause *LimitClause
+  lockingClause *LockingClause
+  lockingItem LockingItem
   boolean bool
   placeholder interface{}
 }
@@ -35,11 +38,23 @@ package main
 %type <orderExpr> sortby
 %type <orderClause> opt_sort_clause sort_clause sortby_list
 %type <src> opt_asc_desc opt_nulls_order
-%type <placeholder> select_limit_value select_offset_value into_clause
+%type <placeholder> into_clause
   window_clause
   values_clause
   relation_expr
   qual_all_Op
+
+%type <limitClause> select_limit opt_select_limit
+
+%type <expr> limit_clause offset_clause select_limit_value select_offset_value
+
+%type <lockingClause> opt_for_locking_clause for_locking_clause for_locking_items
+%type <lockingItem> for_locking_item
+%type <src> for_locking_strength opt_nowait_or_skip
+
+%type <identifiers> locked_rels_list qualified_name_list indirection name_list
+
+%type <src> indirection_el attr_name qualified_name ColId name
 
 %type <groupByClause> group_clause
 %type <fields>  group_by_list
@@ -358,6 +373,11 @@ from_clause:
 | /*EMPTY*/  { $$ = nil }
 
 
+opt_nowait_or_skip:
+  NOWAIT        { $$ = "nowait" }
+| SKIP LOCKED   { $$ = "skip locked" }
+| /*EMPTY*/     { $$ = "" }
+
 
 expr_list:
   a_expr
@@ -368,6 +388,7 @@ expr_list:
   {
     $$ = append($1, $3)
   }
+
 
 /*****************************************************************************
  *
@@ -429,6 +450,20 @@ select_no_parens:
   {
     $1.OrderClause = $2
     $$ = $1
+  }
+| select_clause opt_sort_clause for_locking_clause opt_select_limit
+  {
+    $1.OrderClause = $2
+    $1.LockingClause = $3
+    $1.LimitClause = $4
+    $$ = $1;
+  }
+| select_clause opt_sort_clause select_limit opt_for_locking_clause
+  {
+    $1.OrderClause = $2
+    $1.LimitClause = $3
+    $1.LockingClause = $4
+    $$ = $1;
   }
 
 select_clause:
@@ -612,6 +647,42 @@ having_clause:
   HAVING a_expr  { $$ = $2 }
 | /*EMPTY*/      { $$ = nil }
 
+for_locking_clause:
+  for_locking_items   { $$ = $1 }
+| FOR READ ONLY       { $$ = nil }
+
+opt_for_locking_clause:
+  for_locking_clause  { $$ = $1 }
+| /* EMPTY */         { $$ = nil }
+
+for_locking_items:
+  for_locking_item
+  {
+    $$ = &LockingClause{Locks: []LockingItem{$1}}
+  }
+| for_locking_items for_locking_item
+  {
+    $1.Locks = append($1.Locks, $2)
+    $$ = $1
+  }
+
+for_locking_item:
+  for_locking_strength locked_rels_list opt_nowait_or_skip
+  {
+    $$ = LockingItem{Strength: $1, LockedRels: $2, WaitPolicy: $3}
+  }
+
+for_locking_strength:
+FOR UPDATE            { $$ = "update" }
+| FOR NO KEY UPDATE   { $$ = "no key update" }
+| FOR SHARE           { $$ = "share" }
+| FOR KEY SHARE       { $$ = "key share" }
+
+locked_rels_list:
+  OF qualified_name_list  { $$ = $2 }
+| /* EMPTY */             { $$ = nil }
+
+
 /*
  * Window Definitions
  */
@@ -631,27 +702,39 @@ qual_all_Op: { panic("TODO") }
 
 
 select_limit:
-      limit_clause offset_clause      { panic("TODO") }
-      | offset_clause limit_clause    { panic("TODO") }
-      | limit_clause            { panic("TODO") }
-      | offset_clause           { panic("TODO") }
-    ;
+  limit_clause offset_clause
+  {
+    $$ = &LimitClause{Limit: $1, Offset: $2}
+  }
+| offset_clause limit_clause
+  {
+    $$ = &LimitClause{Limit: $2, Offset: $1}
+  }
+| limit_clause
+  {
+    $$ = &LimitClause{Limit: $1}
+  }
+| offset_clause
+  {
+    $$ = &LimitClause{Offset: $1}
+  }
+
 
 opt_select_limit:
-  select_limit  { panic("TODO") }
-| /* EMPTY */   { panic("TODO") }
+  select_limit
+| /* EMPTY */   { $$ = nil }
 
 limit_clause:
   LIMIT select_limit_value
   {
-    panic("TODO")
+    $$ = $2
   }
   /* TODO SQL:2008 syntax */
 
 offset_clause:
   OFFSET select_offset_value
   {
-    panic("TODO")
+    $$ = $2
   }
   /* TODO SQL:2008 syntax */
 
@@ -659,7 +742,7 @@ select_limit_value:
   a_expr      { $$ = $1; }
 | ALL
   {
-    panic("TODO")
+    $$ = nil
   }
 
 select_offset_value:
@@ -681,6 +764,38 @@ select_offset_value:
 where_clause:
   WHERE a_expr   { $$ = &WhereClause{Expr: $2} }
 | /*EMPTY*/      { $$ = nil }
+
+
+
+
+indirection_el:
+  '.' attr_name
+  {
+    $$ = $2
+  }
+/* TODO     | '.' '*'
+        {
+          $$ = (Node *) makeNode(A_Star);
+        }
+      | '[' a_expr ']'
+        {
+          A_Indices *ai = makeNode(A_Indices);
+          ai->lidx = NULL;
+          ai->uidx = $2;
+          $$ = (Node *) ai;
+        }
+      | '[' a_expr ':' a_expr ']'
+        {
+          A_Indices *ai = makeNode(A_Indices);
+          ai->lidx = $2;
+          ai->uidx = $4;
+          $$ = (Node *) ai;
+        }*/
+
+indirection:
+  indirection_el              { $$ = []string{$1} }
+| indirection indirection_el  { $$ = append($1, $2) }
+
 
 
 /*****************************************************************************
@@ -713,6 +828,78 @@ target_el:
 /* TODO
       | '*'
 */
+
+
+
+/*****************************************************************************
+ *
+ *  Names and constants
+ *
+ *****************************************************************************/
+
+qualified_name_list:
+  qualified_name
+  {
+    $$ = []string{$1}
+  }
+| qualified_name_list ',' qualified_name
+  {
+    $$ = append($1, $3)
+  }
+
+/*
+ * The production for a qualified relation name has to exactly match the
+ * production for a qualified func_name, because in a FROM clause we cannot
+ * tell which we are parsing until we see what comes after it ('(' for a
+ * func_name, something else for a relation). Therefore we allow 'indirection'
+ * which may contain subscripts, and reject that case in the C code.
+ */
+qualified_name:
+  ColId
+    {
+      $$ = $1
+    }
+/* TODO
+| ColId indirection
+  {
+    check_qualified_name($2, yyscanner);
+    $$ = makeRangeVar(NULL, NULL, @1);
+    switch (list_length($2))
+    {
+      case 1:
+        $$->catalogname = NULL;
+        $$->schemaname = $1;
+        $$->relname = strVal(linitial($2));
+        break;
+      case 2:
+        $$->catalogname = $1;
+        $$->schemaname = strVal(linitial($2));
+        $$->relname = strVal(lsecond($2));
+        break;
+      default:
+        ereport(ERROR,
+            (errcode(ERRCODE_SYNTAX_ERROR),
+             errmsg("improper qualified name (too many dotted names): %s",
+                NameListToString(lcons(makeString($1), $2))),
+             parser_errposition(@1)));
+        break;
+    }
+  }
+*/
+
+name_list:
+  name { $$ = []string{$1} }
+| name_list ',' name
+  {
+    $$ = append($1, $3)
+  }
+
+name:
+  ColId { $$ = $1 }
+
+attr_name:
+  ColLabel { $$ = $1 }
+
 
 Iconst:   ICONST
 Sconst:   SCONST
