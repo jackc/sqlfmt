@@ -53,7 +53,7 @@ package main
 %type <lockingItem> for_locking_item
 %type <str> for_locking_strength opt_nowait_or_skip
 
-%type <identifiers> locked_rels_list qualified_name_list indirection name_list
+%type <identifiers> locked_rels_list qualified_name_list indirection opt_indirection name_list
 
 %type <str> indirection_el attr_name qualified_name ColId name
 
@@ -341,10 +341,6 @@ a_expr:
   {
     $$ = IntegerLiteral($1)
   }
-| '(' a_expr ')'
-  {
-    $$ = ParenExpr{Expr: $2}
-  }
 | TRUE_P /* temp hack while integrating PostgreSQL keywords */
   {
     $$ = ColumnRef{Column: "true"}
@@ -497,7 +493,14 @@ c_expr:
 /* TODO
 | AexprConst              { $$ = $1; }
 | PARAM opt_indirection
+*/
+
+/* TODO -- something with opt_indirection */
 | '(' a_expr ')' opt_indirection
+  {
+    $$ = ParenExpr{Expr: $2}
+  }
+/*
 | case_expr
   { $$ = $1; }
 | func_expr
@@ -1022,7 +1025,16 @@ indirection:
   indirection_el              { $$ = []string{$1} }
 | indirection indirection_el  { $$ = append($1, $2) }
 
-
+opt_indirection:
+  /*EMPTY*/               { $$ = nil }
+| opt_indirection indirection_el
+  {
+    if $1 != nil {
+      $$ = append($1, $2)
+    } else {
+      $$ = []string{$2}
+    }
+  }
 
 /*****************************************************************************
  *
