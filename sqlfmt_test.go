@@ -270,7 +270,7 @@ func TestSqlFmt(t *testing.T) {
 
 		output, err := sqlfmt(string(input))
 		if err != nil {
-			t.Errorf("%d. sqfmt failed with %s: %v", i, tt.inputFile, err)
+			t.Errorf("%d. sqlfmt failed with %s: %v", i, tt.inputFile, err)
 			continue
 		}
 
