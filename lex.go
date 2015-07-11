@@ -198,9 +198,24 @@ func lexOperator(l *sqlLex) stateFn {
 	l.acceptRunFunc(isOperator)
 
 	t := token{src: l.src[l.start:l.pos]}
-	if len(t.src) == 1 {
+	switch {
+	case len(t.src) == 1:
 		t.typ = int(t.src[0])
-	} else {
+	case t.src == "::":
+		t.typ = TYPECAST
+	case t.src == "..":
+		t.typ = DOT_DOT
+	case t.src == ":=":
+		t.typ = COLON_EQUALS
+	case t.src == "=>":
+		t.typ = EQUALS_GREATER
+	case t.src == "<=":
+		t.typ = LESS_EQUALS
+	case t.src == ">=":
+		t.typ = GREATER_EQUALS
+	case t.src == "<>", t.src == "!=":
+		t.typ = NOT_EQUALS
+	default:
 		t.typ = OP
 	}
 

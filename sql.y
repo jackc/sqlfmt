@@ -345,10 +345,6 @@ a_expr:
   {
     $$ = ParenExpr{Expr: $2}
   }
-| a_expr OP a_expr
-  {
-    $$ = BinaryExpr{Left: $1, Operator: $2, Right: $3}
-  }
 | TRUE_P /* temp hack while integrating PostgreSQL keywords */
   {
     $$ = ColumnRef{Column: "true"}
