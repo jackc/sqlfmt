@@ -31,7 +31,7 @@ package main
 %type <placeholder> opt_all_clause
 
 %type <expr> aliasableExpr
-%type <expr> expr target_el a_expr c_expr
+%type <expr> target_el a_expr c_expr
 %type <fromClause> from_clause
 %type <identifiers> identifierSeq
 %type <expr> joinExpr
@@ -288,21 +288,51 @@ opt_nulls_order:
 | /*EMPTY*/           { $$ = "" }
 
 aliasableExpr:
-  expr
+  a_expr
   {
     $$ = $1
   }
-| expr AS IDENT
+| a_expr AS IDENT
   {
     $$ = AliasedExpr{Expr: $1, Alias: $3}
   }
-| expr IDENT
+| a_expr IDENT
   {
     $$ = AliasedExpr{Expr: $1, Alias: $2}
   }
 
-expr:
-  c_expr { $$ = $1 }
+/*****************************************************************************
+ *
+ *  expression grammar
+ *
+ *****************************************************************************/
+
+/*
+ * General expressions
+ * This is the heart of the expression syntax.
+ *
+ * We have two expression types: a_expr is the unrestricted kind, and
+ * b_expr is a subset that must be used in some places to avoid shift/reduce
+ * conflicts.  For example, we can't do BETWEEN as "BETWEEN a_expr AND a_expr"
+ * because that use of AND conflicts with AND as a boolean operator.  So,
+ * b_expr is used in BETWEEN and we remove boolean keywords from b_expr.
+ *
+ * Note that '(' a_expr ')' is a b_expr, so an unrestricted expression can
+ * always be used by surrounding it with parens.
+ *
+ * c_expr is all the productions that are common to a_expr and b_expr;
+ * it's factored out just to eliminate redundant coding.
+ *
+ * Be careful of productions involving more than one terminal token.
+ * By default, bison will assign such productions the precedence of their
+ * last terminal, but in nearly all cases you want it to be the precedence
+ * of the first terminal instead; otherwise you will not get the behavior
+ * you expect!  So we use %prec annotations freely to set precedences.
+ */
+a_expr:
+  c_expr
+
+/* TODO - replace these placeholders as more PostgreSQL grammer is ported */
 | Sconst
   {
     $$ = StringLiteral($1)
@@ -311,61 +341,152 @@ expr:
   {
     $$ = IntegerLiteral($1)
   }
+| '(' a_expr ')'
+  {
+    $$ = ParenExpr{Expr: $2}
+  }
+| a_expr OP a_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: $2, Right: $3}
+  }
 | TRUE_P /* temp hack while integrating PostgreSQL keywords */
   {
     $$ = ColumnRef{Column: "true"}
   }
-| expr '+' expr
+
+/* TODO      | a_expr TYPECAST Typename
+      | a_expr COLLATE any_name
+      | a_expr AT TIME ZONE a_expr      %prec AT
+*/
+    /*
+     * These operators must be called out explicitly in order to make use
+     * of bison's automatic operator-precedence handling.  All other
+     * operator names are handled by the generic productions using "Op",
+     * below; and all those operators will have the same precedence.
+     *
+     * If you add more explicitly-known operators, be sure to add them
+     * also to b_expr and to the MathOp list below.
+     */
+/* TODO      | '+' a_expr          %prec UMINUS
+      | '-' a_expr          %prec UMINUS
+*/
+| a_expr '+' a_expr
   {
     $$ = BinaryExpr{Left: $1, Operator: "+", Right: $3}
   }
-| expr '-' expr
+| a_expr '-' a_expr
   {
     $$ = BinaryExpr{Left: $1, Operator: "-", Right: $3}
   }
-| expr '*' expr
+| a_expr '*' a_expr
   {
     $$ = BinaryExpr{Left: $1, Operator: "*", Right: $3}
   }
-| expr '/' expr
+| a_expr '/' a_expr
   {
     $$ = BinaryExpr{Left: $1, Operator: "/", Right: $3}
   }
-| expr '=' expr
+| a_expr '%' a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "=", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: "%", Right: $3}
   }
-| expr '<' expr
+| a_expr '^' a_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "^", Right: $3}
+  }
+| a_expr '<' a_expr
   {
     $$ = BinaryExpr{Left: $1, Operator: "<", Right: $3}
   }
-| expr '>' expr
+| a_expr '>' a_expr
   {
     $$ = BinaryExpr{Left: $1, Operator: ">", Right: $3}
   }
-| expr OP expr
+| a_expr '=' a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: $2, Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: "=", Right: $3}
   }
-| expr AND expr
+| a_expr LESS_EQUALS a_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "<=", Right: $3}
+  }
+| a_expr GREATER_EQUALS a_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: ">=", Right: $3}
+  }
+| a_expr NOT_EQUALS a_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "!=", Right: $3}
+  }
+/* TODO
+      | a_expr qual_Op a_expr       %prec Op
+      | qual_Op a_expr          %prec Op
+      | a_expr qual_Op          %prec POSTFIXOP
+*/
+| a_expr AND a_expr
   {
     $$ = BinaryExpr{Left: $1, Operator: "and", Right: $3}
   }
-| expr OR expr
+| a_expr OR a_expr
   {
     $$ = BinaryExpr{Left: $1, Operator: "or", Right: $3}
   }
-| NOT expr
+| NOT a_expr
   {
     $$ = NotExpr{Expr: $2}
   }
-| '(' expr ')'
-  {
-    $$ = ParenExpr{Expr: $2}
-  }
+/* TODO
+      | NOT_LA a_expr           %prec NOT
 
-a_expr: expr
+      | a_expr LIKE a_expr
+      | a_expr LIKE a_expr ESCAPE a_expr          %prec LIKE
+      | a_expr NOT_LA LIKE a_expr             %prec NOT_LA
+      | a_expr NOT_LA LIKE a_expr ESCAPE a_expr     %prec NOT_LA
+      | a_expr ILIKE a_expr
+      | a_expr ILIKE a_expr ESCAPE a_expr         %prec ILIKE
+      | a_expr NOT_LA ILIKE a_expr            %prec NOT_LA
+      | a_expr NOT_LA ILIKE a_expr ESCAPE a_expr      %prec NOT_LA
 
+      | a_expr SIMILAR TO a_expr              %prec SIMILAR
+      | a_expr SIMILAR TO a_expr ESCAPE a_expr      %prec SIMILAR
+      | a_expr NOT_LA SIMILAR TO a_expr         %prec NOT_LA
+      | a_expr NOT_LA SIMILAR TO a_expr ESCAPE a_expr   %prec NOT_LA
+*/
+      /* NullTest clause
+       * Define SQL-style Null test clause.
+       * Allow two forms described in the standard:
+       *  a IS NULL
+       *  a IS NOT NULL
+       * Allow two SQL extensions
+       *  a ISNULL
+       *  a NOTNULL
+       */
+/*      | a_expr IS NULL_P              %prec IS
+      | a_expr ISNULL
+      | a_expr IS NOT NULL_P            %prec IS
+      | a_expr NOTNULL
+      | row OVERLAPS row
+      | a_expr IS TRUE_P              %prec IS
+      | a_expr IS NOT TRUE_P            %prec IS
+      | a_expr IS FALSE_P             %prec IS
+      | a_expr IS NOT FALSE_P           %prec IS
+      | a_expr IS UNKNOWN             %prec IS
+      | a_expr IS NOT UNKNOWN           %prec IS
+      | a_expr IS DISTINCT FROM a_expr      %prec IS
+      | a_expr IS NOT DISTINCT FROM a_expr    %prec IS
+      | a_expr IS OF '(' type_list ')'      %prec IS
+      | a_expr IS NOT OF '(' type_list ')'    %prec IS
+      | a_expr BETWEEN opt_asymmetric b_expr AND a_expr   %prec BETWEEN
+      | a_expr NOT_LA BETWEEN opt_asymmetric b_expr AND a_expr %prec NOT_LA
+      | a_expr BETWEEN SYMMETRIC b_expr AND a_expr      %prec BETWEEN
+      | a_expr NOT_LA BETWEEN SYMMETRIC b_expr AND a_expr   %prec NOT_LA
+      | a_expr IN_P in_expr
+      | a_expr NOT_LA IN_P in_expr            %prec NOT_LA
+      | a_expr subquery_Op sub_type select_with_parens  %prec Op
+      | a_expr subquery_Op sub_type '(' a_expr ')'    %prec Op
+      | a_expr IS DOCUMENT_P          %prec IS
+      | a_expr IS NOT DOCUMENT_P        %prec IS
+*/
 
 /*
  * Productions that can be used in both a_expr and b_expr.
@@ -427,7 +548,7 @@ joinExpr:
   {
     $$ = JoinExpr{Left: $1, Join: "join", Right: $3, Using: $6}
   }
-| aliasableExpr JOIN aliasableExpr ON expr
+| aliasableExpr JOIN aliasableExpr ON a_expr
   {
     $$ = JoinExpr{Left: $1, Join: "join", Right: $3, On: $5}
   }
