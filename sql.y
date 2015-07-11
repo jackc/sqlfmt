@@ -20,6 +20,7 @@ package main
   lockingItem LockingItem
   boolean bool
   placeholder interface{}
+  columnRef ColumnRef
 }
 
 %type <sqlSelect> top
@@ -30,7 +31,7 @@ package main
 %type <placeholder> opt_all_clause
 
 %type <expr> aliasableExpr
-%type <expr> expr target_el a_expr
+%type <expr> expr target_el a_expr c_expr
 %type <fromClause> from_clause
 %type <identifiers> identifierSeq
 %type <expr> joinExpr
@@ -67,6 +68,8 @@ package main
 %type <boolean> all_or_distinct
 
 %type <str>  Iconst SignedIconst Sconst
+
+%type <columnRef> columnref
 
 %type <str>
   ColLabel
@@ -299,14 +302,7 @@ aliasableExpr:
   }
 
 expr:
-  IDENT
-  {
-    $$ = ColumnRef{Column: $1}
-  }
-| IDENT '.' IDENT
-  {
-    $$ = ColumnRef{Table: $1, Column: $3}
-  }
+  c_expr { $$ = $1 }
 | Sconst
   {
     $$ = StringLiteral($1)
@@ -373,6 +369,18 @@ expr:
   }
 
 a_expr: expr
+
+
+/*
+ * Productions that can be used in both a_expr and b_expr.
+ *
+ * Note: productions that refer recursively to a_expr or b_expr mostly
+ * cannot appear here.  However, it's OK to refer to a_exprs that occur
+ * inside parentheses, such as function arguments; that cannot introduce
+ * ambiguity to the b_expr syntax.
+ */
+c_expr:
+  columnref { $$ = $1 }
 
 identifierSeq:
   IDENT
@@ -835,17 +843,28 @@ qual_all_Op:
 | OPERATOR '(' any_operator ')' { $$ = $3 }
 
 
+columnref:
+ColId
+  {
+    $$ = ColumnRef{Column: $1}
+  }
+| ColId indirection
+  {
+    $$ = ColumnRef{Table: $1, Column: $2[0]}
+  }
+
+
 
 indirection_el:
   '.' attr_name
   {
     $$ = $2
   }
-/* TODO     | '.' '*'
-        {
-          $$ = (Node *) makeNode(A_Star);
-        }
-      | '[' a_expr ']'
+| '.' '*'
+  {
+    $$ = "*"
+  }
+/* TODO      | '[' a_expr ']'
         {
           A_Indices *ai = makeNode(A_Indices);
           ai->lidx = NULL;

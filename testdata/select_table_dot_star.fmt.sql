@@ -1,0 +1,4 @@
+select
+  baz.*
+from
+  baz

@@ -1,0 +1,1 @@
+select baz.* from baz
