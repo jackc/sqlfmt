@@ -226,6 +226,10 @@ func TestSqlFmt(t *testing.T) {
 			expectedOutputFile: "limit_offset.fmt.sql",
 		},
 		{
+			inputFile:          "offset_fetch.sql",
+			expectedOutputFile: "limit_offset.fmt.sql",
+		},
+		{
 			inputFile:          "select_for_update.sql",
 			expectedOutputFile: "select_for_update.fmt.sql",
 		},

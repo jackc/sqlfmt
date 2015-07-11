@@ -82,7 +82,7 @@ package main
 
 %type <boolean> all_or_distinct
 
-%type <expr>  Iconst SignedIconst Sconst
+%type <expr>  Iconst SignedIconst Sconst AexprConst
 
 %type <expr> case_expr case_arg case_default
 %type <whenClauses> when_clause_list
@@ -543,14 +543,6 @@ a_expr:
   c_expr
 
 /* TODO - replace these placeholders as more PostgreSQL grammer is ported */
-| Sconst
-  {
-    $$ = $1
-  }
-| Iconst
-  {
-    $$ = $1
-  }
 | TRUE_P /* temp hack while integrating PostgreSQL keywords */
   {
     $$ = ColumnRef{Column: "true"}
@@ -708,9 +700,9 @@ a_expr:
  * ambiguity to the b_expr syntax.
  */
 c_expr:
-  columnref { $$ = $1 }
+  columnref   { $$ = $1 }
+| AexprConst  { $$ = $1 }
 /* TODO
-| AexprConst              { $$ = $1; }
 | PARAM opt_indirection
 */
 
@@ -1149,7 +1141,11 @@ offset_clause:
   {
     $$ = $2
   }
-  /* TODO SQL:2008 syntax */
+  /* SQL:2008 syntax */
+| OFFSET select_offset_value2 row_or_rows
+  {
+    $$ = $2
+  }
 
 select_limit_value:
   a_expr      { $$ = $1; }
@@ -1468,6 +1464,33 @@ name:
 attr_name:
   ColLabel { $$ = $1 }
 
+/*
+ * Constants
+ */
+AexprConst:
+Iconst
+  {
+    $$ = $1
+  }
+/* TODO
+| FCONST
+*/
+| Sconst
+  {
+    $$ = $1
+  }
+/* TODO
+| BCONST
+| XCONST
+| func_name Sconst
+| func_name '(' func_arg_list opt_sort_clause ')' Sconst
+| ConstTypename Sconst
+| ConstInterval Sconst opt_interval
+| ConstInterval '(' Iconst ')' Sconst
+| TRUE_P
+| FALSE_P
+| NULL_P
+*/
 
 Iconst:   ICONST { $$ = IntegerLiteral($1) }
 Sconst:   SCONST { $$ = StringLiteral($1) }
