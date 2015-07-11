@@ -1303,9 +1303,7 @@ opt_indirection:
 
 ctext_expr:
   a_expr    { $$ = $1 }
-/* TODO
-| DEFAULT   { $$ = ? }
-*/
+| DEFAULT   { $$ = DefaultExpr(true) }
 
 ctext_expr_list:
   ctext_expr

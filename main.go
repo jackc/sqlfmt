@@ -377,6 +377,12 @@ func (lc LockingClause) RenderTo(r Renderer) {
 	}
 }
 
+type DefaultExpr bool
+
+func (d DefaultExpr) RenderTo(r Renderer) {
+	r.Text("default", "keyword")
+}
+
 type ValuesRow []Expr
 
 func (vr ValuesRow) RenderTo(r Renderer) {
