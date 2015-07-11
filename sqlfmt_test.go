@@ -265,6 +265,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "typecast.sql",
 			expectedOutputFile: "typecast.fmt.sql",
 		},
+		{
+			inputFile:          "unary.sql",
+			expectedOutputFile: "unary.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

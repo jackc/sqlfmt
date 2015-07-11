@@ -72,6 +72,16 @@ func (e BinaryExpr) RenderTo(r Renderer) {
 	e.Right.RenderTo(r)
 }
 
+type UnaryExpr struct {
+	Operator string
+	Expr     Expr
+}
+
+func (e UnaryExpr) RenderTo(r Renderer) {
+	r.Text(e.Operator, "operator")
+	e.Expr.RenderTo(r)
+}
+
 type WhenClause struct {
 	When Expr
 	Then Expr

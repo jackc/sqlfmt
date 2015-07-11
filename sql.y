@@ -551,18 +551,23 @@ a_expr:
       | a_expr COLLATE any_name
       | a_expr AT TIME ZONE a_expr      %prec AT
 */
-    /*
-     * These operators must be called out explicitly in order to make use
-     * of bison's automatic operator-precedence handling.  All other
-     * operator names are handled by the generic productions using "Op",
-     * below; and all those operators will have the same precedence.
-     *
-     * If you add more explicitly-known operators, be sure to add them
-     * also to b_expr and to the MathOp list below.
-     */
-/* TODO      | '+' a_expr          %prec UMINUS
-      | '-' a_expr          %prec UMINUS
+/*
+* These operators must be called out explicitly in order to make use
+* of bison's automatic operator-precedence handling.  All other
+* operator names are handled by the generic productions using "Op",
+* below; and all those operators will have the same precedence.
+*
+* If you add more explicitly-known operators, be sure to add them
+* also to b_expr and to the MathOp list below.
 */
+| '+' a_expr          %prec UMINUS
+  {
+    $$ = UnaryExpr{Operator: "+", Expr: $2}
+  }
+| '-' a_expr          %prec UMINUS
+  {
+    $$ = UnaryExpr{Operator: "-", Expr: $2}
+  }
 | a_expr '+' a_expr
   {
     $$ = BinaryExpr{Left: $1, Operator: "+", Right: $3}
