@@ -251,5 +251,5 @@ func isAlphanumeric(r rune) bool {
 }
 
 func isOperator(r rune) bool {
-	return r == '+' || r == '-' || r == '*' || r == '/' || r == '=' || r == '<' || r == '>' || r == '!'
+	return r == '+' || r == '-' || r == '*' || r == '/' || r == '=' || r == '<' || r == '>' || r == '!' || r == ':'
 }

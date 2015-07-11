@@ -25,6 +25,14 @@ type Expr interface {
 	RenderTo(Renderer)
 }
 
+type PgType struct {
+	Name string
+}
+
+func (t PgType) RenderTo(r Renderer) {
+	r.Text(t.Name, "typename")
+}
+
 type ColumnRef struct {
 	Table  string
 	Column string
@@ -123,6 +131,17 @@ func (e ParenExpr) RenderTo(r Renderer) {
 	r.Text("(", "lparen")
 	e.Expr.RenderTo(r)
 	r.Text(")", "rparen")
+}
+
+type TypecastExpr struct {
+	Expr     Expr
+	Typename PgType
+}
+
+func (t TypecastExpr) RenderTo(r Renderer) {
+	t.Expr.RenderTo(r)
+	r.Text("::", "typecast")
+	t.Typename.RenderTo(r)
 }
 
 type NotExpr struct {

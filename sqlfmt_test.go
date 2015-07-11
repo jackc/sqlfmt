@@ -261,6 +261,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "case_implicit.sql",
 			expectedOutputFile: "case_implicit.fmt.sql",
 		},
+		{
+			inputFile:          "typecast.sql",
+			expectedOutputFile: "typecast.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

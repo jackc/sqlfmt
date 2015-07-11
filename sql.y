@@ -23,6 +23,7 @@ package main
   columnRef ColumnRef
   whenClauses []WhenClause
   whenClause WhenClause
+  pgType PgType
 }
 
 %type <sqlSelect> top
@@ -45,6 +46,8 @@ package main
   window_clause
   values_clause
   relation_expr
+  opt_array_bounds
+  opt_type_modifiers
 
 
 %type <limitClause> select_limit opt_select_limit
@@ -81,8 +84,11 @@ package main
   ColLabel
   unreserved_keyword
   col_name_keyword
+  type_function_name
   type_func_name_keyword
   reserved_keyword
+
+%type <pgType> GenericType Numeric Typename SimpleTypename
 
 
 
@@ -307,6 +313,191 @@ aliasableExpr:
     $$ = AliasedExpr{Expr: $1, Alias: $2}
   }
 
+
+/*****************************************************************************
+ *
+ *  Type syntax
+ *    SQL introduces a large amount of type-specific syntax.
+ *    Define individual clauses to handle these cases, and use
+ *     the generic case to handle regular type-extensible Postgres syntax.
+ *    - thomas 1997-10-10
+ *
+ *****************************************************************************/
+
+Typename:
+  /* TODO -- do something with opt_array_bounds */
+  SimpleTypename opt_array_bounds
+  {
+    $$ = $1
+  }
+/* TODO
+      | SETOF SimpleTypename opt_array_bounds
+        {
+          $$ = $2;
+          $$->arrayBounds = $3;
+          $$->setof = TRUE;
+        }
+*/
+      /* SQL standard syntax, currently only one-dimensional */
+/* TODO
+      | SimpleTypename ARRAY '[' Iconst ']'
+      | SETOF SimpleTypename ARRAY '[' Iconst ']'
+      | SimpleTypename ARRAY
+      | SETOF SimpleTypename ARRAY
+*/
+
+opt_array_bounds:
+/* TODO
+  opt_array_bounds '[' ']'
+    {  $$ = lappend($1, makeInteger(-1)); }
+| opt_array_bounds '[' Iconst ']'
+    {  $$ = lappend($1, makeInteger($3)); }
+| */ /*EMPTY*/
+    {  $$ = nil }
+
+SimpleTypename:
+  GenericType      { $$ = $1 }
+| Numeric          { $$ = $1 }
+/* TODO
+| Bit              { $$ = $1 }
+| Character        { $$ = $1 }
+| ConstDatetime    { $$ = $1 }
+| ConstInterval opt_interval
+  {
+    $$ = $1;
+    $$->typmods = $2;
+  }
+| ConstInterval '(' Iconst ')'
+  {
+    $$ = $1;
+    $$->typmods = list_make2(makeIntConst(INTERVAL_FULL_RANGE, -1),
+                 makeIntConst($3, @3));
+  }
+*/
+
+/* We have a separate ConstTypename to allow defaulting fixed-length
+ * types such as CHAR() and BIT() to an unspecified length.
+ * SQL9x requires that these default to a length of one, but this
+ * makes no sense for constructs like CHAR 'hi' and BIT '0101',
+ * where there is an obvious better choice to make.
+ * Note that ConstInterval is not included here since it must
+ * be pushed up higher in the rules to accommodate the postfix
+ * options (e.g. INTERVAL '1' YEAR). Likewise, we have to handle
+ * the generic-type-name case in AExprConst to avoid premature
+ * reduce/reduce conflicts against function names.
+ */
+/* TODO
+ConstTypename:
+      Numeric                 { $$ = $1; }
+      | ConstBit                { $$ = $1; }
+      | ConstCharacter            { $$ = $1; }
+      | ConstDatetime             { $$ = $1; }
+*/
+
+/*
+ * GenericType covers all type names that don't have special syntax mandated
+ * by the standard, including qualified names.  We also allow type modifiers.
+ * To avoid parsing conflicts against function invocations, the modifiers
+ * have to be shown as expr_list here, but parse analysis will only accept
+ * constants for them.
+ */
+GenericType:
+  /* TODO -- something with opt_type_modifiers */
+  type_function_name opt_type_modifiers
+  {
+    $$ = PgType{Name: $1}
+  }
+/* TODO
+| type_function_name attrs opt_type_modifiers
+  {
+    panic("TODO")
+  }
+*/
+
+opt_type_modifiers:
+  '(' expr_list ')'   { $$ = $2 }
+| /* EMPTY */         { $$ = nil }
+
+/*
+ * SQL numeric data types
+ */
+Numeric:
+  INT_P
+  {
+    $$ = PgType{Name: "int"}
+  }
+| INTEGER
+  {
+    $$ = PgType{Name: "integer"}
+  }
+| SMALLINT
+  {
+    $$ = PgType{Name: "smallint"}
+  }
+| BIGINT
+  {
+    $$ = PgType{Name: "bigint"}
+  }
+| REAL
+  {
+    $$ = PgType{Name: "real"}
+  }
+/* TODO
+| FLOAT_P opt_float
+  {
+    $$ = $2;
+    $$->location = @1;
+  }
+| DOUBLE_P PRECISION
+  {
+    $$ = SystemTypeName("float8");
+    $$->location = @1;
+  }
+| DECIMAL_P opt_type_modifiers
+  {
+    $$ = SystemTypeName("numeric");
+    $$->typmods = $2;
+    $$->location = @1;
+  }
+| DEC opt_type_modifiers
+  {
+    $$ = SystemTypeName("numeric");
+    $$->typmods = $2;
+    $$->location = @1;
+  }
+| NUMERIC opt_type_modifiers
+  {
+    $$ = SystemTypeName("numeric");
+    $$->typmods = $2;
+    $$->location = @1;
+  }
+*/
+| BOOLEAN_P
+  {
+    $$ = PgType{Name: "bool"}
+  }
+
+/* TODO
+opt_float
+Bit
+ConstBit
+BitWithLength
+BitWithoutLength
+Character
+ConstCharacter
+CharacterWithLength
+CharacterWithoutLength
+character
+opt_varying
+opt_charset
+ConstDatetime
+ConstInterval
+opt_timezone
+opt_interval
+interval_second
+*/
+
+
 /*****************************************************************************
  *
  *  expression grammar
@@ -352,7 +543,11 @@ a_expr:
     $$ = ColumnRef{Column: "true"}
   }
 
-/* TODO      | a_expr TYPECAST Typename
+| a_expr TYPECAST Typename
+  {
+    $$ = TypecastExpr{Expr: $1, Typename: $3}
+  }
+/* TODO
       | a_expr COLLATE any_name
       | a_expr AT TIME ZONE a_expr      %prec AT
 */
