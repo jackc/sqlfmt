@@ -9,6 +9,7 @@ package main
   fields []Expr
   expr Expr
   src string
+  str string
   identifiers []string
   fromClause *FromClause
   whereClause *WhereClause
@@ -42,7 +43,7 @@ package main
   window_clause
   values_clause
   relation_expr
-  qual_all_Op
+
 
 %type <limitClause> select_limit opt_select_limit
 
@@ -55,6 +56,8 @@ package main
 %type <identifiers> locked_rels_list qualified_name_list indirection name_list
 
 %type <src> indirection_el attr_name qualified_name ColId name
+
+%type <src> MathOp qual_Op qual_all_Op all_Op
 
 %type <groupByClause> group_clause
 %type <fields>  group_by_list
@@ -75,8 +78,23 @@ package main
 
 
 
-%token  <src> IDENT ICONST SCONST
-%token  <src> OP
+%token  <src> OP any_operator
+
+
+/*
+ * Non-keyword token types.  These are hard-wired into the "flex" lexer.
+ * They must be listed first so that their numeric codes do not depend on
+ * the set of keywords.  PL/pgsql depends on this so that it can share the
+ * same lexer.  If you add/change tokens here, fix PL/pgsql to match!
+ *
+ * DOT_DOT is unused in the core SQL grammar, and so will always provoke
+ * parse errors.  It is needed by PL/pgsql.
+ */
+%token <src>  IDENT FCONST SCONST BCONST XCONST Op
+/* ival in PostgreSQL */
+%token <src> ICONST PARAM
+%token      TYPECAST DOT_DOT COLON_EQUALS EQUALS_GREATER
+%token      LESS_EQUALS GREATER_EQUALS NOT_EQUALS
 
 
 /* ordinary key words in alphabetical order */
@@ -622,7 +640,7 @@ sortby_list:
 sortby:
 a_expr USING qual_all_Op opt_nulls_order
   {
-    panic("TODO")
+    $$ = OrderExpr{Expr: $1, Using: $3, Nulls: $4}
   }
 | a_expr opt_asc_desc opt_nulls_order
   {
@@ -722,10 +740,6 @@ window_clause:
 
 values_clause: { panic("TODO") }
 relation_expr: { panic("TODO") }
-qual_all_Op: { panic("TODO") }
-
-
-
 
 
 
@@ -793,6 +807,33 @@ where_clause:
   WHERE a_expr   { $$ = &WhereClause{Expr: $2} }
 | /*EMPTY*/      { $$ = nil }
 
+
+
+all_Op:
+  Op { $$ = string($1) }
+| MathOp { $$ = string($1) }
+
+MathOp:
+  '+'             { $$ = "+" }
+| '-'             { $$ = "-" }
+| '*'             { $$ = "*" }
+| '/'             { $$ = "/" }
+| '%'             { $$ = "%" }
+| '^'             { $$ = "^" }
+| '<'             { $$ = "<" }
+| '>'             { $$ = ">" }
+| '='             { $$ = "=" }
+| LESS_EQUALS     { $$ = "<=" }
+| GREATER_EQUALS  { $$ = ">=" }
+| NOT_EQUALS      { $$ = "<>" }
+
+qual_Op:
+  Op { $$ = string($1) }
+| OPERATOR '(' any_operator ')' { $$ = $3 }
+
+qual_all_Op:
+  all_Op { $$ = string($1) }
+| OPERATOR '(' any_operator ')' { $$ = $3 }
 
 
 

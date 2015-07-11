@@ -186,6 +186,10 @@ func TestSqlFmt(t *testing.T) {
 			expectedOutputFile: "order_nulls.fmt.sql",
 		},
 		{
+			inputFile:          "order_using.sql",
+			expectedOutputFile: "order_using.fmt.sql",
+		},
+		{
 			inputFile:          "distinct.sql",
 			expectedOutputFile: "distinct.fmt.sql",
 		},
