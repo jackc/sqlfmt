@@ -196,7 +196,15 @@ func lexQuotedIdentifier(l *sqlLex) stateFn {
 
 func lexOperator(l *sqlLex) stateFn {
 	l.acceptRunFunc(isOperator)
-	l.append(token{OP, l.src[l.start:l.pos]})
+
+	t := token{src: l.src[l.start:l.pos]}
+	if len(t.src) == 1 {
+		t.typ = int(t.src[0])
+	} else {
+		t.typ = OP
+	}
+
+	l.append(t)
 	l.start = l.pos
 	return blankState
 }

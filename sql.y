@@ -302,6 +302,34 @@ expr:
   {
     $$ = ColumnRef{Column: "true"}
   }
+| expr '+' expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "+", Right: $3}
+  }
+| expr '-' expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "-", Right: $3}
+  }
+| expr '*' expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "*", Right: $3}
+  }
+| expr '/' expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "/", Right: $3}
+  }
+| expr '=' expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "=", Right: $3}
+  }
+| expr '<' expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "<", Right: $3}
+  }
+| expr '>' expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: ">", Right: $3}
+  }
 | expr OP expr
   {
     $$ = BinaryExpr{Left: $1, Operator: $2, Right: $3}
@@ -825,9 +853,10 @@ target_el:
     $$ = AliasedExpr{Expr: $1, Alias: $2}
   }
 | a_expr
-/* TODO
-      | '*'
-*/
+| '*'
+  {
+    $$ = ColumnRef{Column: "*"}
+  }
 
 
 
