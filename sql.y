@@ -50,11 +50,19 @@ package main
   relation_expr
   opt_array_bounds
   opt_type_modifiers
+  row_or_rows
+  first_or_next
 
 
 %type <limitClause> select_limit opt_select_limit
 
-%type <expr> limit_clause offset_clause select_limit_value select_offset_value
+%type <expr>
+  limit_clause
+  offset_clause
+  select_limit_value
+  select_offset_value
+  opt_select_fetch_first_value
+  select_offset_value2
 
 %type <lockingClause> opt_for_locking_clause for_locking_clause for_locking_items
 %type <lockingItem> for_locking_item
@@ -74,7 +82,7 @@ package main
 
 %type <boolean> all_or_distinct
 
-%type <str>  Iconst SignedIconst Sconst
+%type <expr>  Iconst SignedIconst Sconst
 
 %type <expr> case_expr case_arg case_default
 %type <whenClauses> when_clause_list
@@ -537,11 +545,11 @@ a_expr:
 /* TODO - replace these placeholders as more PostgreSQL grammer is ported */
 | Sconst
   {
-    $$ = StringLiteral($1)
+    $$ = $1
   }
 | Iconst
   {
-    $$ = IntegerLiteral($1)
+    $$ = $1
   }
 | TRUE_P /* temp hack while integrating PostgreSQL keywords */
   {
@@ -1130,7 +1138,11 @@ limit_clause:
   {
     $$ = $2
   }
-  /* TODO SQL:2008 syntax */
+  /* SQL:2008 syntax */
+| FETCH first_or_next opt_select_fetch_first_value row_or_rows ONLY
+  {
+    $$ = $3
+  }
 
 offset_clause:
   OFFSET select_offset_value
@@ -1148,6 +1160,33 @@ select_limit_value:
 
 select_offset_value:
   a_expr   { $$ = $1 }
+
+/*
+ * Allowing full expressions without parentheses causes various parsing
+ * problems with the trailing ROW/ROWS key words.  SQL only calls for
+ * constants, so we allow the rest only with parentheses.  If omitted,
+ * default to 1.
+ */
+opt_select_fetch_first_value:
+  SignedIconst       { $$ = $1 }
+| '(' a_expr ')'     { $$ = $2 }
+| /*EMPTY*/          { $$ = IntegerLiteral("1") }
+
+/*
+ * Again, the trailing ROW/ROWS in this case prevent the full expression
+ * syntax.  c_expr is the best we can do.
+ */
+select_offset_value2:
+  c_expr  { $$ = $1 }
+
+/* noise words */
+row_or_rows:
+  ROW   { $$ = 0 }
+| ROWS  { $$ = 0 }
+
+first_or_next:
+  FIRST_P  { $$ = 0 }
+| NEXT     { $$ = 0 }
 
 values_clause:
 VALUES ctext_row
@@ -1430,8 +1469,8 @@ attr_name:
   ColLabel { $$ = $1 }
 
 
-Iconst:   ICONST
-Sconst:   SCONST
+Iconst:   ICONST { $$ = IntegerLiteral($1) }
+Sconst:   SCONST { $$ = StringLiteral($1) }
 
 SignedIconst:
   Iconst      { $$ = $1 }
