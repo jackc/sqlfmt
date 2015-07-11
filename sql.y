@@ -24,12 +24,15 @@ package main
   whenClauses []WhenClause
   whenClause WhenClause
   pgType PgType
+  valuesRow ValuesRow
+  valuesClause ValuesClause
 }
 
 %type <sqlSelect> top
 %type <sqlSelect> SelectStmt
 %type <sqlSelect> select_no_parens
 %type <sqlSelect> select_with_parens select_clause simple_select
+%type <sqlSelect> values_clause
 %type <fields> opt_target_list target_list distinct_clause expr_list
 %type <placeholder> opt_all_clause
 
@@ -44,7 +47,6 @@ package main
 %type <str> opt_asc_desc opt_nulls_order
 %type <placeholder> into_clause
   window_clause
-  values_clause
   relation_expr
   opt_array_bounds
   opt_type_modifiers
@@ -77,6 +79,9 @@ package main
 %type <expr> case_expr case_arg case_default
 %type <whenClauses> when_clause_list
 %type <whenClause> when_clause
+
+%type <expr> ctext_expr
+%type <valuesRow> ctext_expr_list ctext_row
 
 %type <columnRef> columnref
 
@@ -894,32 +899,33 @@ select_clause:
  * However, this is not checked by the grammar; parse analysis must check it.
  */
 simple_select:
-      SELECT opt_all_clause opt_target_list
-      into_clause from_clause where_clause
-      group_clause having_clause window_clause
-        {
-          ss := &SelectStmt{}
-          ss.TargetList = $3
-          ss.FromClause = $5
-          ss.WhereClause = $6
-          ss.GroupByClause = $7
-          ss.HavingClause = $8
-          $$ = ss
-        }
-      | SELECT distinct_clause target_list
-      into_clause from_clause where_clause
-      group_clause having_clause window_clause
-        {
-          ss := &SelectStmt{}
-          ss.DistinctList = $2
-          ss.TargetList = $3
-          ss.FromClause = $5
-          ss.WhereClause = $6
-          ss.GroupByClause = $7
-          ss.HavingClause = $8
-          $$ = ss
-        }
-/*      | values_clause
+  SELECT opt_all_clause opt_target_list
+  into_clause from_clause where_clause
+  group_clause having_clause window_clause
+    {
+      ss := &SelectStmt{}
+      ss.TargetList = $3
+      ss.FromClause = $5
+      ss.WhereClause = $6
+      ss.GroupByClause = $7
+      ss.HavingClause = $8
+      $$ = ss
+    }
+| SELECT distinct_clause target_list
+  into_clause from_clause where_clause
+  group_clause having_clause window_clause
+  {
+    ss := &SelectStmt{}
+    ss.DistinctList = $2
+    ss.TargetList = $3
+    ss.FromClause = $5
+    ss.WhereClause = $6
+    ss.GroupByClause = $7
+    ss.HavingClause = $8
+    $$ = ss
+  }
+| values_clause
+/*
       | TABLE relation_expr
         {
           panic("TODO")
@@ -1092,7 +1098,6 @@ window_clause:
     ;
 
 
-values_clause: { panic("TODO") }
 relation_expr: { panic("TODO") }
 
 
@@ -1144,6 +1149,16 @@ select_limit_value:
 select_offset_value:
   a_expr   { $$ = $1 }
 
+values_clause:
+VALUES ctext_row
+  {
+    $$ = &SelectStmt{ValuesClause: ValuesClause{$2}}
+  }
+| values_clause ',' ctext_row
+  {
+    $1.ValuesClause = append($1.ValuesClause, $3)
+    $$ = $1
+  }
 
 
 /*****************************************************************************
@@ -1277,6 +1292,40 @@ opt_indirection:
     } else {
       $$ = []string{$2}
     }
+  }
+
+/*
+ * The SQL spec defines "contextually typed value expressions" and
+ * "contextually typed row value constructors", which for our purposes
+ * are the same as "a_expr" and "row" except that DEFAULT can appear at
+ * the top level.
+ */
+
+ctext_expr:
+  a_expr    { $$ = $1 }
+/* TODO
+| DEFAULT   { $$ = ? }
+*/
+
+ctext_expr_list:
+  ctext_expr
+  {
+    $$ = ValuesRow{$1}
+  }
+| ctext_expr_list ',' ctext_expr
+  {
+    $$ = append($1, $3)
+  }
+
+/*
+ * We should allow ROW '(' ctext_expr_list ')' too, but that seems to require
+ * making VALUES a fully reserved word, which will probably break more apps
+ * than allowing the noise-word is worth.
+ */
+ctext_row:
+  '(' ctext_expr_list ')'
+  {
+    $$ = $2
   }
 
 /*****************************************************************************

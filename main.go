@@ -377,6 +377,40 @@ func (lc LockingClause) RenderTo(r Renderer) {
 	}
 }
 
+type ValuesRow []Expr
+
+func (vr ValuesRow) RenderTo(r Renderer) {
+	r.Text("(", "lparen")
+
+	for i, e := range vr {
+		e.RenderTo(r)
+		if i < len(vr)-1 {
+			r.Text(",", "comma")
+			r.Text(" ", "space")
+		}
+	}
+
+	r.Text(")", "rparen")
+}
+
+type ValuesClause []ValuesRow
+
+func (vc ValuesClause) RenderTo(r Renderer) {
+	r.Text("values", "keyword")
+	r.NewLine()
+	r.Indent()
+
+	for i, row := range vc {
+		row.RenderTo(r)
+		if i < len(vc)-1 {
+			r.Text(",", "comma")
+		}
+		r.NewLine()
+	}
+
+	r.Unindent()
+}
+
 type SelectStmt struct {
 	DistinctList  []Expr
 	TargetList    []Expr
@@ -387,10 +421,18 @@ type SelectStmt struct {
 	HavingClause  Expr
 	LimitClause   *LimitClause
 	LockingClause *LockingClause
-	ParenWrapped  bool
+
+	ParenWrapped bool
+
+	ValuesClause ValuesClause
 }
 
 func (s SelectStmt) RenderTo(r Renderer) {
+	if s.ValuesClause != nil {
+		s.ValuesClause.RenderTo(r)
+		return
+	}
+
 	if s.ParenWrapped {
 		r.Text("(", "lparen")
 	}

@@ -269,6 +269,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "unary.sql",
 			expectedOutputFile: "unary.fmt.sql",
 		},
+		{
+			inputFile:          "values.sql",
+			expectedOutputFile: "values.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {
