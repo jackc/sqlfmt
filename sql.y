@@ -363,10 +363,6 @@ expr:
   {
     $$ = ParenExpr{Expr: $2}
   }
-| '(' SelectStmt ')'
-  {
-    $$ = ParenExpr{Expr: $2}
-  }
 
 a_expr: expr
 
@@ -381,6 +377,28 @@ a_expr: expr
  */
 c_expr:
   columnref { $$ = $1 }
+/* TODO
+| AexprConst              { $$ = $1; }
+| PARAM opt_indirection
+| '(' a_expr ')' opt_indirection
+| case_expr
+  { $$ = $1; }
+| func_expr
+  { $$ = $1; }
+  */
+| select_with_parens      %prec UMINUS
+  {
+    $$ = $1
+  }
+/* TODO
+| select_with_parens indirection
+| EXISTS select_with_parens
+| ARRAY select_with_parens
+| ARRAY array_expr
+| explicit_row
+| implicit_row
+| GROUPING '(' expr_list ')'
+*/
 
 identifierSeq:
   IDENT
@@ -494,7 +512,11 @@ SelectStmt:
 
 
 select_with_parens:
-  '(' select_no_parens ')'        { $$ = $2 }
+  '(' select_no_parens ')'
+  {
+    $2.ParenWrapped = true
+    $$ = $2
+  }
 | '(' select_with_parens ')'      { $$ = $2 }
 
 select_no_parens:

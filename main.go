@@ -307,9 +307,14 @@ type SelectStmt struct {
 	HavingClause  Expr
 	LimitClause   *LimitClause
 	LockingClause *LockingClause
+	ParenWrapped  bool
 }
 
 func (s SelectStmt) RenderTo(r Renderer) {
+	if s.ParenWrapped {
+		r.Text("(", "lparen")
+	}
+
 	r.Text("select", "keyword")
 
 	if s.DistinctList != nil {
@@ -374,5 +379,10 @@ func (s SelectStmt) RenderTo(r Renderer) {
 
 	if s.LockingClause != nil {
 		s.LockingClause.RenderTo(r)
+	}
+
+	if s.ParenWrapped {
+		r.Text(")", "rparen")
+		r.NewLine()
 	}
 }

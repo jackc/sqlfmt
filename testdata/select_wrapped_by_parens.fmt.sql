@@ -1,4 +1,5 @@
-select
+(select
   foo
 from
   bar
+)

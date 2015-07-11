@@ -17,6 +17,7 @@ type TextRenderer struct {
 	indentLvl    int
 	indent       string
 	lineIndented bool
+	newLine      bool
 }
 
 func NewTextRenderer(w io.Writer) *TextRenderer {
@@ -27,6 +28,8 @@ func (tr *TextRenderer) Text(val, typ string) {
 	if tr.err != nil {
 		return
 	}
+
+	tr.newLine = false
 
 	if !tr.lineIndented {
 		for i := 0; i < tr.indentLvl; i++ {
@@ -46,6 +49,12 @@ func (tr *TextRenderer) NewLine() {
 	if tr.err != nil {
 		return
 	}
+
+	if tr.newLine {
+		return
+	}
+
+	tr.newLine = true
 
 	_, tr.err = io.WriteString(tr.w, "\n")
 	if tr.err != nil {
