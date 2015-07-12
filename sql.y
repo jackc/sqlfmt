@@ -91,7 +91,7 @@ package main
 %type <expr> ctext_expr
 %type <valuesRow> ctext_expr_list ctext_row
 
-%type <qualifiedName> columnref
+%type <qualifiedName> columnref any_name attrs
 
 %type <str>
   ColLabel
@@ -327,6 +327,25 @@ aliasableExpr:
   }
 
 
+any_name:
+  ColId        { $$ = QualifiedName{$1} }
+| ColId attrs
+  {
+    $$ = QualifiedName{$1}
+    $$ = append($$, $2...)
+  }
+
+attrs:
+  '.' attr_name
+  {
+    $$ = QualifiedName{$2}
+  }
+| attrs '.' attr_name
+  {
+    $$ = append($1, $3)
+  }
+
+
 /*****************************************************************************
  *
  *  Type syntax
@@ -545,8 +564,11 @@ a_expr:
   {
     $$ = TypecastExpr{Expr: $1, Typename: $3}
   }
+| a_expr COLLATE any_name
+  {
+    $$ = CollateExpr{Expr: $1, Collation: $3}
+  }
 /* TODO
-      | a_expr COLLATE any_name
       | a_expr AT TIME ZONE a_expr      %prec AT
 */
 /*

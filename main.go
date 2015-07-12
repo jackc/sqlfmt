@@ -162,6 +162,19 @@ func (t TypecastExpr) RenderTo(r Renderer) {
 	t.Typename.RenderTo(r)
 }
 
+type CollateExpr struct {
+	Expr      Expr
+	Collation QualifiedName
+}
+
+func (c CollateExpr) RenderTo(r Renderer) {
+	c.Expr.RenderTo(r)
+	r.Text(" ", "space")
+	r.Text("collate", "keyword")
+	r.Text(" ", "space")
+	c.Collation.RenderTo(r)
+}
+
 type NotExpr struct {
 	Expr Expr
 }
