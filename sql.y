@@ -20,7 +20,7 @@ package main
   lockingItem LockingItem
   boolean bool
   placeholder interface{}
-  columnRef ColumnRef
+  qualifiedName QualifiedName
   whenClauses []WhenClause
   whenClause WhenClause
   pgType PgType
@@ -91,7 +91,7 @@ package main
 %type <expr> ctext_expr
 %type <valuesRow> ctext_expr_list ctext_row
 
-%type <columnRef> columnref
+%type <qualifiedName> columnref
 
 %type <str>
   ColLabel
@@ -1274,11 +1274,12 @@ case_arg:
 columnref:
 ColId
   {
-    $$ = ColumnRef{Column: $1}
+    $$ = QualifiedName{$1}
   }
 | ColId indirection
   {
-    $$ = ColumnRef{Table: $1, Column: $2[0]}
+    $$ = QualifiedName{$1}
+    $$ = append($$, $2...)
   }
 
 
@@ -1383,7 +1384,7 @@ target_el:
 | a_expr
 | '*'
   {
-    $$ = ColumnRef{Column: "*"}
+    $$ = QualifiedName{"*"}
   }
 
 

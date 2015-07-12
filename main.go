@@ -33,17 +33,15 @@ func (t PgType) RenderTo(r Renderer) {
 	r.Text(t.Name, "typename")
 }
 
-type ColumnRef struct {
-	Table  string
-	Column string
-}
+type QualifiedName []string
 
-func (cr ColumnRef) RenderTo(r Renderer) {
-	if cr.Table != "" {
-		r.Text(cr.Table, "identifier")
-		r.Text(".", "period")
+func (qn QualifiedName) RenderTo(r Renderer) {
+	for i, s := range qn {
+		r.Text(s, "identifier")
+		if i+1 < len(qn) {
+			r.Text(".", "period")
+		}
 	}
-	r.Text(cr.Column, "identifier")
 }
 
 type StringLiteral string

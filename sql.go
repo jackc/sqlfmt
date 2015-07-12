@@ -22,7 +22,7 @@ type sqlSymType struct {
 	lockingItem   LockingItem
 	boolean       bool
 	placeholder   interface{}
-	columnRef     ColumnRef
+	qualifiedName QualifiedName
 	whenClauses   []WhenClause
 	whenClause    WhenClause
 	pgType        PgType
@@ -929,7 +929,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlMaxDepth = 200
 
-//line sql.y:2007
+//line sql.y:2008
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -2368,7 +2368,7 @@ sqldefault:
 	case 43:
 		//line sql.y:696
 		{
-			sqlVAL.expr = sqlS[sqlpt-0].columnRef
+			sqlVAL.expr = sqlS[sqlpt-0].qualifiedName
 		}
 	case 44:
 		//line sql.y:697
@@ -2973,40 +2973,41 @@ sqldefault:
 	case 164:
 		//line sql.y:1276
 		{
-			sqlVAL.columnRef = ColumnRef{Column: sqlS[sqlpt-0].str}
+			sqlVAL.qualifiedName = QualifiedName{sqlS[sqlpt-0].str}
 		}
 	case 165:
 		//line sql.y:1280
 		{
-			sqlVAL.columnRef = ColumnRef{Table: sqlS[sqlpt-1].str, Column: sqlS[sqlpt-0].identifiers[0]}
+			sqlVAL.qualifiedName = QualifiedName{sqlS[sqlpt-1].str}
+			sqlVAL.qualifiedName = append(sqlVAL.qualifiedName, sqlS[sqlpt-0].identifiers...)
 		}
 	case 166:
-		//line sql.y:1288
+		//line sql.y:1289
 		{
 			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 167:
-		//line sql.y:1292
+		//line sql.y:1293
 		{
 			sqlVAL.str = "*"
 		}
 	case 168:
-		//line sql.y:1311
+		//line sql.y:1312
 		{
 			sqlVAL.identifiers = []string{sqlS[sqlpt-0].str}
 		}
 	case 169:
-		//line sql.y:1312
+		//line sql.y:1313
 		{
 			sqlVAL.identifiers = append(sqlS[sqlpt-1].identifiers, sqlS[sqlpt-0].str)
 		}
 	case 170:
-		//line sql.y:1315
+		//line sql.y:1316
 		{
 			sqlVAL.identifiers = nil
 		}
 	case 171:
-		//line sql.y:1317
+		//line sql.y:1318
 		{
 			if sqlS[sqlpt-1].identifiers != nil {
 				sqlVAL.identifiers = append(sqlS[sqlpt-1].identifiers, sqlS[sqlpt-0].str)
@@ -3015,134 +3016,134 @@ sqldefault:
 			}
 		}
 	case 172:
-		//line sql.y:1333
+		//line sql.y:1334
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 173:
-		//line sql.y:1334
+		//line sql.y:1335
 		{
 			sqlVAL.expr = DefaultExpr(true)
 		}
 	case 174:
-		//line sql.y:1338
+		//line sql.y:1339
 		{
 			sqlVAL.valuesRow = ValuesRow{sqlS[sqlpt-0].expr}
 		}
 	case 175:
-		//line sql.y:1342
+		//line sql.y:1343
 		{
 			sqlVAL.valuesRow = append(sqlS[sqlpt-2].valuesRow, sqlS[sqlpt-0].expr)
 		}
 	case 176:
-		//line sql.y:1353
+		//line sql.y:1354
 		{
 			sqlVAL.valuesRow = sqlS[sqlpt-1].valuesRow
 		}
 	case 177:
-		//line sql.y:1364
+		//line sql.y:1365
 		{
 			sqlVAL.fields = sqlS[sqlpt-0].fields
 		}
 	case 178:
-		//line sql.y:1365
+		//line sql.y:1366
 		{
 			sqlVAL.fields = nil
 		}
 	case 179:
-		//line sql.y:1368
+		//line sql.y:1369
 		{
 			sqlVAL.fields = []Expr{sqlS[sqlpt-0].expr}
 		}
 	case 180:
-		//line sql.y:1370
+		//line sql.y:1371
 		{
 			sqlVAL.fields = append(sqlS[sqlpt-2].fields, sqlS[sqlpt-0].expr)
 		}
 	case 181:
-		//line sql.y:1376
+		//line sql.y:1377
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-2].expr, Alias: sqlS[sqlpt-0].str}
 		}
 	case 182:
-		//line sql.y:1380
+		//line sql.y:1381
 		{
 			sqlVAL.expr = AliasedExpr{Expr: sqlS[sqlpt-1].expr, Alias: sqlS[sqlpt-0].str}
 		}
 	case 183:
 		sqlVAL.expr = sqlS[sqlpt-0].expr
 	case 184:
-		//line sql.y:1385
+		//line sql.y:1386
 		{
-			sqlVAL.expr = ColumnRef{Column: "*"}
+			sqlVAL.expr = QualifiedName{"*"}
 		}
 	case 185:
-		//line sql.y:1399
+		//line sql.y:1400
 		{
 			sqlVAL.identifiers = []string{sqlS[sqlpt-0].str}
 		}
 	case 186:
-		//line sql.y:1403
+		//line sql.y:1404
 		{
 			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].str)
 		}
 	case 187:
-		//line sql.y:1416
+		//line sql.y:1417
 		{
 			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 188:
-		//line sql.y:1448
+		//line sql.y:1449
 		{
 			sqlVAL.identifiers = []string{sqlS[sqlpt-0].str}
 		}
 	case 189:
-		//line sql.y:1450
+		//line sql.y:1451
 		{
 			sqlVAL.identifiers = append(sqlS[sqlpt-2].identifiers, sqlS[sqlpt-0].str)
 		}
 	case 190:
-		//line sql.y:1455
+		//line sql.y:1456
 		{
 			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 191:
-		//line sql.y:1458
+		//line sql.y:1459
 		{
 			sqlVAL.str = sqlS[sqlpt-0].str
 		}
 	case 192:
-		//line sql.y:1465
+		//line sql.y:1466
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 193:
-		//line sql.y:1472
+		//line sql.y:1473
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
 	case 194:
-		//line sql.y:1485
+		//line sql.y:1486
 		{
 			sqlVAL.expr = BoolLiteral(true)
 		}
 	case 195:
-		//line sql.y:1489
+		//line sql.y:1490
 		{
 			sqlVAL.expr = BoolLiteral(false)
 		}
 	case 196:
-		//line sql.y:1496
+		//line sql.y:1497
 		{
 			sqlVAL.expr = IntegerLiteral(sqlS[sqlpt-0].str)
 		}
 	case 197:
-		//line sql.y:1497
+		//line sql.y:1498
 		{
 			sqlVAL.expr = StringLiteral(sqlS[sqlpt-0].str)
 		}
 	case 198:
-		//line sql.y:1500
+		//line sql.y:1501
 		{
 			sqlVAL.expr = sqlS[sqlpt-0].expr
 		}
@@ -3159,27 +3160,27 @@ sqldefault:
 	case 204:
 		sqlVAL.str = sqlS[sqlpt-0].str
 	case 209:
-		//line sql.y:1543
-		{
-			sqlVAL.str = sqlS[sqlpt-0].str
-		}
-	case 210:
 		//line sql.y:1544
 		{
 			sqlVAL.str = sqlS[sqlpt-0].str
 		}
-	case 211:
+	case 210:
 		//line sql.y:1545
 		{
 			sqlVAL.str = sqlS[sqlpt-0].str
 		}
-	case 212:
+	case 211:
 		//line sql.y:1546
 		{
 			sqlVAL.str = sqlS[sqlpt-0].str
 		}
-	case 213:
+	case 212:
 		//line sql.y:1547
+		{
+			sqlVAL.str = sqlS[sqlpt-0].str
+		}
+	case 213:
+		//line sql.y:1548
 		{
 			sqlVAL.str = sqlS[sqlpt-0].str
 		}
