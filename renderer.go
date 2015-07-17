@@ -6,6 +6,7 @@ import (
 
 type Renderer interface {
 	Text(val string, typ string)
+	Space()
 	NewLine()
 	Indent()
 	Unindent()
@@ -43,6 +44,14 @@ func (tr *TextRenderer) Text(val, typ string) {
 	}
 
 	_, tr.err = io.WriteString(tr.w, val)
+}
+
+func (tr *TextRenderer) Space() {
+	if tr.err != nil {
+		return
+	}
+
+	_, tr.err = io.WriteString(tr.w, " ")
 }
 
 func (tr *TextRenderer) NewLine() {

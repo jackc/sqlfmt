@@ -76,7 +76,7 @@ func (e BooleanExpr) RenderTo(r Renderer) {
 	e.Left.RenderTo(r)
 	r.NewLine()
 	r.Text(e.Operator, "operator")
-	r.Text(" ", "space")
+	r.Space()
 	e.Right.RenderTo(r)
 }
 
@@ -88,9 +88,9 @@ type BinaryExpr struct {
 
 func (e BinaryExpr) RenderTo(r Renderer) {
 	e.Left.RenderTo(r)
-	r.Text(" ", "space")
+	r.Space()
 	r.Text(e.Operator, "operator")
-	r.Text(" ", "space")
+	r.Space()
 	e.Right.RenderTo(r)
 }
 
@@ -103,15 +103,15 @@ type TextOpWithEscapeExpr struct {
 
 func (e TextOpWithEscapeExpr) RenderTo(r Renderer) {
 	e.Left.RenderTo(r)
-	r.Text(" ", "space")
+	r.Space()
 	r.Text(e.Operator, "operator")
-	r.Text(" ", "space")
+	r.Space()
 	e.Right.RenderTo(r)
 
 	if e.Escape != nil {
-		r.Text(" ", "space")
+		r.Space()
 		r.Text("escape", "keyword")
-		r.Text(" ", "space")
+		r.Space()
 		e.Escape.RenderTo(r)
 	}
 }
@@ -133,9 +133,9 @@ type WhenClause struct {
 
 func (w WhenClause) RenderTo(r Renderer) {
 	r.Text("when", "keyword")
-	r.Text(" ", "space")
+	r.Space()
 	w.When.RenderTo(r)
-	r.Text(" ", "space")
+	r.Space()
 	r.Text("then", "keyword")
 	r.NewLine()
 	r.Indent()
@@ -154,7 +154,7 @@ func (c CaseExpr) RenderTo(r Renderer) {
 	r.Text("case", "keyword")
 
 	if c.CaseArg != nil {
-		r.Text(" ", "space")
+		r.Space()
 		c.CaseArg.RenderTo(r)
 	}
 
@@ -205,9 +205,9 @@ type CollateExpr struct {
 
 func (c CollateExpr) RenderTo(r Renderer) {
 	c.Expr.RenderTo(r)
-	r.Text(" ", "space")
+	r.Space()
 	r.Text("collate", "keyword")
-	r.Text(" ", "space")
+	r.Space()
 	c.Collation.RenderTo(r)
 }
 
@@ -217,7 +217,7 @@ type NotExpr struct {
 
 func (e NotExpr) RenderTo(r Renderer) {
 	r.Text("not", "keyword")
-	r.Text(" ", "space")
+	r.Space()
 	e.Expr.RenderTo(r)
 }
 
@@ -228,12 +228,12 @@ type IsNullExpr struct {
 
 func (e IsNullExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
-	r.Text(" ", "space")
+	r.Space()
 	r.Text("is", "keyword")
-	r.Text(" ", "space")
+	r.Space()
 	if e.Not {
 		r.Text("not", "keyword")
-		r.Text(" ", "space")
+		r.Space()
 	}
 	r.Text("null", "keyword")
 }
@@ -245,9 +245,9 @@ type AliasedExpr struct {
 
 func (e AliasedExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
-	r.Text(" ", "space")
+	r.Space()
 	r.Text("as", "keyword")
-	r.Text(" ", "space")
+	r.Space()
 	r.Text(e.Alias, "identifier")
 }
 
@@ -281,13 +281,13 @@ func (s JoinExpr) RenderTo(r Renderer) {
 	} else {
 		r.NewLine()
 		r.Text(s.Join, "keyword")
-		r.Text(" ", "space")
+		r.Space()
 	}
 
 	s.Right.RenderTo(r)
 
 	if len(s.Using) > 0 {
-		r.Text(" ", "space")
+		r.Space()
 		r.Text("using", "keyword")
 		r.Text("(", "lparen")
 
@@ -295,7 +295,7 @@ func (s JoinExpr) RenderTo(r Renderer) {
 			r.Text(u, "identifier")
 			if i+1 < len(s.Using) {
 				r.Text(",", "comma")
-				r.Text(" ", "space")
+				r.Space()
 			}
 		}
 
@@ -303,9 +303,9 @@ func (s JoinExpr) RenderTo(r Renderer) {
 	}
 
 	if s.On != nil {
-		r.Text(" ", "space")
+		r.Space()
 		r.Text("on", "keyword")
-		r.Text(" ", "space")
+		r.Space()
 		s.On.RenderTo(r)
 	}
 }
@@ -333,19 +333,19 @@ type OrderExpr struct {
 func (e OrderExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
 	if e.Order != "" {
-		r.Text(" ", "space")
+		r.Space()
 		r.Text(e.Order, "keyword")
 	}
 	if e.Using != "" {
-		r.Text(" ", "space")
+		r.Space()
 		r.Text("using", "keyword")
-		r.Text(" ", "space")
+		r.Space()
 		r.Text(e.Using, "operator")
 	}
 	if e.Nulls != "" {
-		r.Text(" ", "space")
+		r.Space()
 		r.Text("nulls", "keyword")
-		r.Text(" ", "space")
+		r.Space()
 		r.Text(e.Nulls, "keyword")
 	}
 }
@@ -396,13 +396,13 @@ type LimitClause struct {
 func (e LimitClause) RenderTo(r Renderer) {
 	if e.Limit != nil {
 		r.Text("limit", "keyword")
-		r.Text(" ", "space")
+		r.Space()
 		e.Limit.RenderTo(r)
 		r.NewLine()
 	}
 	if e.Offset != nil {
 		r.Text("offset", "keyword")
-		r.Text(" ", "space")
+		r.Space()
 		e.Offset.RenderTo(r)
 		r.NewLine()
 	}
@@ -415,9 +415,9 @@ type AtTimeZoneExpr struct {
 
 func (e AtTimeZoneExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
-	r.Text(" ", "space")
+	r.Space()
 	r.Text("at time zone", "keyword")
-	r.Text(" ", "space")
+	r.Space()
 	e.TimeZone.RenderTo(r)
 }
 
@@ -429,25 +429,25 @@ type LockingItem struct {
 
 func (li LockingItem) RenderTo(r Renderer) {
 	r.Text("for", "keyword")
-	r.Text(" ", "space")
+	r.Space()
 	r.Text(li.Strength, "keyword")
 
 	if li.LockedRels != nil {
-		r.Text(" ", "space")
+		r.Space()
 		r.Text("of", "keyword")
-		r.Text(" ", "space")
+		r.Space()
 
 		for i, lr := range li.LockedRels {
 			r.Text(lr, "identifier")
 			if i < len(li.LockedRels)-1 {
 				r.Text(",", "comma")
-				r.Text(" ", "space")
+				r.Space()
 			}
 		}
 	}
 
 	if li.WaitPolicy != "" {
-		r.Text(" ", "space")
+		r.Space()
 		r.Text(li.WaitPolicy, "keyword")
 	}
 
@@ -479,7 +479,7 @@ func (vr ValuesRow) RenderTo(r Renderer) {
 		e.RenderTo(r)
 		if i < len(vr)-1 {
 			r.Text(",", "comma")
-			r.Text(" ", "space")
+			r.Space()
 		}
 	}
 
@@ -533,11 +533,11 @@ func (s SelectStmt) RenderTo(r Renderer) {
 	r.Text("select", "keyword")
 
 	if s.DistinctList != nil {
-		r.Text(" ", "space")
+		r.Space()
 		r.Text("distinct", "keyword")
 
 		if len(s.DistinctList) > 0 {
-			r.Text(" ", "space")
+			r.Space()
 			r.Text("on", "keyword")
 			r.Text("(", "lparen")
 
@@ -545,7 +545,7 @@ func (s SelectStmt) RenderTo(r Renderer) {
 				f.RenderTo(r)
 				if i < len(s.DistinctList)-1 {
 					r.Text(",", "comma")
-					r.Text(" ", "space")
+					r.Space()
 				}
 			}
 			r.Text(")", "rparen")
