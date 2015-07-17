@@ -664,8 +664,11 @@ a_expr:
   {
     $$ = NotExpr{Expr: $2}
   }
+| a_expr LIKE a_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "like", Right: $3}
+  }
 /* TODO
-      | a_expr LIKE a_expr
       | a_expr LIKE a_expr ESCAPE a_expr          %prec LIKE
       | a_expr NOT_LA LIKE a_expr             %prec NOT_LA
       | a_expr NOT_LA LIKE a_expr ESCAPE a_expr     %prec NOT_LA
