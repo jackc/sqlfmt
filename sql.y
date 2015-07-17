@@ -765,9 +765,15 @@ a_expr:
   {
     $$ = IsBoolOpExpr{Expr: $1, Not: true, Op: "unknown"}
   }
+| a_expr IS DISTINCT FROM a_expr      %prec IS
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "is distinct from", Right: $5}
+  }
+| a_expr IS NOT DISTINCT FROM a_expr    %prec IS
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "is not distinct from", Right: $6}
+  }
 /* TODO
-      | a_expr IS DISTINCT FROM a_expr      %prec IS
-      | a_expr IS NOT DISTINCT FROM a_expr    %prec IS
       | a_expr IS OF '(' type_list ')'      %prec IS
       | a_expr IS NOT OF '(' type_list ')'    %prec IS
       | a_expr BETWEEN opt_asymmetric b_expr AND a_expr   %prec BETWEEN
