@@ -301,6 +301,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "is_null.sql",
 			expectedOutputFile: "is_null.fmt.sql",
 		},
+		{
+			inputFile:          "is_bool_op.sql",
+			expectedOutputFile: "is_bool_op.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

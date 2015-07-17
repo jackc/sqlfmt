@@ -740,12 +740,32 @@ a_expr:
   }
 /* TODO
       | row OVERLAPS row
-      | a_expr IS TRUE_P              %prec IS
-      | a_expr IS NOT TRUE_P            %prec IS
-      | a_expr IS FALSE_P             %prec IS
-      | a_expr IS NOT FALSE_P           %prec IS
-      | a_expr IS UNKNOWN             %prec IS
-      | a_expr IS NOT UNKNOWN           %prec IS
+*/
+| a_expr IS TRUE_P              %prec IS
+  {
+    $$ = IsBoolOpExpr{Expr: $1, Op: "true"}
+  }
+| a_expr IS NOT TRUE_P            %prec IS
+  {
+    $$ = IsBoolOpExpr{Expr: $1, Not: true, Op: "true"}
+  }
+| a_expr IS FALSE_P             %prec IS
+  {
+    $$ = IsBoolOpExpr{Expr: $1, Op: "false"}
+  }
+| a_expr IS NOT FALSE_P           %prec IS
+  {
+    $$ = IsBoolOpExpr{Expr: $1, Not: true, Op: "false"}
+  }
+| a_expr IS UNKNOWN             %prec IS
+  {
+    $$ = IsBoolOpExpr{Expr: $1, Op: "unknown"}
+  }
+| a_expr IS NOT UNKNOWN           %prec IS
+  {
+    $$ = IsBoolOpExpr{Expr: $1, Not: true, Op: "unknown"}
+  }
+/* TODO
       | a_expr IS DISTINCT FROM a_expr      %prec IS
       | a_expr IS NOT DISTINCT FROM a_expr    %prec IS
       | a_expr IS OF '(' type_list ')'      %prec IS

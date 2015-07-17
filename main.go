@@ -238,6 +238,24 @@ func (e IsNullExpr) RenderTo(r Renderer) {
 	r.Text("null", "keyword")
 }
 
+type IsBoolOpExpr struct {
+	Expr Expr
+	Not  bool
+	Op   string
+}
+
+func (e IsBoolOpExpr) RenderTo(r Renderer) {
+	e.Expr.RenderTo(r)
+	r.Space()
+	r.Text("is", "keyword")
+	r.Space()
+	if e.Not {
+		r.Text("not", "keyword")
+		r.Space()
+	}
+	r.Text(e.Op, "keyword")
+}
+
 type AliasedExpr struct {
 	Expr  Expr
 	Alias string
