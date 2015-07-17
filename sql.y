@@ -650,11 +650,11 @@ a_expr:
 */
 | a_expr AND a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "and", Right: $3}
+    $$ = BooleanExpr{Left: $1, Operator: "and", Right: $3}
   }
 | a_expr OR a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "or", Right: $3}
+    $$ = BooleanExpr{Left: $1, Operator: "or", Right: $3}
   }
 | NOT a_expr
   {
@@ -666,22 +666,53 @@ a_expr:
   }
 | a_expr LIKE a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "like", Right: $3}
+    $$ = TextOpWithEscapeExpr{Left: $1, Operator: "like", Right: $3}
   }
-/* TODO
-      | a_expr LIKE a_expr ESCAPE a_expr          %prec LIKE
-      | a_expr NOT_LA LIKE a_expr             %prec NOT_LA
-      | a_expr NOT_LA LIKE a_expr ESCAPE a_expr     %prec NOT_LA
-      | a_expr ILIKE a_expr
-      | a_expr ILIKE a_expr ESCAPE a_expr         %prec ILIKE
-      | a_expr NOT_LA ILIKE a_expr            %prec NOT_LA
-      | a_expr NOT_LA ILIKE a_expr ESCAPE a_expr      %prec NOT_LA
+| a_expr LIKE a_expr ESCAPE a_expr          %prec LIKE
+  {
+    $$ = TextOpWithEscapeExpr{Left: $1, Operator: "like", Right: $3, Escape: $5}
+  }
+| a_expr NOT_LA LIKE a_expr             %prec NOT_LA
+  {
+    $$ = TextOpWithEscapeExpr{Left: $1, Operator: "not like", Right: $4}
+  }
+| a_expr NOT_LA LIKE a_expr ESCAPE a_expr     %prec NOT_LA
+  {
+    $$ = TextOpWithEscapeExpr{Left: $1, Operator: "not like", Right: $4, Escape: $6}
+  }
+| a_expr ILIKE a_expr
+  {
+    $$ = TextOpWithEscapeExpr{Left: $1, Operator: "ilike", Right: $3}
+  }
+| a_expr ILIKE a_expr ESCAPE a_expr         %prec ILIKE
+  {
+    $$ = TextOpWithEscapeExpr{Left: $1, Operator: "ilike", Right: $3, Escape: $5}
+  }
+| a_expr NOT_LA ILIKE a_expr            %prec NOT_LA
+  {
+    $$ = TextOpWithEscapeExpr{Left: $1, Operator: "not ilike", Right: $4}
+  }
+| a_expr NOT_LA ILIKE a_expr ESCAPE a_expr      %prec NOT_LA
+  {
+    $$ = TextOpWithEscapeExpr{Left: $1, Operator: "not ilike", Right: $4, Escape: $6}
+  }
 
-      | a_expr SIMILAR TO a_expr              %prec SIMILAR
-      | a_expr SIMILAR TO a_expr ESCAPE a_expr      %prec SIMILAR
-      | a_expr NOT_LA SIMILAR TO a_expr         %prec NOT_LA
-      | a_expr NOT_LA SIMILAR TO a_expr ESCAPE a_expr   %prec NOT_LA
-*/
+| a_expr SIMILAR TO a_expr              %prec SIMILAR
+  {
+    $$ = TextOpWithEscapeExpr{Left: $1, Operator: "similar to", Right: $4}
+  }
+| a_expr SIMILAR TO a_expr ESCAPE a_expr      %prec SIMILAR
+  {
+    $$ = TextOpWithEscapeExpr{Left: $1, Operator: "similar to", Right: $4, Escape: $6}
+  }
+| a_expr NOT_LA SIMILAR TO a_expr         %prec NOT_LA
+  {
+    $$ = TextOpWithEscapeExpr{Left: $1, Operator: "not similar to", Right: $5}
+  }
+| a_expr NOT_LA SIMILAR TO a_expr ESCAPE a_expr   %prec NOT_LA
+  {
+    $$ = TextOpWithEscapeExpr{Left: $1, Operator: "not similar to", Right: $5, Escape: $7}
+  }
       /* NullTest clause
        * Define SQL-style Null test clause.
        * Allow two forms described in the standard:

@@ -293,6 +293,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "at_time_zone.sql",
 			expectedOutputFile: "at_time_zone.fmt.sql",
 		},
+		{
+			inputFile:          "like.sql",
+			expectedOutputFile: "like.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

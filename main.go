@@ -66,6 +66,20 @@ func (b BoolLiteral) RenderTo(r Renderer) {
 	}
 }
 
+type BooleanExpr struct {
+	Left     Expr
+	Operator string
+	Right    Expr
+}
+
+func (e BooleanExpr) RenderTo(r Renderer) {
+	e.Left.RenderTo(r)
+	r.NewLine()
+	r.Text(e.Operator, "operator")
+	r.Text(" ", "space")
+	e.Right.RenderTo(r)
+}
+
 type BinaryExpr struct {
 	Left     Expr
 	Operator string
@@ -78,6 +92,28 @@ func (e BinaryExpr) RenderTo(r Renderer) {
 	r.Text(e.Operator, "operator")
 	r.Text(" ", "space")
 	e.Right.RenderTo(r)
+}
+
+type TextOpWithEscapeExpr struct {
+	Left     Expr
+	Operator string
+	Right    Expr
+	Escape   Expr
+}
+
+func (e TextOpWithEscapeExpr) RenderTo(r Renderer) {
+	e.Left.RenderTo(r)
+	r.Text(" ", "space")
+	r.Text(e.Operator, "operator")
+	r.Text(" ", "space")
+	e.Right.RenderTo(r)
+
+	if e.Escape != nil {
+		r.Text(" ", "space")
+		r.Text("escape", "keyword")
+		r.Text(" ", "space")
+		e.Escape.RenderTo(r)
+	}
 }
 
 type UnaryExpr struct {
