@@ -568,9 +568,10 @@ a_expr:
   {
     $$ = CollateExpr{Expr: $1, Collation: $3}
   }
-/* TODO
-      | a_expr AT TIME ZONE a_expr      %prec AT
-*/
+| a_expr AT TIME ZONE a_expr      %prec AT
+  {
+    $$ = AtTimeZoneExpr{Expr: $1, TimeZone: $5}
+  }
 /*
 * These operators must be called out explicitly in order to make use
 * of bison's automatic operator-precedence handling.  All other

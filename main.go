@@ -355,6 +355,19 @@ func (e LimitClause) RenderTo(r Renderer) {
 	}
 }
 
+type AtTimeZoneExpr struct {
+	Expr     Expr
+	TimeZone Expr
+}
+
+func (e AtTimeZoneExpr) RenderTo(r Renderer) {
+	e.Expr.RenderTo(r)
+	r.Text(" ", "space")
+	r.Text("at time zone", "keyword")
+	r.Text(" ", "space")
+	e.TimeZone.RenderTo(r)
+}
+
 type LockingItem struct {
 	Strength   string
 	LockedRels []string
