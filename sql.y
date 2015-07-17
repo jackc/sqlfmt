@@ -637,9 +637,15 @@ a_expr:
   {
     $$ = BinaryExpr{Left: $1, Operator: "!=", Right: $3}
   }
+| a_expr qual_Op a_expr       %prec Op
+  {
+    $$ = BinaryExpr{Left: $1, Operator: $2, Right: $3}
+  }
+| qual_Op a_expr          %prec Op
+  {
+    $$ = UnaryExpr{Operator: $1, Expr: $2}
+  }
 /* TODO
-      | a_expr qual_Op a_expr       %prec Op
-      | qual_Op a_expr          %prec Op
       | a_expr qual_Op          %prec POSTFIXOP
 */
 | a_expr AND a_expr
