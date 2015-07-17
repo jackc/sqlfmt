@@ -713,19 +713,32 @@ a_expr:
   {
     $$ = TextOpWithEscapeExpr{Left: $1, Operator: "not similar to", Right: $5, Escape: $7}
   }
-      /* NullTest clause
-       * Define SQL-style Null test clause.
-       * Allow two forms described in the standard:
-       *  a IS NULL
-       *  a IS NOT NULL
-       * Allow two SQL extensions
-       *  a ISNULL
-       *  a NOTNULL
-       */
-/*      | a_expr IS NULL_P              %prec IS
-      | a_expr ISNULL
-      | a_expr IS NOT NULL_P            %prec IS
-      | a_expr NOTNULL
+/* NullTest clause
+ * Define SQL-style Null test clause.
+ * Allow two forms described in the standard:
+ *  a IS NULL
+ *  a IS NOT NULL
+ * Allow two SQL extensions
+ *  a ISNULL
+ *  a NOTNULL
+ */
+| a_expr IS NULL_P              %prec IS
+  {
+    $$ = IsNullExpr{Expr: $1}
+  }
+| a_expr ISNULL
+  {
+    $$ = IsNullExpr{Expr: $1}
+  }
+| a_expr IS NOT NULL_P            %prec IS
+  {
+    $$ = IsNullExpr{Expr: $1, Not: true}
+  }
+| a_expr NOTNULL
+  {
+    $$ = IsNullExpr{Expr: $1, Not: true}
+  }
+/* TODO
       | row OVERLAPS row
       | a_expr IS TRUE_P              %prec IS
       | a_expr IS NOT TRUE_P            %prec IS
