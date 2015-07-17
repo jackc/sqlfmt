@@ -660,9 +660,11 @@ a_expr:
   {
     $$ = NotExpr{Expr: $2}
   }
+| NOT_LA a_expr           %prec NOT
+  {
+    $$ = NotExpr{Expr: $2}
+  }
 /* TODO
-      | NOT_LA a_expr           %prec NOT
-
       | a_expr LIKE a_expr
       | a_expr LIKE a_expr ESCAPE a_expr          %prec LIKE
       | a_expr NOT_LA LIKE a_expr             %prec NOT_LA
