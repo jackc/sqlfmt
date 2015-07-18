@@ -32,7 +32,7 @@ package main
 %type <sqlSelect> SelectStmt
 %type <sqlSelect> select_no_parens
 %type <sqlSelect> select_with_parens select_clause simple_select
-%type <sqlSelect> values_clause
+%type <valuesClause> values_clause
 %type <fields> opt_target_list target_list distinct_clause expr_list
 %type <placeholder> opt_all_clause
 
@@ -1022,6 +1022,9 @@ simple_select:
     $$ = ss
   }
 | values_clause
+  {
+    $$ = &SelectStmt{ValuesClause: $1}
+  }
 /*
       | TABLE relation_expr
         {
@@ -1284,12 +1287,11 @@ first_or_next:
 values_clause:
 VALUES ctext_row
   {
-    $$ = &SelectStmt{ValuesClause: ValuesClause{$2}}
+    $$ = ValuesClause{$2}
   }
 | values_clause ',' ctext_row
   {
-    $1.ValuesClause = append($1.ValuesClause, $3)
-    $$ = $1
+    $$ = append($1, $3)
   }
 
 
