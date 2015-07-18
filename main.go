@@ -522,30 +522,21 @@ func (vc ValuesClause) RenderTo(r Renderer) {
 	r.Unindent()
 }
 
-type SelectStmt struct {
+type SimpleSelect struct {
 	DistinctList  []Expr
 	TargetList    []Expr
 	FromClause    *FromClause
 	WhereClause   *WhereClause
-	OrderClause   *OrderClause
 	GroupByClause *GroupByClause
 	HavingClause  Expr
-	LimitClause   *LimitClause
-	LockingClause *LockingClause
-
-	ParenWrapped bool
 
 	ValuesClause ValuesClause
 }
 
-func (s SelectStmt) RenderTo(r Renderer) {
+func (s SimpleSelect) RenderTo(r Renderer) {
 	if s.ValuesClause != nil {
 		s.ValuesClause.RenderTo(r)
 		return
-	}
-
-	if s.ParenWrapped {
-		r.Text("(", "lparen")
 	}
 
 	r.Text("select", "keyword")
@@ -601,6 +592,23 @@ func (s SelectStmt) RenderTo(r Renderer) {
 		s.HavingClause.RenderTo(r)
 		r.NewLine()
 	}
+}
+
+type SelectStmt struct {
+	SimpleSelect
+	OrderClause   *OrderClause
+	LimitClause   *LimitClause
+	LockingClause *LockingClause
+
+	ParenWrapped bool
+}
+
+func (s SelectStmt) RenderTo(r Renderer) {
+	if s.ParenWrapped {
+		r.Text("(", "lparen")
+	}
+
+	s.SimpleSelect.RenderTo(r)
 
 	if s.OrderClause != nil {
 		s.OrderClause.RenderTo(r)

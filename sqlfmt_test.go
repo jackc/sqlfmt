@@ -282,6 +282,10 @@ func TestSqlFmt(t *testing.T) {
 			expectedOutputFile: "values.fmt.sql",
 		},
 		{
+			inputFile:          "values_order.sql",
+			expectedOutputFile: "values_order.fmt.sql",
+		},
+		{
 			inputFile:          "values_default.sql",
 			expectedOutputFile: "values_default.fmt.sql",
 		},

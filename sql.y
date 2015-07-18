@@ -6,6 +6,7 @@ package main
 
 %union {
   sqlSelect *SelectStmt
+  simpleSelect *SimpleSelect
   fields []Expr
   expr Expr
   str string
@@ -31,7 +32,8 @@ package main
 %type <sqlSelect> top
 %type <sqlSelect> SelectStmt
 %type <sqlSelect> select_no_parens
-%type <sqlSelect> select_with_parens select_clause simple_select
+%type <sqlSelect> select_with_parens select_clause
+%type <simpleSelect> simple_select
 %type <valuesClause> values_clause
 %type <fields> opt_target_list target_list distinct_clause expr_list
 %type <placeholder> opt_all_clause
@@ -948,6 +950,11 @@ select_with_parens:
 
 select_no_parens:
   simple_select
+  {
+    ss := &SelectStmt{}
+    ss.SimpleSelect = *$1
+    $$ = ss
+  }
 | select_clause sort_clause
   {
     $1.OrderClause = $2
@@ -970,6 +977,11 @@ select_no_parens:
 
 select_clause:
   simple_select
+  {
+    ss := &SelectStmt{}
+    ss.SimpleSelect = *$1
+    $$ = ss
+  }
 | select_with_parens
 
 /*
@@ -1000,7 +1012,7 @@ simple_select:
   into_clause from_clause where_clause
   group_clause having_clause window_clause
     {
-      ss := &SelectStmt{}
+      ss := &SimpleSelect{}
       ss.TargetList = $3
       ss.FromClause = $5
       ss.WhereClause = $6
@@ -1012,7 +1024,7 @@ simple_select:
   into_clause from_clause where_clause
   group_clause having_clause window_clause
   {
-    ss := &SelectStmt{}
+    ss := &SimpleSelect{}
     ss.DistinctList = $2
     ss.TargetList = $3
     ss.FromClause = $5
@@ -1023,7 +1035,9 @@ simple_select:
   }
 | values_clause
   {
-    $$ = &SelectStmt{ValuesClause: $1}
+    ss := &SimpleSelect{}
+    ss.ValuesClause = $1
+    $$ = ss
   }
 /*
       | TABLE relation_expr
