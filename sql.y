@@ -27,6 +27,7 @@ package main
   pgType PgType
   valuesRow ValuesRow
   valuesClause ValuesClause
+  funcApplication FuncApplication
 }
 
 %type <sqlSelect> top
@@ -54,6 +55,8 @@ package main
   opt_type_modifiers
   row_or_rows
   first_or_next
+  within_group_clause
+  filter_clause
 
 
 %type <limitClause> select_limit opt_select_limit
@@ -93,6 +96,9 @@ package main
 %type <expr> ctext_expr
 %type <valuesRow> ctext_expr_list ctext_row
 
+%type <funcApplication> func_application
+%type <expr> func_expr
+
 %type <qualifiedName> columnref any_name attrs
 
 %type <str>
@@ -102,6 +108,7 @@ package main
   type_function_name
   type_func_name_keyword
   reserved_keyword
+  func_name
 
 %type <pgType> GenericType Numeric Typename SimpleTypename
 
@@ -811,10 +818,7 @@ c_expr:
     $$ = ParenExpr{Expr: $2}
   }
 | case_expr { $$ = $1 }
-/*
-| func_expr
-  { $$ = $1; }
-  */
+| func_expr { $$ = $1 }
 | select_with_parens      %prec UMINUS
   {
     $$ = $1
@@ -828,6 +832,50 @@ c_expr:
 | implicit_row
 | GROUPING '(' expr_list ')'
 */
+
+
+
+func_application:
+  func_name '(' ')'
+  {
+    $$ = FuncApplication{Name: $1}
+  }
+/* TODO
+      | func_name '(' func_arg_list opt_sort_clause ')'
+      | func_name '(' VARIADIC func_arg_expr opt_sort_clause ')'
+      | func_name '(' func_arg_list ',' VARIADIC func_arg_expr opt_sort_clause ')'
+      | func_name '(' ALL func_arg_list opt_sort_clause ')'
+      | func_name '(' DISTINCT func_arg_list opt_sort_clause ')'
+      | func_name '(' '*' ')'
+*/
+
+
+/*
+ * func_expr and its cousin func_expr_windowless are split out from c_expr just
+ * so that we have classifications for "everything that is a function call or
+ * looks like one".  This isn't very important, but it saves us having to
+ * document which variants are legal in places like "FROM function()" or the
+ * backwards-compatible functional-index syntax for CREATE INDEX.
+ * (Note that many of the special SQL functions wouldn't actually make any
+ * sense as functional index entries, but we ignore that consideration here.)
+ */
+func_expr:
+  func_application within_group_clause filter_clause /* TODO over_clause */
+  {
+    $$ = $1
+  }
+/* TODO
+      | func_expr_common_subexpr
+        { $$ = $1; }
+*/
+
+
+
+
+
+
+
+
 
 identifierSeq:
   IDENT
@@ -1341,6 +1389,22 @@ where_clause:
 
 
 
+
+/*
+ * Aggregate decoration clauses
+ */
+within_group_clause:
+      WITHIN GROUP_P '(' sort_clause ')'    { panic("TODO") }
+      | /*EMPTY*/               { $$ = nil }
+    ;
+
+filter_clause:
+      FILTER '(' WHERE a_expr ')'       { panic("TODO") }
+      | /*EMPTY*/               { $$ = nil }
+    ;
+
+
+
 all_Op:
   Op { $$ = string($1) }
 | MathOp { $$ = string($1) }
@@ -1592,6 +1656,26 @@ name:
 
 attr_name:
   ColLabel { $$ = $1 }
+
+
+/*
+ * The production for a qualified func_name has to exactly match the
+ * production for a qualified columnref, because we cannot tell which we
+ * are parsing until we see what comes after it ('(' or Sconst for a func_name,
+ * anything else for a columnref).  Therefore we allow 'indirection' which
+ * may contain subscripts, and reject that case in the C code.  (If we
+ * ever implement SQL99-like methods, such syntax may actually become legal!)
+ */
+func_name:
+  type_function_name
+  {
+    $$ = $1
+  }
+| ColId indirection
+  {
+    panic("TODO")
+  }
+
 
 /*
  * Constants

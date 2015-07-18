@@ -325,6 +325,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "except.sql",
 			expectedOutputFile: "except.fmt.sql",
 		},
+		{
+			inputFile:          "function_call_without_args.sql",
+			expectedOutputFile: "function_call_without_args.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

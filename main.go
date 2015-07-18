@@ -482,6 +482,16 @@ func (lc LockingClause) RenderTo(r Renderer) {
 	}
 }
 
+type FuncApplication struct {
+	Name string
+}
+
+func (fa FuncApplication) RenderTo(r Renderer) {
+	r.Text(fa.Name, "identifier")
+	r.Text("(", "lparen")
+	r.Text(")", "lparen")
+}
+
 type DefaultExpr bool
 
 func (d DefaultExpr) RenderTo(r Renderer) {
