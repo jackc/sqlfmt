@@ -313,6 +313,18 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "is_distinct_from.sql",
 			expectedOutputFile: "is_distinct_from.fmt.sql",
 		},
+		{
+			inputFile:          "union.sql",
+			expectedOutputFile: "union.fmt.sql",
+		},
+		{
+			inputFile:          "intersect.sql",
+			expectedOutputFile: "intersect.fmt.sql",
+		},
+		{
+			inputFile:          "except.sql",
+			expectedOutputFile: "except.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

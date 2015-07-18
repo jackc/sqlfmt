@@ -531,11 +531,33 @@ type SimpleSelect struct {
 	HavingClause  Expr
 
 	ValuesClause ValuesClause
+
+	LeftSelect  *SelectStmt
+	SetOp       string
+	SetAll      bool
+	RightSelect *SelectStmt
 }
 
 func (s SimpleSelect) RenderTo(r Renderer) {
 	if s.ValuesClause != nil {
 		s.ValuesClause.RenderTo(r)
+		return
+	}
+
+	if s.LeftSelect != nil {
+		s.LeftSelect.RenderTo(r)
+		r.NewLine()
+		r.Text(s.SetOp, "keyword")
+
+		if s.SetAll {
+			r.Space()
+			r.Text("all", "keyword")
+		}
+
+		r.NewLine()
+
+		s.RightSelect.RenderTo(r)
+
 		return
 	}
 

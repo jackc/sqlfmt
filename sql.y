@@ -1044,19 +1044,34 @@ simple_select:
         {
           panic("TODO")
         }
+*/
       | select_clause UNION all_or_distinct select_clause
         {
-          panic("TODO")
+          ss := &SimpleSelect{}
+          ss.LeftSelect = $1
+          ss.SetOp = "union"
+          ss.SetAll = $3
+          ss.RightSelect = $4
+          $$ = ss
         }
       | select_clause INTERSECT all_or_distinct select_clause
         {
-          panic("TODO")
+          ss := &SimpleSelect{}
+          ss.LeftSelect = $1
+          ss.SetOp = "intersect"
+          ss.SetAll = $3
+          ss.RightSelect = $4
+          $$ = ss
         }
       | select_clause EXCEPT all_or_distinct select_clause
         {
-          panic("TODO")
+          ss := &SimpleSelect{}
+          ss.LeftSelect = $1
+          ss.SetOp = "except"
+          ss.SetAll = $3
+          ss.RightSelect = $4
+          $$ = ss
         }
-*/
 
 
 
