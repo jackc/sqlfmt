@@ -528,10 +528,18 @@ func (fa FuncApplication) RenderTo(r Renderer) {
 }
 
 type FuncArg struct {
-	Expr Expr
+	Name   string
+	NameOp string
+	Expr   Expr
 }
 
 func (fa FuncArg) RenderTo(r Renderer) {
+	if fa.Name != "" {
+		r.Text(fa.Name, "identifier")
+		r.Space()
+		r.Text(fa.NameOp, "operator")
+		r.Space()
+	}
 	fa.Expr.RenderTo(r)
 }
 

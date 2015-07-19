@@ -77,7 +77,7 @@ package main
 
 %type <identifiers> locked_rels_list qualified_name_list indirection opt_indirection name_list
 
-%type <str> indirection_el attr_name qualified_name ColId name
+%type <str> indirection_el attr_name qualified_name ColId name param_name
 
 %type <str> MathOp qual_Op qual_all_Op all_Op
 
@@ -324,6 +324,11 @@ opt_nulls_order:
   NULLS_LA FIRST_P    { $$ = "first" }
 | NULLS_LA LAST_P     { $$ = "last" }
 | /*EMPTY*/           { $$ = "" }
+
+/*
+ * Ideally param_name should be ColId, but that causes too many conflicts.
+ */
+param_name: type_function_name
 
 aliasableExpr:
   a_expr
@@ -963,10 +968,14 @@ func_arg_expr:
   {
     $$ = FuncArg{Expr: $1}
   }
-/* TODO
-      | param_name COLON_EQUALS a_expr
-      | param_name EQUALS_GREATER a_expr
-*/
+| param_name COLON_EQUALS a_expr
+  {
+    $$ = FuncArg{Name: $1, NameOp: ":=", Expr: $3}
+  }
+| param_name EQUALS_GREATER a_expr
+  {
+    $$ = FuncArg{Name: $1, NameOp: "=>", Expr: $3}
+  }
 
 
 /*****************************************************************************

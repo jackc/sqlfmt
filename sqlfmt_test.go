@@ -337,6 +337,14 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "function_call_with_positional_args.sql",
 			expectedOutputFile: "function_call_with_positional_args.fmt.sql",
 		},
+		{
+			inputFile:          "function_call_with_pg_named_args.sql",
+			expectedOutputFile: "function_call_with_pg_named_args.fmt.sql",
+		},
+		{
+			inputFile:          "function_call_with_sql_named_args.sql",
+			expectedOutputFile: "function_call_with_sql_named_args.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {
