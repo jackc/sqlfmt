@@ -508,11 +508,14 @@ type FuncApplication struct {
 
 	Star bool
 	Args []FuncArg
+
+	OrderClause *OrderClause
 }
 
 func (fa FuncApplication) RenderTo(r Renderer) {
 	r.Text(fa.Name, "identifier")
 	r.Text("(", "lparen")
+
 	if fa.Star {
 		r.Text("*", "star")
 	} else if len(fa.Args) > 0 {
@@ -524,6 +527,12 @@ func (fa FuncApplication) RenderTo(r Renderer) {
 			}
 		}
 	}
+
+	if fa.OrderClause != nil {
+		r.Space()
+		fa.OrderClause.RenderTo(r)
+	}
+
 	r.Text(")", "lparen")
 }
 

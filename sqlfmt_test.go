@@ -345,6 +345,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "function_call_with_sql_named_args.sql",
 			expectedOutputFile: "function_call_with_sql_named_args.fmt.sql",
 		},
+		{
+			inputFile:          "function_call_with_order.sql",
+			expectedOutputFile: "function_call_with_order.fmt.sql", // TODO - fix formatting when order by is inside function call
+		},
 	}
 
 	for i, tt := range tests {

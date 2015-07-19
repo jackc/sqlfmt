@@ -851,7 +851,7 @@ func_application:
   }
 | func_name '(' func_arg_list opt_sort_clause ')'
   {
-    $$ = FuncApplication{Name: $1, Args: $3}
+    $$ = FuncApplication{Name: $1, Args: $3, OrderClause: $4}
   }
 /* TODO
       | func_name '(' VARIADIC func_arg_expr opt_sort_clause ')'

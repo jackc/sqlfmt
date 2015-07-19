@@ -3050,7 +3050,7 @@ sqldefault:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
 		//line sql.y:853
 		{
-			sqlVAL.funcApplication = FuncApplication{Name: sqlDollar[1].str, Args: sqlDollar[3].funcArgs}
+			sqlVAL.funcApplication = FuncApplication{Name: sqlDollar[1].str, Args: sqlDollar[3].funcArgs, OrderClause: sqlDollar[4].orderClause}
 		}
 	case 85:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
