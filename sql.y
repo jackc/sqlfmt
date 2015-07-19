@@ -856,8 +856,13 @@ func_application:
 /* TODO
       | func_name '(' VARIADIC func_arg_expr opt_sort_clause ')'
       | func_name '(' func_arg_list ',' VARIADIC func_arg_expr opt_sort_clause ')'
-      | func_name '(' ALL func_arg_list opt_sort_clause ')'
-      | func_name '(' DISTINCT func_arg_list opt_sort_clause ')'
+*/
+| func_name '(' ALL func_arg_list opt_sort_clause ')'
+  {
+    $$ = FuncApplication{Name: $1, Args: $4, OrderClause: $5}
+  }
+/* TODO
+| func_name '(' DISTINCT func_arg_list opt_sort_clause ')'
 */
 | func_name '(' '*' ')'
   {
