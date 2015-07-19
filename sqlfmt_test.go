@@ -357,6 +357,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "function_call_with_distinct.sql",
 			expectedOutputFile: "function_call_with_distinct.fmt.sql",
 		},
+		{
+			inputFile:          "function_call_with_filter.sql",
+			expectedOutputFile: "function_call_with_filter.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

@@ -503,6 +503,20 @@ func (lc LockingClause) RenderTo(r Renderer) {
 	}
 }
 
+type FuncExpr struct {
+	FuncApplication
+	FilterClause *FilterClause
+}
+
+func (fe FuncExpr) RenderTo(r Renderer) {
+	fe.FuncApplication.RenderTo(r)
+
+	if fe.FilterClause != nil {
+		r.Space()
+		fe.FilterClause.RenderTo(r)
+	}
+}
+
 type FuncApplication struct {
 	Name string
 
@@ -557,6 +571,20 @@ func (fa FuncArg) RenderTo(r Renderer) {
 		r.Space()
 	}
 	fa.Expr.RenderTo(r)
+}
+
+type FilterClause struct {
+	Expr
+}
+
+func (f FilterClause) RenderTo(r Renderer) {
+	r.Text("filter", "keyword")
+	r.Space()
+	r.Text("(", "lparen")
+	r.Text("where", "keyword")
+	r.Space()
+	f.Expr.RenderTo(r)
+	r.Text(")", "rparen")
 }
 
 type DefaultExpr bool

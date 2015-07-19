@@ -30,6 +30,7 @@ package main
   funcApplication FuncApplication
   funcArgs []FuncArg
   funcArg FuncArg
+  filterClause *FilterClause
 }
 
 %type <sqlSelect> top
@@ -58,7 +59,8 @@ package main
   row_or_rows
   first_or_next
   within_group_clause
-  filter_clause
+
+%type <filterClause> filter_clause
 
 
 %type <limitClause> select_limit opt_select_limit
@@ -881,9 +883,9 @@ func_application:
  * sense as functional index entries, but we ignore that consideration here.)
  */
 func_expr:
-  func_application within_group_clause filter_clause /* TODO over_clause */
+  func_application /* TODO within_group_clause */ filter_clause /* TODO over_clause */
   {
-    $$ = $1
+    $$ = &FuncExpr{FuncApplication: $1, FilterClause: $2}
   }
 /* TODO
       | func_expr_common_subexpr
@@ -1445,10 +1447,11 @@ within_group_clause:
     ;
 
 filter_clause:
-      FILTER '(' WHERE a_expr ')'       { panic("TODO") }
-      | /*EMPTY*/               { $$ = nil }
-    ;
-
+  FILTER '(' WHERE a_expr ')'
+  {
+    $$ = &FilterClause{Expr: $4}
+  }
+| /*EMPTY*/ { $$ = nil }
 
 
 all_Op:
