@@ -505,7 +505,9 @@ func (lc LockingClause) RenderTo(r Renderer) {
 
 type FuncApplication struct {
 	Name string
+
 	Star bool
+	Args []FuncArg
 }
 
 func (fa FuncApplication) RenderTo(r Renderer) {
@@ -513,8 +515,24 @@ func (fa FuncApplication) RenderTo(r Renderer) {
 	r.Text("(", "lparen")
 	if fa.Star {
 		r.Text("*", "star")
+	} else if len(fa.Args) > 0 {
+		for i, a := range fa.Args {
+			a.RenderTo(r)
+			if i < len(fa.Args)-1 {
+				r.Text(",", "comma")
+				r.Space()
+			}
+		}
 	}
 	r.Text(")", "lparen")
+}
+
+type FuncArg struct {
+	Expr Expr
+}
+
+func (fa FuncArg) RenderTo(r Renderer) {
+	fa.Expr.RenderTo(r)
 }
 
 type DefaultExpr bool

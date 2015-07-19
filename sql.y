@@ -28,6 +28,8 @@ package main
   valuesRow ValuesRow
   valuesClause ValuesClause
   funcApplication FuncApplication
+  funcArgs []FuncArg
+  funcArg FuncArg
 }
 
 %type <sqlSelect> top
@@ -97,6 +99,8 @@ package main
 %type <valuesRow> ctext_expr_list ctext_row
 
 %type <funcApplication> func_application
+%type <funcArgs> func_arg_list
+%type <funcArg> func_arg_expr
 %type <expr> func_expr
 
 %type <qualifiedName> columnref any_name attrs
@@ -840,8 +844,11 @@ func_application:
   {
     $$ = FuncApplication{Name: $1}
   }
+| func_name '(' func_arg_list opt_sort_clause ')'
+  {
+    $$ = FuncApplication{Name: $1, Args: $3}
+  }
 /* TODO
-      | func_name '(' func_arg_list opt_sort_clause ')'
       | func_name '(' VARIADIC func_arg_expr opt_sort_clause ')'
       | func_name '(' func_arg_list ',' VARIADIC func_arg_expr opt_sort_clause ')'
       | func_name '(' ALL func_arg_list opt_sort_clause ')'
@@ -939,6 +946,27 @@ expr_list:
   {
     $$ = append($1, $3)
   }
+
+/* function arguments can have names */
+func_arg_list:
+  func_arg_expr
+  {
+    $$ = []FuncArg{$1}
+  }
+  | func_arg_list ',' func_arg_expr
+  {
+    $$ = append($1, $3)
+  }
+
+func_arg_expr:
+  a_expr
+  {
+    $$ = FuncArg{Expr: $1}
+  }
+/* TODO
+      | param_name COLON_EQUALS a_expr
+      | param_name EQUALS_GREATER a_expr
+*/
 
 
 /*****************************************************************************
