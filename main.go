@@ -506,6 +506,8 @@ func (lc LockingClause) RenderTo(r Renderer) {
 type FuncApplication struct {
 	Name string
 
+	Distinct bool
+
 	Star bool
 	Args []FuncArg
 
@@ -515,6 +517,11 @@ type FuncApplication struct {
 func (fa FuncApplication) RenderTo(r Renderer) {
 	r.Text(fa.Name, "identifier")
 	r.Text("(", "lparen")
+
+	if fa.Distinct {
+		r.Text("distinct", "keyword")
+		r.Space()
+	}
 
 	if fa.Star {
 		r.Text("*", "star")

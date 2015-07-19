@@ -861,9 +861,10 @@ func_application:
   {
     $$ = FuncApplication{Name: $1, Args: $4, OrderClause: $5}
   }
-/* TODO
 | func_name '(' DISTINCT func_arg_list opt_sort_clause ')'
-*/
+  {
+    $$ = FuncApplication{Name: $1, Distinct: true, Args: $4, OrderClause: $5}
+  }
 | func_name '(' '*' ')'
   {
     $$ = FuncApplication{Name: $1, Star: true}
