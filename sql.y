@@ -846,8 +846,11 @@ func_application:
       | func_name '(' func_arg_list ',' VARIADIC func_arg_expr opt_sort_clause ')'
       | func_name '(' ALL func_arg_list opt_sort_clause ')'
       | func_name '(' DISTINCT func_arg_list opt_sort_clause ')'
-      | func_name '(' '*' ')'
 */
+| func_name '(' '*' ')'
+  {
+    $$ = FuncApplication{Name: $1, Star: true}
+  }
 
 
 /*

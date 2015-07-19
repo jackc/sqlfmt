@@ -505,11 +505,15 @@ func (lc LockingClause) RenderTo(r Renderer) {
 
 type FuncApplication struct {
 	Name string
+	Star bool
 }
 
 func (fa FuncApplication) RenderTo(r Renderer) {
 	r.Text(fa.Name, "identifier")
 	r.Text("(", "lparen")
+	if fa.Star {
+		r.Text("*", "star")
+	}
 	r.Text(")", "lparen")
 }
 
