@@ -262,6 +262,22 @@ func TestSqlFmt(t *testing.T) {
 			expectedOutputFile: "select_table_dot_star.fmt.sql",
 		},
 		{
+			inputFile:          "table.sql",
+			expectedOutputFile: "table.fmt.sql",
+		},
+		{
+			inputFile:          "table_star.sql",
+			expectedOutputFile: "table_star.fmt.sql",
+		},
+		{
+			inputFile:          "table_only.sql",
+			expectedOutputFile: "table_only.fmt.sql",
+		},
+		{
+			inputFile:          "table_only_paren.sql",
+			expectedOutputFile: "table_only.fmt.sql",
+		},
+		{
 			inputFile:          "case_full.sql",
 			expectedOutputFile: "case_full.fmt.sql",
 		},

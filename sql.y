@@ -31,6 +31,7 @@ package main
   funcArgs []FuncArg
   funcArg FuncArg
   filterClause *FilterClause
+  relationExpr *RelationExpr
 }
 
 %type <sqlSelect> top
@@ -53,7 +54,6 @@ package main
 %type <str> opt_asc_desc opt_nulls_order
 %type <placeholder> into_clause
   window_clause
-  relation_expr
   opt_array_bounds
   opt_type_modifiers
   row_or_rows
@@ -61,6 +61,8 @@ package main
   within_group_clause
 
 %type <filterClause> filter_clause
+
+%type <relationExpr> relation_expr
 
 
 %type <limitClause> select_limit opt_select_limit
@@ -1135,39 +1137,39 @@ simple_select:
     ss.ValuesClause = $1
     $$ = ss
   }
-/*
-      | TABLE relation_expr
-        {
-          panic("TODO")
-        }
-*/
-      | select_clause UNION all_or_distinct select_clause
-        {
-          ss := &SimpleSelect{}
-          ss.LeftSelect = $1
-          ss.SetOp = "union"
-          ss.SetAll = $3
-          ss.RightSelect = $4
-          $$ = ss
-        }
-      | select_clause INTERSECT all_or_distinct select_clause
-        {
-          ss := &SimpleSelect{}
-          ss.LeftSelect = $1
-          ss.SetOp = "intersect"
-          ss.SetAll = $3
-          ss.RightSelect = $4
-          $$ = ss
-        }
-      | select_clause EXCEPT all_or_distinct select_clause
-        {
-          ss := &SimpleSelect{}
-          ss.LeftSelect = $1
-          ss.SetOp = "except"
-          ss.SetAll = $3
-          ss.RightSelect = $4
-          $$ = ss
-        }
+| TABLE relation_expr
+  {
+    ss := &SimpleSelect{}
+    ss.Table = $2
+    $$ = ss
+  }
+| select_clause UNION all_or_distinct select_clause
+  {
+    ss := &SimpleSelect{}
+    ss.LeftSelect = $1
+    ss.SetOp = "union"
+    ss.SetAll = $3
+    ss.RightSelect = $4
+    $$ = ss
+  }
+| select_clause INTERSECT all_or_distinct select_clause
+  {
+    ss := &SimpleSelect{}
+    ss.LeftSelect = $1
+    ss.SetOp = "intersect"
+    ss.SetAll = $3
+    ss.RightSelect = $4
+    $$ = ss
+  }
+| select_clause EXCEPT all_or_distinct select_clause
+  {
+    ss := &SimpleSelect{}
+    ss.LeftSelect = $1
+    ss.SetOp = "except"
+    ss.SetAll = $3
+    ss.RightSelect = $4
+    $$ = ss
+  }
 
 
 
@@ -1323,7 +1325,23 @@ window_clause:
     ;
 
 
-relation_expr: { panic("TODO") }
+relation_expr:
+  qualified_name
+  {
+    $$ = &RelationExpr{Name: $1}
+  }
+| qualified_name '*'
+  {
+    $$ = &RelationExpr{Name: $1, Star: true}
+  }
+| ONLY qualified_name
+  {
+    $$ = &RelationExpr{Name: $2, Only: true}
+  }
+| ONLY '(' qualified_name ')'
+  {
+    $$ = &RelationExpr{Name: $3, Only: true}
+  }
 
 
 

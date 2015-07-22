@@ -627,6 +627,28 @@ func (vc ValuesClause) RenderTo(r Renderer) {
 	r.Unindent()
 }
 
+type RelationExpr struct {
+	Name string
+	Star bool
+	Only bool
+}
+
+func (re RelationExpr) RenderTo(r Renderer) {
+	if re.Only {
+		r.Text("only", "keyword")
+		r.Space()
+	}
+
+	r.Text(re.Name, "identifier")
+
+	if re.Star {
+		r.Space()
+		r.Text("*", "star")
+	}
+
+	r.NewLine()
+}
+
 type SimpleSelect struct {
 	DistinctList  []Expr
 	TargetList    []Expr
@@ -641,9 +663,18 @@ type SimpleSelect struct {
 	SetOp       string
 	SetAll      bool
 	RightSelect *SelectStmt
+
+	Table *RelationExpr
 }
 
 func (s SimpleSelect) RenderTo(r Renderer) {
+	if s.Table != nil {
+		r.Text("table", "keyword")
+		r.Space()
+		s.Table.RenderTo(r)
+		return
+	}
+
 	if s.ValuesClause != nil {
 		s.ValuesClause.RenderTo(r)
 		return
