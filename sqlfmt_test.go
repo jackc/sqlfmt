@@ -377,6 +377,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "function_call_with_filter.sql",
 			expectedOutputFile: "function_call_with_filter.fmt.sql",
 		},
+		{
+			inputFile:          "null.sql",
+			expectedOutputFile: "null.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

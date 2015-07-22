@@ -1775,10 +1775,11 @@ Iconst
 | FALSE_P
   {
     $$ = BoolLiteral(false)
-    }
-/* TODO
+  }
 | NULL_P
-*/
+  {
+    $$ = NullLiteral{}
+  }
 
 Iconst:   ICONST { $$ = IntegerLiteral($1) }
 Sconst:   SCONST { $$ = StringLiteral($1) }

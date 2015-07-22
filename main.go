@@ -87,6 +87,12 @@ func (b BoolLiteral) RenderTo(r Renderer) {
 	}
 }
 
+type NullLiteral struct{}
+
+func (n NullLiteral) RenderTo(r Renderer) {
+	r.Text("null", "nullLiteral")
+}
+
 type BooleanExpr struct {
 	Left     Expr
 	Operator string
