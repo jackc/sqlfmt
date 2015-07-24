@@ -32,6 +32,13 @@ package main
   funcArg FuncArg
   filterClause *FilterClause
   relationExpr *RelationExpr
+  windowDefinitions []WindowDefinition
+  windowDefinition WindowDefinition
+  windowSpecification WindowSpecification
+  overClause *OverClause
+  partitionClause PartitionClause
+  frameClause *FrameClause
+  frameBound *FrameBound
 }
 
 %type <sqlSelect> top
@@ -53,7 +60,6 @@ package main
 %type <orderClause> opt_sort_clause sort_clause sortby_list
 %type <str> opt_asc_desc opt_nulls_order
 %type <placeholder> into_clause
-  window_clause
   opt_array_bounds
   opt_type_modifiers
   row_or_rows
@@ -106,6 +112,15 @@ package main
 %type <funcArgs> func_arg_list
 %type <funcArg> func_arg_expr
 %type <expr> func_expr
+
+%type <windowDefinitions> window_definition_list window_clause
+%type <windowDefinition> window_definition
+%type <windowSpecification> window_specification
+%type <overClause> over_clause
+%type <str> opt_existing_window_name
+%type <partitionClause> opt_partition_clause
+%type <frameClause> opt_frame_clause frame_extent
+%type <frameBound> frame_bound
 
 %type <qualifiedName> columnref any_name attrs
 
@@ -885,9 +900,9 @@ func_application:
  * sense as functional index entries, but we ignore that consideration here.)
  */
 func_expr:
-  func_application /* TODO within_group_clause */ filter_clause /* TODO over_clause */
+  func_application /* TODO within_group_clause */ filter_clause over_clause
   {
-    $$ = &FuncExpr{FuncApplication: $1, FilterClause: $2}
+    $$ = &FuncExpr{FuncApplication: $1, FilterClause: $2, OverClause: $3}
   }
 /* TODO
       | func_expr_common_subexpr
@@ -1116,6 +1131,7 @@ simple_select:
       ss.WhereClause = $6
       ss.GroupByClause = $7
       ss.HavingClause = $8
+      ss.WindowClause = $9
       $$ = ss
     }
 | SELECT distinct_clause target_list
@@ -1129,6 +1145,7 @@ simple_select:
     ss.WhereClause = $6
     ss.GroupByClause = $7
     ss.HavingClause = $8
+    ss.WindowClause = $9
     $$ = ss
   }
 | values_clause
@@ -1320,9 +1337,124 @@ locked_rels_list:
  * Window Definitions
  */
 window_clause:
-      /* TODO WINDOW window_definition_list     { $$ = $2; }
-      |*/ /*EMPTY*/               { $$ = nil }
-    ;
+  WINDOW window_definition_list
+  {
+    $$ = $2
+  }
+| /*EMPTY*/               { $$ = nil }
+
+window_definition_list:
+  window_definition
+  {
+    $$ = []WindowDefinition{$1}
+  }
+| window_definition_list ',' window_definition
+  {
+    $$ = append($1, $3)
+  }
+
+window_definition:
+  ColId AS window_specification
+  {
+    $$ = WindowDefinition{Name: $1, Specification: $3}
+  }
+
+over_clause:
+  OVER window_specification
+  {
+    spec := $2
+    $$ = &OverClause{Specification: &spec}
+  }
+| OVER ColId
+  {
+    $$ = &OverClause{Name: $2}
+  }
+| /*EMPTY*/ { $$ = nil }
+
+window_specification:
+  '(' opt_existing_window_name opt_partition_clause opt_sort_clause opt_frame_clause ')'
+  {
+    $$ = WindowSpecification{ExistingName: $2, PartitionClause: $3, OrderClause: $4, FrameClause: $5}
+  }
+
+/*
+ * If we see PARTITION, RANGE, or ROWS as the first token after the '('
+ * of a window_specification, we want the assumption to be that there is
+ * no existing_window_name; but those keywords are unreserved and so could
+ * be ColIds.  We fix this by making them have the same precedence as IDENT
+ * and giving the empty production here a slightly higher precedence, so
+ * that the shift/reduce conflict is resolved in favor of reducing the rule.
+ * These keywords are thus precluded from being an existing_window_name but
+ * are not reserved for any other purpose.
+ */
+opt_existing_window_name:
+  ColId           { $$ = $1 }
+| /*EMPTY*/       %prec Op    { $$ = "" }
+
+opt_partition_clause:
+  PARTITION BY expr_list    { $$ = PartitionClause($3) }
+| /*EMPTY*/               { $$ = nil }
+
+/*
+ * For frame clauses, we return a WindowDef, but only some fields are used:
+ * frameOptions, startOffset, and endOffset.
+ *
+ * This is only a subset of the full SQL:2008 frame_clause grammar.
+ * We don't support <window frame exclusion> yet.
+ */
+opt_frame_clause:
+  RANGE frame_extent
+  {
+    $2.Mode = "range"
+    $$ = $2
+  }
+| ROWS frame_extent
+  {
+    $2.Mode = "rows"
+    $$ = $2
+  }
+| /*EMPTY*/
+  {
+    $$ = nil
+  }
+
+frame_extent:
+  frame_bound
+  {
+    $$ = &FrameClause{Start: $1}
+  }
+| BETWEEN frame_bound AND frame_bound
+  {
+    $$ = &FrameClause{Start: $2, End: $4}
+  }
+
+/*
+ * This is used for both frame start and frame end, with output set up on
+ * the assumption it's frame start; the frame_extent productions must reject
+ * invalid cases.
+ */
+frame_bound:
+  UNBOUNDED PRECEDING
+  {
+    $$ = &FrameBound{Direction: "preceding"}
+  }
+| UNBOUNDED FOLLOWING
+  {
+    $$ = &FrameBound{Direction: "following"}
+  }
+| CURRENT_P ROW
+  {
+    $$ = &FrameBound{CurrentRow: true}
+  }
+| a_expr PRECEDING
+  {
+    $$ = &FrameBound{BoundExpr: $1, Direction: "preceding"}
+  }
+| a_expr FOLLOWING
+  {
+    $$ = &FrameBound{BoundExpr: $1, Direction: "following"}
+  }
+
 
 
 relation_expr:

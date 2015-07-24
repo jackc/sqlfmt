@@ -381,6 +381,30 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "null.sql",
 			expectedOutputFile: "null.fmt.sql",
 		},
+		{
+			inputFile:          "window_function.sql",
+			expectedOutputFile: "window_function.fmt.sql",
+		},
+		{
+			inputFile:          "window_function_partition_by.sql",
+			expectedOutputFile: "window_function_partition_by.fmt.sql",
+		},
+		{
+			inputFile:          "window_function_order_by.sql", // TODO - fix formatting when order by is inside function call
+			expectedOutputFile: "window_function_order_by.fmt.sql",
+		},
+		{
+			inputFile:          "window_function_named.sql",
+			expectedOutputFile: "window_function_named.fmt.sql",
+		},
+		{
+			inputFile:          "window_function_named_multiple.sql",
+			expectedOutputFile: "window_function_named_multiple.fmt.sql",
+		},
+		{
+			inputFile:          "window_function_frame.sql",
+			expectedOutputFile: "window_function_frame.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

@@ -512,6 +512,7 @@ func (lc LockingClause) RenderTo(r Renderer) {
 type FuncExpr struct {
 	FuncApplication
 	FilterClause *FilterClause
+	OverClause   *OverClause
 }
 
 func (fe FuncExpr) RenderTo(r Renderer) {
@@ -520,6 +521,11 @@ func (fe FuncExpr) RenderTo(r Renderer) {
 	if fe.FilterClause != nil {
 		r.Space()
 		fe.FilterClause.RenderTo(r)
+	}
+
+	if fe.OverClause != nil {
+		r.Space()
+		fe.OverClause.RenderTo(r)
 	}
 }
 
@@ -633,6 +639,152 @@ func (vc ValuesClause) RenderTo(r Renderer) {
 	r.Unindent()
 }
 
+type OverClause struct {
+	Name          string
+	Specification *WindowSpecification
+}
+
+func (oc *OverClause) RenderTo(r Renderer) {
+	r.Text("over", "keyword")
+	r.Space()
+	if oc.Name != "" {
+		r.Text(oc.Name, "identifier")
+	} else {
+		oc.Specification.RenderTo(r)
+	}
+}
+
+type WindowClause []WindowDefinition
+
+func (wc WindowClause) RenderTo(r Renderer) {
+	r.Text("window", "keyword")
+	r.NewLine()
+	r.Indent()
+
+	for i, wd := range wc {
+		wd.RenderTo(r)
+		if i < len(wc)-1 {
+			r.Text(",", "comma")
+		}
+		r.NewLine()
+	}
+
+	r.Unindent()
+}
+
+type WindowDefinition struct {
+	Name          string
+	Specification WindowSpecification
+}
+
+func (wd WindowDefinition) RenderTo(r Renderer) {
+	r.Text(wd.Name, "identifier")
+	r.Space()
+	r.Text("as", "keyword")
+	r.Space()
+	wd.Specification.RenderTo(r)
+}
+
+type WindowSpecification struct {
+	ExistingName    string
+	PartitionClause PartitionClause
+	OrderClause     *OrderClause
+	FrameClause     *FrameClause
+}
+
+func (ws WindowSpecification) RenderTo(r Renderer) {
+	r.Text("(", "lparen")
+
+	if ws.ExistingName != "" {
+		r.Text(ws.ExistingName, "identifier")
+		r.Space()
+	}
+
+	if ws.PartitionClause != nil {
+		ws.PartitionClause.RenderTo(r)
+
+		// TODO figure better way to handle spaces
+		if ws.OrderClause != nil || ws.FrameClause != nil {
+			r.Space()
+		}
+	}
+
+	if ws.OrderClause != nil {
+		ws.OrderClause.RenderTo(r)
+		if ws.FrameClause != nil {
+			r.Space()
+		}
+	}
+
+	if ws.FrameClause != nil {
+		ws.FrameClause.RenderTo(r)
+	}
+
+	r.Text(")", "rparen")
+}
+
+type PartitionClause []Expr
+
+func (pc PartitionClause) RenderTo(r Renderer) {
+	r.Text("partition by", "keyword")
+	r.Space()
+
+	for i, e := range pc {
+		e.RenderTo(r)
+		if i < len(pc)-1 {
+			r.Text(",", "comma")
+			r.Space()
+		}
+	}
+}
+
+type FrameClause struct {
+	Mode  string
+	Start *FrameBound
+	End   *FrameBound
+}
+
+func (fc *FrameClause) RenderTo(r Renderer) {
+	r.Text(fc.Mode, "keyword")
+	r.Space()
+
+	if fc.End != nil {
+		r.Text("between", "keyword")
+		r.Space()
+		fc.Start.RenderTo(r)
+		r.Space()
+		r.Text("and", "keyword")
+		r.Space()
+		fc.End.RenderTo(r)
+	} else {
+		fc.Start.RenderTo(r)
+	}
+}
+
+type FrameBound struct {
+	CurrentRow bool
+
+	BoundExpr Expr
+	Direction string
+}
+
+func (fb FrameBound) RenderTo(r Renderer) {
+	if fb.CurrentRow {
+		r.Text("current row", "keyword")
+		return
+	}
+
+	if fb.BoundExpr != nil {
+		fb.BoundExpr.RenderTo(r)
+	} else {
+		r.Text("unbounded", "keyword")
+	}
+
+	r.Space()
+
+	r.Text(fb.Direction, "keyword")
+}
+
 type RelationExpr struct {
 	Name string
 	Star bool
@@ -662,6 +814,7 @@ type SimpleSelect struct {
 	WhereClause   *WhereClause
 	GroupByClause *GroupByClause
 	HavingClause  Expr
+	WindowClause  WindowClause
 
 	ValuesClause ValuesClause
 
@@ -755,6 +908,10 @@ func (s SimpleSelect) RenderTo(r Renderer) {
 		r.Indent()
 		s.HavingClause.RenderTo(r)
 		r.NewLine()
+	}
+
+	if s.WindowClause != nil {
+		s.WindowClause.RenderTo(r)
 	}
 }
 
