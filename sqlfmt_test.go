@@ -405,6 +405,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "window_function_frame.sql",
 			expectedOutputFile: "window_function_frame.fmt.sql",
 		},
+		{
+			inputFile:          "exists.sql",
+			expectedOutputFile: "exists.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

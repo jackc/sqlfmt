@@ -948,3 +948,11 @@ func (s SelectStmt) RenderTo(r Renderer) {
 		r.NewLine()
 	}
 }
+
+type ExistsExpr SelectStmt
+
+func (e ExistsExpr) RenderTo(r Renderer) {
+	r.Text("exists", "keyword")
+
+	SelectStmt(e).RenderTo(r)
+}

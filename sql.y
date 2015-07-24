@@ -853,7 +853,12 @@ c_expr:
   }
 /* TODO
 | select_with_parens indirection
+*/
 | EXISTS select_with_parens
+  {
+    $$ = ExistsExpr(*$2)
+  }
+/* TODO
 | ARRAY select_with_parens
 | ARRAY array_expr
 | explicit_row
