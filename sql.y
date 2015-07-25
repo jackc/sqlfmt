@@ -119,7 +119,7 @@ package sqlfmt
 %type <funcApplication> func_application
 %type <funcArgs> func_arg_list
 %type <funcArg> func_arg_expr
-%type <expr> func_expr
+%type <expr> func_expr func_expr_common_subexpr
 
 %type <windowDefinitions> window_definition_list window_clause
 %type <windowDefinition> window_definition
@@ -929,15 +929,67 @@ func_expr:
   {
     $$ = &FuncExpr{FuncApplication: $1, FilterClause: $2, OverClause: $3}
   }
+| func_expr_common_subexpr
+  {
+    $$ = $1
+  }
+
+
+
+
+
+/*
+ * Special expressions that are considered to be functions.
+ */
+func_expr_common_subexpr:
 /* TODO
-      | func_expr_common_subexpr
-        { $$ = $1; }
+COLLATION FOR '(' a_expr ')'
+| CURRENT_DATE
+| CURRENT_TIME
+| CURRENT_TIME '(' Iconst ')'
+| CURRENT_TIMESTAMP
+| CURRENT_TIMESTAMP '(' Iconst ')'
+| LOCALTIME
+| LOCALTIME '(' Iconst ')'
+| LOCALTIMESTAMP
+| LOCALTIMESTAMP '(' Iconst ')'
+| CURRENT_ROLE
+| CURRENT_USER
+| SESSION_USER
+| USER
+| CURRENT_CATALOG
+| CURRENT_SCHEMA
+| */ CAST '(' a_expr AS Typename ')'
+  {
+    $$ = CastFunc{Expr: $3, Type: $5}
+  }
+/* TODO
+| EXTRACT '(' extract_list ')'
+| OVERLAY '(' overlay_list ')'
+| POSITION '(' position_list ')'
+| SUBSTRING '(' substr_list ')'
+| TREAT '(' a_expr AS Typename ')'
+| TRIM '(' BOTH trim_list ')'
+| TRIM '(' LEADING trim_list ')'
+| TRIM '(' TRAILING trim_list ')'
+| TRIM '(' trim_list ')'
+| NULLIF '(' a_expr ',' a_expr ')'
+| COALESCE '(' expr_list ')'
+| GREATEST '(' expr_list ')'
+| LEAST '(' expr_list ')'
+| XMLCONCAT '(' expr_list ')'
+| XMLELEMENT '(' NAME_P ColLabel ')'
+| XMLELEMENT '(' NAME_P ColLabel ',' xml_attributes ')'
+| XMLELEMENT '(' NAME_P ColLabel ',' expr_list ')'
+| XMLELEMENT '(' NAME_P ColLabel ',' xml_attributes ',' expr_list ')'
+| XMLEXISTS '(' c_expr xmlexists_argument ')'
+| XMLFOREST '(' xml_attribute_list ')'
+| XMLPARSE '(' document_or_content a_expr xml_whitespace_option ')'
+| XMLPI '(' NAME_P ColLabel ')'
+| XMLPI '(' NAME_P ColLabel ',' a_expr ')'
+| XMLROOT '(' a_expr ',' xml_root_version opt_xml_root_standalone ')'
+| XMLSERIALIZE '(' document_or_content a_expr AS SimpleTypename ')'
 */
-
-
-
-
-
 
 
 

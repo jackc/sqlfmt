@@ -628,6 +628,22 @@ func (fa FuncArg) RenderTo(r Renderer) {
 	fa.Expr.RenderTo(r)
 }
 
+type CastFunc struct {
+	Expr Expr
+	Type PgType
+}
+
+func (cf CastFunc) RenderTo(r Renderer) {
+	r.Text("cast", "keyword")
+	r.Text("(", "lparen")
+	cf.Expr.RenderTo(r)
+	r.Space()
+	r.Text("as", "keyword")
+	r.Space()
+	cf.Type.RenderTo(r)
+	r.Text(")", "rparen")
+}
+
 type FilterClause struct {
 	Expr
 }
