@@ -334,7 +334,7 @@ top:
   SelectStmt
   {
     $$ = $1
-    sqllex.(*sqlLex).stmt = $1
+    yylex.(*sqlLex).stmt = $1
   }
 
 opt_asc_desc:

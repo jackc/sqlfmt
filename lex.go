@@ -1,5 +1,5 @@
 //go:generate -command yacc go tool yacc
-//go:generate yacc -o sql.go -p "sql" sql.y
+//go:generate yacc -o sql.go sql.y
 package sqlfmt
 
 import (
@@ -26,7 +26,7 @@ type sqlLex struct {
 	stmt   *SelectStmt
 }
 
-func (x *sqlLex) Lex(yylval *sqlSymType) int {
+func (x *sqlLex) Lex(yylval *yySymType) int {
 	token := x.tokens[0]
 	x.tokens = x.tokens[1:]
 

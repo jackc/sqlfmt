@@ -5,7 +5,7 @@ import (
 )
 
 func Parse(lexer *sqlLex) (stmt *SelectStmt, err error) {
-	if rc := sqlParse(lexer); rc != 0 {
+	if rc := yyParse(lexer); rc != 0 {
 		return nil, errors.New("Parse failed")
 	}
 
