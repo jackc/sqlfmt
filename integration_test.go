@@ -16,154 +16,49 @@ func TestIntegration(t *testing.T) {
 		inputFile          string
 		expectedOutputFile string
 	}{
-		{
-			inputFile:          "simple_select_without_from.sql",
-			expectedOutputFile: "simple_select_without_from.fmt.sql",
-		},
-		{
-			inputFile:          "simple_select_with_from.sql",
-			expectedOutputFile: "simple_select_with_from.fmt.sql",
-		},
-		{
-			inputFile:          "select_from_aliased.sql",
-			expectedOutputFile: "select_from_aliased.fmt.sql",
-		},
-		{
-			inputFile:          "simple_select_with_selection_alias.sql",
-			expectedOutputFile: "simple_select_with_selection_alias.fmt.sql",
-		},
+		{inputFile: "simple_select_without_from.sql"},
+		{inputFile: "simple_select_with_from.sql"},
+		{inputFile: "select_from_aliased.sql"},
+		{inputFile: "simple_select_with_selection_alias.sql"},
 		{
 			inputFile:          "simple_select_with_selection_alias_no_as.sql",
 			expectedOutputFile: "simple_select_with_selection_alias.fmt.sql",
 		},
-		{
-			inputFile:          "select_table_dot_column.sql",
-			expectedOutputFile: "select_table_dot_column.fmt.sql",
-		},
-		{
-			inputFile:          "simple_select_literal_integer.sql",
-			expectedOutputFile: "simple_select_literal_integer.fmt.sql",
-		},
-		{
-			inputFile:          "simple_select_literal_text.sql",
-			expectedOutputFile: "simple_select_literal_text.fmt.sql",
-		},
-		{
-			inputFile:          "arithmetic_expression.sql",
-			expectedOutputFile: "arithmetic_expression.fmt.sql",
-		},
-		{
-			inputFile:          "paren_expression.sql",
-			expectedOutputFile: "paren_expression.fmt.sql",
-		},
-		{
-			inputFile:          "subselect_expression.sql",
-			expectedOutputFile: "subselect_expression.fmt.sql",
-		},
-		{
-			inputFile:          "comparison_expression.sql",
-			expectedOutputFile: "comparison_expression.fmt.sql",
-		},
-		{
-			inputFile:          "select_from_comma_join.sql",
-			expectedOutputFile: "select_from_comma_join.fmt.sql",
-		},
-		{
-			inputFile:          "select_from_cross_join.sql",
-			expectedOutputFile: "select_from_cross_join.fmt.sql",
-		},
-		{
-			inputFile:          "select_from_natural_join.sql",
-			expectedOutputFile: "select_from_natural_join.fmt.sql",
-		},
-		{
-			inputFile:          "select_from_join_using.sql",
-			expectedOutputFile: "select_from_join_using.fmt.sql",
-		},
-		{
-			inputFile:          "select_from_join_using_multiple.sql",
-			expectedOutputFile: "select_from_join_using_multiple.fmt.sql",
-		},
-		{
-			inputFile:          "select_from_join_on.sql",
-			expectedOutputFile: "select_from_join_on.fmt.sql",
-		},
-		{
-			inputFile:          "quoted_identifier.sql",
-			expectedOutputFile: "quoted_identifier.fmt.sql",
-		},
-		{
-			inputFile:          "boolean_binary_op.sql",
-			expectedOutputFile: "boolean_binary_op.fmt.sql",
-		},
-		{
-			inputFile:          "boolean_not.sql",
-			expectedOutputFile: "boolean_not.fmt.sql",
-		},
-		{
-			inputFile:          "select_where.sql",
-			expectedOutputFile: "select_where.fmt.sql",
-		},
-		{
-			inputFile:          "order.sql",
-			expectedOutputFile: "order.fmt.sql",
-		},
-		{
-			inputFile:          "order_column_num.sql",
-			expectedOutputFile: "order_column_num.fmt.sql",
-		},
-		{
-			inputFile:          "order_desc.sql",
-			expectedOutputFile: "order_desc.fmt.sql",
-		},
-		{
-			inputFile:          "order_multiple.sql",
-			expectedOutputFile: "order_multiple.fmt.sql",
-		},
-		{
-			inputFile:          "select_wrapped_by_parens.sql",
-			expectedOutputFile: "select_wrapped_by_parens.fmt.sql",
-		},
-		{
-			inputFile:          "order_nulls.sql",
-			expectedOutputFile: "order_nulls.fmt.sql",
-		},
-		{
-			inputFile:          "order_using.sql",
-			expectedOutputFile: "order_using.fmt.sql",
-		},
-		{
-			inputFile:          "distinct.sql",
-			expectedOutputFile: "distinct.fmt.sql",
-		},
-		{
-			inputFile:          "distinct_on.sql",
-			expectedOutputFile: "distinct_on.fmt.sql",
-		},
-		{
-			inputFile:          "group_by.sql",
-			expectedOutputFile: "group_by.fmt.sql",
-		},
-		{
-			inputFile:          "having.sql",
-			expectedOutputFile: "having.fmt.sql",
-		},
-		{
-			inputFile:          "limit.sql",
-			expectedOutputFile: "limit.fmt.sql",
-		},
+		{inputFile: "select_table_dot_column.sql"},
+		{inputFile: "simple_select_literal_integer.sql"},
+		{inputFile: "simple_select_literal_text.sql"},
+		{inputFile: "arithmetic_expression.sql"},
+		{inputFile: "paren_expression.sql"},
+		{inputFile: "subselect_expression.sql"},
+		{inputFile: "comparison_expression.sql"},
+		{inputFile: "select_from_comma_join.sql"},
+		{inputFile: "select_from_cross_join.sql"},
+		{inputFile: "select_from_natural_join.sql"},
+		{inputFile: "select_from_join_using.sql"},
+		{inputFile: "select_from_join_using_multiple.sql"},
+		{inputFile: "select_from_join_on.sql"},
+		{inputFile: "quoted_identifier.sql"},
+		{inputFile: "boolean_binary_op.sql"},
+		{inputFile: "boolean_not.sql"},
+		{inputFile: "select_where.sql"},
+		{inputFile: "order.sql"},
+		{inputFile: "order_column_num.sql"},
+		{inputFile: "order_desc.sql"},
+		{inputFile: "order_multiple.sql"},
+		{inputFile: "select_wrapped_by_parens.sql"},
+		{inputFile: "order_nulls.sql"},
+		{inputFile: "order_using.sql"},
+		{inputFile: "distinct.sql"},
+		{inputFile: "distinct_on.sql"},
+		{inputFile: "group_by.sql"},
+		{inputFile: "having.sql"},
+		{inputFile: "limit.sql"},
 		{
 			inputFile:          "limit_fetch.sql",
 			expectedOutputFile: "limit.fmt.sql",
 		},
-		{
-			inputFile:          "offset.sql",
-			expectedOutputFile: "offset.fmt.sql",
-		},
-		{
-			inputFile:          "limit_offset.sql",
-			expectedOutputFile: "limit_offset.fmt.sql",
-		},
+		{inputFile: "offset.sql"},
+		{inputFile: "limit_offset.sql"},
 		{
 			inputFile:          "offset_limit.sql",
 			expectedOutputFile: "limit_offset.fmt.sql",
@@ -172,198 +67,57 @@ func TestIntegration(t *testing.T) {
 			inputFile:          "offset_fetch.sql",
 			expectedOutputFile: "limit_offset.fmt.sql",
 		},
-		{
-			inputFile:          "select_for_update.sql",
-			expectedOutputFile: "select_for_update.fmt.sql",
-		},
-		{
-			inputFile:          "select_for_no_key_update.sql",
-			expectedOutputFile: "select_for_no_key_update.fmt.sql",
-		},
-		{
-			inputFile:          "select_for_share.sql",
-			expectedOutputFile: "select_for_share.fmt.sql",
-		},
-		{
-			inputFile:          "select_for_key_share.sql",
-			expectedOutputFile: "select_for_key_share.fmt.sql",
-		},
-		{
-			inputFile:          "select_for_update_of.sql",
-			expectedOutputFile: "select_for_update_of.fmt.sql",
-		},
-		{
-			inputFile:          "select_for_update_nowait.sql",
-			expectedOutputFile: "select_for_update_nowait.fmt.sql",
-		},
-		{
-			inputFile:          "select_star.sql",
-			expectedOutputFile: "select_star.fmt.sql",
-		},
-		{
-			inputFile:          "select_table_dot_star.sql",
-			expectedOutputFile: "select_table_dot_star.fmt.sql",
-		},
-		{
-			inputFile:          "table.sql",
-			expectedOutputFile: "table.fmt.sql",
-		},
-		{
-			inputFile:          "table_star.sql",
-			expectedOutputFile: "table_star.fmt.sql",
-		},
-		{
-			inputFile:          "table_only.sql",
-			expectedOutputFile: "table_only.fmt.sql",
-		},
+		{inputFile: "select_for_update.sql"},
+		{inputFile: "select_for_no_key_update.sql"},
+		{inputFile: "select_for_share.sql"},
+		{inputFile: "select_for_key_share.sql"},
+		{inputFile: "select_for_update_of.sql"},
+		{inputFile: "select_for_update_nowait.sql"},
+		{inputFile: "select_star.sql"},
+		{inputFile: "select_table_dot_star.sql"},
+		{inputFile: "table.sql"},
+		{inputFile: "table_star.sql"},
+		{inputFile: "table_only.sql"},
 		{
 			inputFile:          "table_only_paren.sql",
 			expectedOutputFile: "table_only.fmt.sql",
 		},
-		{
-			inputFile:          "case_full.sql",
-			expectedOutputFile: "case_full.fmt.sql",
-		},
-		{
-			inputFile:          "case_implicit.sql",
-			expectedOutputFile: "case_implicit.fmt.sql",
-		},
-		{
-			inputFile:          "typecast.sql",
-			expectedOutputFile: "typecast.fmt.sql",
-		},
-		{
-			inputFile:          "unary.sql",
-			expectedOutputFile: "unary.fmt.sql",
-		},
-		{
-			inputFile:          "values.sql",
-			expectedOutputFile: "values.fmt.sql",
-		},
-		{
-			inputFile:          "values_order.sql",
-			expectedOutputFile: "values_order.fmt.sql",
-		},
-		{
-			inputFile:          "values_default.sql",
-			expectedOutputFile: "values_default.fmt.sql",
-		},
-		{
-			inputFile:          "collate.sql",
-			expectedOutputFile: "collate.fmt.sql",
-		},
-		{
-			inputFile:          "at_time_zone.sql",
-			expectedOutputFile: "at_time_zone.fmt.sql",
-		},
-		{
-			inputFile:          "like.sql",
-			expectedOutputFile: "like.fmt.sql",
-		},
-		{
-			inputFile:          "is_null.sql",
-			expectedOutputFile: "is_null.fmt.sql",
-		},
-		{
-			inputFile:          "is_bool_op.sql",
-			expectedOutputFile: "is_bool_op.fmt.sql",
-		},
-		{
-			inputFile:          "is_distinct_from.sql",
-			expectedOutputFile: "is_distinct_from.fmt.sql",
-		},
-		{
-			inputFile:          "union.sql",
-			expectedOutputFile: "union.fmt.sql",
-		},
-		{
-			inputFile:          "intersect.sql",
-			expectedOutputFile: "intersect.fmt.sql",
-		},
-		{
-			inputFile:          "except.sql",
-			expectedOutputFile: "except.fmt.sql",
-		},
-		{
-			inputFile:          "function_call_without_args.sql",
-			expectedOutputFile: "function_call_without_args.fmt.sql",
-		},
-		{
-			inputFile:          "function_call_with_star_arg.sql",
-			expectedOutputFile: "function_call_with_star_arg.fmt.sql",
-		},
-		{
-			inputFile:          "function_call_with_positional_args.sql",
-			expectedOutputFile: "function_call_with_positional_args.fmt.sql",
-		},
-		{
-			inputFile:          "function_call_with_pg_named_args.sql",
-			expectedOutputFile: "function_call_with_pg_named_args.fmt.sql",
-		},
-		{
-			inputFile:          "function_call_with_sql_named_args.sql",
-			expectedOutputFile: "function_call_with_sql_named_args.fmt.sql",
-		},
-		{
-			inputFile:          "function_call_with_order.sql",
-			expectedOutputFile: "function_call_with_order.fmt.sql", // TODO - fix formatting when order by is inside function call
-		},
-		{
-			inputFile:          "function_call_with_all.sql",
-			expectedOutputFile: "function_call_with_all.fmt.sql",
-		},
-		{
-			inputFile:          "function_call_with_distinct.sql",
-			expectedOutputFile: "function_call_with_distinct.fmt.sql",
-		},
-		{
-			inputFile:          "function_call_with_filter.sql",
-			expectedOutputFile: "function_call_with_filter.fmt.sql",
-		},
-		{
-			inputFile:          "null.sql",
-			expectedOutputFile: "null.fmt.sql",
-		},
-		{
-			inputFile:          "window_function.sql",
-			expectedOutputFile: "window_function.fmt.sql",
-		},
-		{
-			inputFile:          "window_function_partition_by.sql",
-			expectedOutputFile: "window_function_partition_by.fmt.sql",
-		},
-		{
-			inputFile:          "window_function_order_by.sql", // TODO - fix formatting when order by is inside function call
-			expectedOutputFile: "window_function_order_by.fmt.sql",
-		},
-		{
-			inputFile:          "window_function_named.sql",
-			expectedOutputFile: "window_function_named.fmt.sql",
-		},
-		{
-			inputFile:          "window_function_named_multiple.sql",
-			expectedOutputFile: "window_function_named_multiple.fmt.sql",
-		},
-		{
-			inputFile:          "window_function_frame.sql",
-			expectedOutputFile: "window_function_frame.fmt.sql",
-		},
-		{
-			inputFile:          "exists.sql",
-			expectedOutputFile: "exists.fmt.sql",
-		},
-		{
-			inputFile:          "array_constructor.sql",
-			expectedOutputFile: "array_constructor.fmt.sql",
-		},
-		{
-			inputFile:          "array_index.sql",
-			expectedOutputFile: "array_index.fmt.sql",
-		},
-		{
-			inputFile:          "array_slice.sql",
-			expectedOutputFile: "array_slice.fmt.sql",
-		},
+		{inputFile: "case_full.sql"},
+		{inputFile: "case_implicit.sql"},
+		{inputFile: "typecast.sql"},
+		{inputFile: "unary.sql"},
+		{inputFile: "values.sql"},
+		{inputFile: "values_order.sql"},
+		{inputFile: "values_default.sql"},
+		{inputFile: "collate.sql"},
+		{inputFile: "at_time_zone.sql"},
+		{inputFile: "like.sql"},
+		{inputFile: "is_null.sql"},
+		{inputFile: "is_bool_op.sql"},
+		{inputFile: "is_distinct_from.sql"},
+		{inputFile: "union.sql"},
+		{inputFile: "intersect.sql"},
+		{inputFile: "except.sql"},
+		{inputFile: "function_call_without_args.sql"},
+		{inputFile: "function_call_with_star_arg.sql"},
+		{inputFile: "function_call_with_positional_args.sql"},
+		{inputFile: "function_call_with_pg_named_args.sql"},
+		{inputFile: "function_call_with_sql_named_args.sql"},
+		{inputFile: "function_call_with_order.sql"}, // TODO - fix formatting when order by is inside function call
+		{inputFile: "function_call_with_all.sql"},
+		{inputFile: "function_call_with_distinct.sql"},
+		{inputFile: "function_call_with_filter.sql"},
+		{inputFile: "null.sql"},
+		{inputFile: "window_function.sql"},
+		{inputFile: "window_function_partition_by.sql"},
+		{inputFile: "window_function_order_by.sql"}, // TODO - fix formatting when order by is inside function call
+		{inputFile: "window_function_named.sql"},
+		{inputFile: "window_function_named_multiple.sql"},
+		{inputFile: "window_function_frame.sql"},
+		{inputFile: "exists.sql"},
+		{inputFile: "array_constructor.sql"},
+		{inputFile: "array_index.sql"},
+		{inputFile: "array_slice.sql"},
 	}
 
 	for i, tt := range tests {
@@ -371,6 +125,10 @@ func TestIntegration(t *testing.T) {
 		if err != nil {
 			t.Errorf("%d. %v", i, err)
 			continue
+		}
+
+		if tt.expectedOutputFile == "" {
+			tt.expectedOutputFile = tt.inputFile[:len(tt.inputFile)-3] + "fmt.sql"
 		}
 
 		expected, err := ioutil.ReadFile(path.Join("testdata", tt.expectedOutputFile))
