@@ -121,6 +121,27 @@ func (e BinaryExpr) RenderTo(r Renderer) {
 	e.Right.RenderTo(r)
 }
 
+type ArrayConstructorExpr ArrayExpr
+
+func (ace ArrayConstructorExpr) RenderTo(r Renderer) {
+	r.Text("array", "keyword")
+	ArrayExpr(ace).RenderTo(r)
+}
+
+type ArrayExpr []Expr
+
+func (a ArrayExpr) RenderTo(r Renderer) {
+	r.Text("[", "lbracket")
+	for i, e := range a {
+		e.RenderTo(r)
+		if i < len(a)-1 {
+			r.Text(",", "comma")
+			r.Space()
+		}
+	}
+	r.Text("]", "rbracket")
+}
+
 type TextOpWithEscapeExpr struct {
 	Left     Expr
 	Operator string

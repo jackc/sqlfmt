@@ -39,6 +39,7 @@ package main
   partitionClause PartitionClause
   frameClause *FrameClause
   frameBound *FrameBound
+  arrayExpr ArrayExpr
 }
 
 %type <sqlSelect> top
@@ -121,6 +122,8 @@ package main
 %type <partitionClause> opt_partition_clause
 %type <frameClause> opt_frame_clause frame_extent
 %type <frameBound> frame_bound
+
+%type <arrayExpr> array_expr array_expr_list
 
 %type <qualifiedName> columnref any_name attrs
 
@@ -860,7 +863,11 @@ c_expr:
   }
 /* TODO
 | ARRAY select_with_parens
-| ARRAY array_expr
+*/
+| ARRAY array_expr {
+  $$ = ArrayConstructorExpr($2)
+}
+/* TODO
 | explicit_row
 | implicit_row
 | GROUPING '(' expr_list ')'
@@ -1007,6 +1014,29 @@ func_arg_expr:
     $$ = FuncArg{Name: $1, NameOp: "=>", Expr: $3}
   }
 
+array_expr:
+  '[' expr_list ']'
+  {
+    $$ = ArrayExpr($2)
+  }
+| '[' array_expr_list ']'
+  {
+    $$ = $2
+  }
+| '[' ']'
+  {
+    $$ = ArrayExpr{}
+  }
+
+array_expr_list:
+  array_expr
+  {
+    $$ = ArrayExpr{$1}
+  }
+| array_expr_list ',' array_expr
+  {
+    $$ = append($1, $3)
+  }
 
 /*****************************************************************************
  *

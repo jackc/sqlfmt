@@ -409,6 +409,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "exists.sql",
 			expectedOutputFile: "exists.fmt.sql",
 		},
+		{
+			inputFile:          "array_constructor.sql",
+			expectedOutputFile: "array_constructor.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {
