@@ -1,3 +1,4 @@
+/cmd/sqlfmt/sqlfmt
+/cmd/sqlfmt/tmp
 /y.output
-/sqlfmt
 /tmp

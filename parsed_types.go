@@ -1,45 +1,15 @@
-//go:generate -command yacc go tool yacc
-//go:generate yacc -o sql.go -p "sql" sql.y
-package main
+package sqlfmt
 
 import (
-	"flag"
-	"fmt"
-	"io/ioutil"
-	"os"
+	"errors"
 )
 
-const Version = "0.0.1"
-
-var options struct {
-	version bool
-}
-
-func main() {
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "usage:  %s [options]\n", os.Args[0])
-		flag.PrintDefaults()
-	}
-
-	flag.BoolVar(&options.version, "version", false, "print version and exit")
-	flag.Parse()
-
-	if options.version {
-		fmt.Printf("sqlfmt v%v\n", Version)
-		os.Exit(0)
-	}
-
-	input, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		os.Exit(1)
-	}
-	lexer := NewSqlLexer(string(input))
+func Parse(lexer *sqlLex) (stmt *SelectStmt, err error) {
 	if rc := sqlParse(lexer); rc != 0 {
-		os.Exit(1)
+		return nil, errors.New("Parse failed")
 	}
 
-	r := NewTextRenderer(os.Stdout)
-	lexer.stmt.RenderTo(r)
+	return lexer.stmt, nil
 }
 
 type Expr interface {

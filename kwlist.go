@@ -1,4 +1,4 @@
-package main
+package sqlfmt
 
 // Derived from PostgreSQL -- ./src/include/parser/kwlist.h
 

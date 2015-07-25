@@ -1,4 +1,6 @@
-package main
+//go:generate -command yacc go tool yacc
+//go:generate yacc -o sql.go -p "sql" sql.y
+package sqlfmt
 
 import (
 	"log"

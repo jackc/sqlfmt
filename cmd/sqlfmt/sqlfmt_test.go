@@ -416,13 +416,13 @@ func TestSqlFmt(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		input, err := ioutil.ReadFile(path.Join("testdata", tt.inputFile))
+		input, err := ioutil.ReadFile(path.Join("../../testdata", tt.inputFile))
 		if err != nil {
 			t.Errorf("%d. %v", i, err)
 			continue
 		}
 
-		expected, err := ioutil.ReadFile(path.Join("testdata", tt.expectedOutputFile))
+		expected, err := ioutil.ReadFile(path.Join("../../testdata", tt.expectedOutputFile))
 		if err != nil {
 			t.Errorf("%d. %v", i, err)
 			continue

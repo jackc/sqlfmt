@@ -1,5 +1,5 @@
 //line sql.y:2
-package main
+package sqlfmt
 
 import __yyfmt__ "fmt"
 
