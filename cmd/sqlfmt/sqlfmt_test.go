@@ -417,6 +417,10 @@ func TestSqlFmt(t *testing.T) {
 			inputFile:          "array_index.sql",
 			expectedOutputFile: "array_index.fmt.sql",
 		},
+		{
+			inputFile:          "array_slice.sql",
+			expectedOutputFile: "array_slice.fmt.sql",
+		},
 	}
 
 	for i, tt := range tests {

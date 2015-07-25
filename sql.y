@@ -1737,14 +1737,10 @@ indirection_el:
   {
     $$ = IndirectionEl{LowerSubscript: $2}
   }
-/* TODO
-      | '[' a_expr ':' a_expr ']'
-        {
-          A_Indices *ai = makeNode(A_Indices);
-          ai->lidx = $2;
-          ai->uidx = $4;
-          $$ = (Node *) ai;
-        }*/
+| '[' a_expr ':' a_expr ']'
+  {
+    $$ = IndirectionEl{LowerSubscript: $2, UpperSubscript:$4}
+  }
 
 indirection:
   indirection_el              { $$ = Indirection{$1} }

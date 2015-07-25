@@ -59,12 +59,17 @@ func (i Indirection) RenderTo(r Renderer) {
 type IndirectionEl struct {
 	Name           string
 	LowerSubscript Expr
+	UpperSubscript Expr
 }
 
 func (ie IndirectionEl) RenderTo(r Renderer) {
 	if ie.LowerSubscript != nil {
 		r.Text("[", "lbracket")
 		ie.LowerSubscript.RenderTo(r)
+		if ie.UpperSubscript != nil {
+			r.Text(":", "colon")
+			ie.UpperSubscript.RenderTo(r)
+		}
 		r.Text("]", "rbracket")
 	} else {
 		r.Text(".", "period")
