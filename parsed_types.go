@@ -24,14 +24,49 @@ func (t PgType) RenderTo(r Renderer) {
 	r.Text(t.Name, "typename")
 }
 
-type QualifiedName []string
+type AnyName []string
 
-func (qn QualifiedName) RenderTo(r Renderer) {
-	for i, s := range qn {
-		r.Text(s, "identifier")
-		if i+1 < len(qn) {
-			r.Text(".", "period")
+func (an AnyName) RenderTo(r Renderer) {
+	for i, n := range an {
+		r.Text(n, "identifer")
+		if i < len(an)-1 {
+			r.Text(",", "comma")
+			r.Space()
 		}
+	}
+}
+
+type ColumnRef struct {
+	Name        string
+	Indirection Indirection
+}
+
+func (cr ColumnRef) RenderTo(r Renderer) {
+	r.Text(cr.Name, "identifer")
+	if cr.Indirection != nil {
+		cr.Indirection.RenderTo(r)
+	}
+}
+
+type Indirection []IndirectionEl
+
+func (i Indirection) RenderTo(r Renderer) {
+	for _, e := range i {
+		e.RenderTo(r)
+	}
+}
+
+type IndirectionEl struct {
+	Subscript bool
+	Name      string
+}
+
+func (ie IndirectionEl) RenderTo(r Renderer) {
+	if ie.Subscript {
+
+	} else {
+		r.Text(".", "period")
+		r.Text(ie.Name, "identifier")
 	}
 }
 
@@ -218,7 +253,7 @@ func (t TypecastExpr) RenderTo(r Renderer) {
 
 type CollateExpr struct {
 	Expr      Expr
-	Collation QualifiedName
+	Collation AnyName
 }
 
 func (c CollateExpr) RenderTo(r Renderer) {

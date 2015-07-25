@@ -21,7 +21,7 @@ package sqlfmt
   lockingItem LockingItem
   boolean bool
   placeholder interface{}
-  qualifiedName QualifiedName
+  columnRef ColumnRef
   whenClauses []WhenClause
   whenClause WhenClause
   pgType PgType
@@ -40,6 +40,9 @@ package sqlfmt
   frameClause *FrameClause
   frameBound *FrameBound
   arrayExpr ArrayExpr
+  anyName AnyName
+  indirectionEl IndirectionEl
+  indirection Indirection
 }
 
 %type <sqlSelect> top
@@ -86,9 +89,11 @@ package sqlfmt
 %type <lockingItem> for_locking_item
 %type <str> for_locking_strength opt_nowait_or_skip
 
-%type <identifiers> locked_rels_list qualified_name_list indirection opt_indirection name_list
+%type <identifiers> locked_rels_list qualified_name_list name_list
 
-%type <str> indirection_el attr_name qualified_name ColId name param_name
+%type <indirectionEl> indirection_el
+%type <indirection> indirection opt_indirection
+%type <str> attr_name qualified_name ColId name param_name
 
 %type <str> MathOp qual_Op qual_all_Op all_Op
 
@@ -125,7 +130,8 @@ package sqlfmt
 
 %type <arrayExpr> array_expr array_expr_list
 
-%type <qualifiedName> columnref any_name attrs
+%type <columnRef> columnref
+%type <anyName> any_name attrs
 
 %type <str>
   ColLabel
@@ -368,17 +374,20 @@ aliasableExpr:
 
 
 any_name:
-  ColId        { $$ = QualifiedName{$1} }
+  ColId
+  {
+    $$ = AnyName{$1}
+  }
 | ColId attrs
   {
-    $$ = QualifiedName{$1}
+    $$ = AnyName{$1}
     $$ = append($$, $2...)
   }
 
 attrs:
   '.' attr_name
   {
-    $$ = QualifiedName{$2}
+    $$ = AnyName{$2}
   }
 | attrs '.' attr_name
   {
@@ -1707,12 +1716,11 @@ case_arg:
 columnref:
 ColId
   {
-    $$ = QualifiedName{$1}
+    $$ = ColumnRef{Name: $1}
   }
 | ColId indirection
   {
-    $$ = QualifiedName{$1}
-    $$ = append($$, $2...)
+    $$ = ColumnRef{Name: $1, Indirection: $2}
   }
 
 
@@ -1720,11 +1728,11 @@ ColId
 indirection_el:
   '.' attr_name
   {
-    $$ = $2
+    $$ = IndirectionEl{Name: $2}
   }
 | '.' '*'
   {
-    $$ = "*"
+    $$ = IndirectionEl{Name: "*"}
   }
 /* TODO      | '[' a_expr ']'
         {
@@ -1742,7 +1750,7 @@ indirection_el:
         }*/
 
 indirection:
-  indirection_el              { $$ = []string{$1} }
+  indirection_el              { $$ = Indirection{$1} }
 | indirection indirection_el  { $$ = append($1, $2) }
 
 opt_indirection:
@@ -1752,7 +1760,7 @@ opt_indirection:
     if $1 != nil {
       $$ = append($1, $2)
     } else {
-      $$ = []string{$2}
+      $$ = Indirection{$2}
     }
   }
 
@@ -1817,7 +1825,7 @@ target_el:
 | a_expr
 | '*'
   {
-    $$ = QualifiedName{"*"}
+    $$ = ColumnRef{Name: "*"}
   }
 
 
