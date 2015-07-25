@@ -852,10 +852,9 @@ c_expr:
 | PARAM opt_indirection
 */
 
-/* TODO -- something with opt_indirection */
 | '(' a_expr ')' opt_indirection
   {
-    $$ = ParenExpr{Expr: $2}
+    $$ = ParenExpr{Expr: $2, Indirection: $4}
   }
 | case_expr { $$ = $1 }
 | func_expr { $$ = $1 }
@@ -1734,13 +1733,11 @@ indirection_el:
   {
     $$ = IndirectionEl{Name: "*"}
   }
-/* TODO      | '[' a_expr ']'
-        {
-          A_Indices *ai = makeNode(A_Indices);
-          ai->lidx = NULL;
-          ai->uidx = $2;
-          $$ = (Node *) ai;
-        }
+| '[' a_expr ']'
+  {
+    $$ = IndirectionEl{LowerSubscript: $2}
+  }
+/* TODO
       | '[' a_expr ':' a_expr ']'
         {
           A_Indices *ai = makeNode(A_Indices);

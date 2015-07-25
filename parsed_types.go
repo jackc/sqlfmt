@@ -57,13 +57,15 @@ func (i Indirection) RenderTo(r Renderer) {
 }
 
 type IndirectionEl struct {
-	Subscript bool
-	Name      string
+	Name           string
+	LowerSubscript Expr
 }
 
 func (ie IndirectionEl) RenderTo(r Renderer) {
-	if ie.Subscript {
-
+	if ie.LowerSubscript != nil {
+		r.Text("[", "lbracket")
+		ie.LowerSubscript.RenderTo(r)
+		r.Text("]", "rbracket")
 	} else {
 		r.Text(".", "period")
 		r.Text(ie.Name, "identifier")
@@ -231,13 +233,17 @@ func (c CaseExpr) RenderTo(r Renderer) {
 }
 
 type ParenExpr struct {
-	Expr Expr
+	Expr        Expr
+	Indirection Indirection
 }
 
 func (e ParenExpr) RenderTo(r Renderer) {
 	r.Text("(", "lparen")
 	e.Expr.RenderTo(r)
 	r.Text(")", "rparen")
+	if e.Indirection != nil {
+		e.Indirection.RenderTo(r)
+	}
 }
 
 type TypecastExpr struct {
