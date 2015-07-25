@@ -43,6 +43,8 @@ package sqlfmt
   anyName AnyName
   indirectionEl IndirectionEl
   indirection Indirection
+  iconst IntegerLiteral
+  optArrayBounds []IntegerLiteral
 }
 
 %type <sqlSelect> top
@@ -64,7 +66,6 @@ package sqlfmt
 %type <orderClause> opt_sort_clause sort_clause sortby_list
 %type <str> opt_asc_desc opt_nulls_order
 %type <placeholder> into_clause
-  opt_array_bounds
   opt_type_modifiers
   row_or_rows
   first_or_next
@@ -105,7 +106,8 @@ package sqlfmt
 
 %type <boolean> all_or_distinct
 
-%type <expr>  Iconst SignedIconst Sconst AexprConst
+%type <expr>  SignedIconst Sconst AexprConst
+%type <iconst> Iconst
 
 %type <expr> case_expr case_arg case_default
 %type <whenClauses> when_clause_list
@@ -143,7 +145,7 @@ package sqlfmt
   func_name
 
 %type <pgType> GenericType Numeric Typename SimpleTypename
-
+%type <optArrayBounds> opt_array_bounds
 
 
 %token  <str> OP any_operator
@@ -406,10 +408,10 @@ attrs:
  *****************************************************************************/
 
 Typename:
-  /* TODO -- do something with opt_array_bounds */
   SimpleTypename opt_array_bounds
   {
     $$ = $1
+    $$.ArrayBounds = $2
   }
 /* TODO
       | SETOF SimpleTypename opt_array_bounds
@@ -428,13 +430,16 @@ Typename:
 */
 
 opt_array_bounds:
-/* TODO
   opt_array_bounds '[' ']'
-    {  $$ = lappend($1, makeInteger(-1)); }
+  {
+    $$ = append($1, "")
+  }
 | opt_array_bounds '[' Iconst ']'
-    {  $$ = lappend($1, makeInteger($3)); }
-| */ /*EMPTY*/
-    {  $$ = nil }
+  {
+    $$ = append($1, $3)
+  }
+| /*EMPTY*/
+  {  $$ = nil }
 
 SimpleTypename:
   GenericType      { $$ = $1 }

@@ -17,11 +17,17 @@ type Expr interface {
 }
 
 type PgType struct {
-	Name string
+	Name        string
+	ArrayBounds []IntegerLiteral
 }
 
 func (t PgType) RenderTo(r Renderer) {
 	r.Text(t.Name, "typename")
+	for _, ab := range t.ArrayBounds {
+		r.Text("[", "lbracket")
+		r.Text(string(ab), "integerLiteral")
+		r.Text("]", "lbracket")
+	}
 }
 
 type AnyName []string
