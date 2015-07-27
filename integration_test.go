@@ -120,6 +120,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "array_slice.sql"},
 		{inputFile: "array_typecast.sql"},
 		{inputFile: "cast_as.sql"},
+		{inputFile: "func_expr_expr_list.sql"},
 	}
 
 	for i, tt := range tests {

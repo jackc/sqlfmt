@@ -974,10 +974,40 @@ COLLATION FOR '(' a_expr ')'
 | TRIM '(' TRAILING trim_list ')'
 | TRIM '(' trim_list ')'
 | NULLIF '(' a_expr ',' a_expr ')'
+*/
 | COALESCE '(' expr_list ')'
+{
+  fa := FuncApplication{Name: "coalesce"}
+  for _, e := range $3 {
+    fa.Args = append(fa.Args, FuncArg{Expr: e})
+  }
+  $$ = fa
+}
 | GREATEST '(' expr_list ')'
+{
+  fa := FuncApplication{Name: "greatest"}
+  for _, e := range $3 {
+    fa.Args = append(fa.Args, FuncArg{Expr: e})
+  }
+  $$ = fa
+}
 | LEAST '(' expr_list ')'
+{
+  fa := FuncApplication{Name: "least"}
+  for _, e := range $3 {
+    fa.Args = append(fa.Args, FuncArg{Expr: e})
+  }
+  $$ = fa
+}
 | XMLCONCAT '(' expr_list ')'
+{
+  fa := FuncApplication{Name: "xmlconcat"}
+  for _, e := range $3 {
+    fa.Args = append(fa.Args, FuncArg{Expr: e})
+  }
+  $$ = fa
+}
+/* TODO
 | XMLELEMENT '(' NAME_P ColLabel ')'
 | XMLELEMENT '(' NAME_P ColLabel ',' xml_attributes ')'
 | XMLELEMENT '(' NAME_P ColLabel ',' expr_list ')'
