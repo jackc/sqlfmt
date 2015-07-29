@@ -109,7 +109,7 @@ func blankState(l *sqlLex) stateFn {
 	switch r := l.next(); {
 	case r == 0:
 		return nil
-	case r == ',' || r == '.' || r == '(' || r == ')' || r == '[' || r == ']':
+	case r == ',' || r == '.' || r == '(' || r == ')' || r == '[' || r == ']' || r == '%' || r == '^':
 		return lexSimple
 	case r == '\'':
 		return lexStringLiteral
@@ -201,7 +201,7 @@ func lexOperator(l *sqlLex) stateFn {
 
 	t := token{src: l.src[l.start:l.pos]}
 	switch {
-	case len(t.src) == 1:
+	case t.src == "+" || t.src == "-" || t.src == "*" || t.src == "/" || t.src == "%" || t.src == "^" || t.src == "<" || t.src == ">" || t.src == "=" || t.src == "[" || t.src == "]" || t.src == ":":
 		t.typ = int(t.src[0])
 	case t.src == "::":
 		t.typ = TYPECAST
@@ -218,7 +218,7 @@ func lexOperator(l *sqlLex) stateFn {
 	case t.src == "<>", t.src == "!=":
 		t.typ = NOT_EQUALS
 	default:
-		t.typ = OP
+		t.typ = Op
 	}
 
 	l.append(t)
@@ -252,6 +252,7 @@ func isAlphanumeric(r rune) bool {
 	return r == '_' || unicode.In(r, unicode.Letter, unicode.Digit)
 }
 
+// TODO - ensure this is complete list of operator characters
 func isOperator(r rune) bool {
-	return r == '+' || r == '-' || r == '*' || r == '/' || r == '=' || r == '<' || r == '>' || r == '!' || r == ':'
+	return r == '+' || r == '-' || r == '*' || r == '/' || r == '=' || r == '<' || r == '>' || r == '!' || r == ':' || r == '@' || r == '%'
 }

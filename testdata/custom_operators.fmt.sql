@@ -1,0 +1,3 @@
+select
+  foo @> bar,
+  @foo

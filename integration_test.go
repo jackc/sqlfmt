@@ -123,6 +123,8 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "func_expr_expr_list.sql"},
 		{inputFile: "is_of_type_list.sql"},
 		{inputFile: "between.sql"},
+		{inputFile: "custom_operators.sql"},
+		{inputFile: "b_expr.sql"}, // b_expr is duplicated subset of a_expr -- test its clauses
 	}
 
 	for i, tt := range tests {

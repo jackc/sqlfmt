@@ -151,7 +151,7 @@ package sqlfmt
 %type <optArrayBounds> opt_array_bounds
 
 
-%token  <str> OP any_operator
+%token  <str> any_operator
 
 
 /*
@@ -877,72 +877,105 @@ b_expr:
   {
     $$ = $1
   }
+| b_expr TYPECAST Typename
+  {
+    $$ = TypecastExpr{Expr: $1, Typename: $3}
+  }
+| '+' b_expr          %prec UMINUS
+  {
+    $$ = UnaryExpr{Operator: "+", Expr: $2}
+  }
+| '-' b_expr          %prec UMINUS
+  {
+    $$ = UnaryExpr{Operator: "-", Expr: $2}
+  }
+| b_expr '+' b_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "+", Right: $3}
+  }
+| b_expr '-' b_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "-", Right: $3}
+  }
+| b_expr '*' b_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "*", Right: $3}
+  }
+| b_expr '/' b_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "/", Right: $3}
+  }
+| b_expr '%' b_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "%", Right: $3}
+  }
+| b_expr '^' b_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "^", Right: $3}
+  }
+| b_expr '<' b_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "<", Right: $3}
+  }
+| b_expr '>' b_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: ">", Right: $3}
+  }
+| b_expr '=' b_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "=", Right: $3}
+  }
+| b_expr LESS_EQUALS b_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "<=", Right: $3}
+  }
+| b_expr GREATER_EQUALS b_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: ">=", Right: $3}
+  }
+| b_expr NOT_EQUALS b_expr
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "!=", Right: $3}
+  }
+| b_expr qual_Op b_expr       %prec Op
+  {
+    $$ = BinaryExpr{Left: $1, Operator: $2, Right: $3}
+  }
+| qual_Op b_expr          %prec Op
+  {
+    $$ = UnaryExpr{Operator: $1, Expr: $2}
+  }
 /* TODO
-      | b_expr TYPECAST Typename
-        { $$ = makeTypeCast($1, $3, @2); }
-      | '+' b_expr          %prec UMINUS
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "+", NULL, $2, @1); }
-      | '-' b_expr          %prec UMINUS
-        { $$ = doNegate($2, @1); }
-      | b_expr '+' b_expr
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "+", $1, $3, @2); }
-      | b_expr '-' b_expr
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "-", $1, $3, @2); }
-      | b_expr '*' b_expr
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "*", $1, $3, @2); }
-      | b_expr '/' b_expr
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "/", $1, $3, @2); }
-      | b_expr '%' b_expr
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "%", $1, $3, @2); }
-      | b_expr '^' b_expr
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "^", $1, $3, @2); }
-      | b_expr '<' b_expr
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "<", $1, $3, @2); }
-      | b_expr '>' b_expr
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, ">", $1, $3, @2); }
-      | b_expr '=' b_expr
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "=", $1, $3, @2); }
-      | b_expr LESS_EQUALS b_expr
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "<=", $1, $3, @2); }
-      | b_expr GREATER_EQUALS b_expr
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, ">=", $1, $3, @2); }
-      | b_expr NOT_EQUALS b_expr
-        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "<>", $1, $3, @2); }
-      | b_expr qual_Op b_expr       %prec Op
-        { $$ = (Node *) makeA_Expr(AEXPR_OP, $2, $1, $3, @2); }
-      | qual_Op b_expr          %prec Op
-        { $$ = (Node *) makeA_Expr(AEXPR_OP, $1, NULL, $2, @1); }
-      | b_expr qual_Op          %prec POSTFIXOP
-        { $$ = (Node *) makeA_Expr(AEXPR_OP, $2, $1, NULL, @2); }
-      | b_expr IS DISTINCT FROM b_expr    %prec IS
-        {
-          $$ = (Node *) makeSimpleA_Expr(AEXPR_DISTINCT, "=", $1, $5, @2);
-        }
-      | b_expr IS NOT DISTINCT FROM b_expr  %prec IS
-        {
-          $$ = makeNotExpr((Node *) makeSimpleA_Expr(AEXPR_DISTINCT,
-                                 "=", $1, $6, @2),
-                   @2);
-        }
-      | b_expr IS OF '(' type_list ')'    %prec IS
-        {
-          $$ = (Node *) makeSimpleA_Expr(AEXPR_OF, "=", $1, (Node *) $5, @2);
-        }
-      | b_expr IS NOT OF '(' type_list ')'  %prec IS
-        {
-          $$ = (Node *) makeSimpleA_Expr(AEXPR_OF, "<>", $1, (Node *) $6, @2);
-        }
-      | b_expr IS DOCUMENT_P          %prec IS
-        {
-          $$ = makeXmlExpr(IS_DOCUMENT, NULL, NIL,
-                   list_make1($1), @2);
-        }
-      | b_expr IS NOT DOCUMENT_P        %prec IS
-        {
-          $$ = makeNotExpr(makeXmlExpr(IS_DOCUMENT, NULL, NIL,
-                         list_make1($1), @2),
-                   @2);
-        }
+| b_expr qual_Op          %prec POSTFIXOP
+*/
+| b_expr IS DISTINCT FROM b_expr    %prec IS
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "is distinct from", Right: $5}
+  }
+| b_expr IS NOT DISTINCT FROM b_expr  %prec IS
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "is not distinct from", Right: $6}
+  }
+| b_expr IS OF '(' type_list ')'    %prec IS
+  {
+    $$ = IsOfExpr{Expr: $1, Types: $5}
+  }
+| b_expr IS NOT OF '(' type_list ')'  %prec IS
+  {
+    $$ = IsOfExpr{Expr: $1, Not: true, Types: $6}
+  }
+/* TODO
+| b_expr IS DOCUMENT_P          %prec IS
+  {
+    $$ = makeXmlExpr(IS_DOCUMENT, NULL, NIL,
+             list_make1($1), @2);
+  }
+| b_expr IS NOT DOCUMENT_P        %prec IS
+  {
+    $$ = makeNotExpr(makeXmlExpr(IS_DOCUMENT, NULL, NIL,
+                   list_make1($1), @2),
+             @2);
+  }
 */
 
 /*
