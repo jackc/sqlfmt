@@ -58,7 +58,7 @@ package sqlfmt
 %type <placeholder> opt_all_clause
 
 %type <expr> aliasableExpr
-%type <expr> target_el a_expr c_expr
+%type <expr> target_el a_expr b_expr c_expr
 %type <fromClause> from_clause
 %type <identifiers> identifierSeq
 %type <expr> joinExpr
@@ -71,6 +71,7 @@ package sqlfmt
   row_or_rows
   first_or_next
   within_group_clause
+  opt_asymmetric
 
 %type <filterClause> filter_clause
 
@@ -837,17 +838,111 @@ a_expr:
   {
     $$ = IsOfExpr{Expr: $1, Not: true, Types: $6}
   }
+| a_expr BETWEEN opt_asymmetric b_expr AND a_expr   %prec BETWEEN
+  {
+    $$ = BetweenExpr{Expr: $1, Left: $4, Right: $6}
+  }
+| a_expr NOT_LA BETWEEN opt_asymmetric b_expr AND a_expr %prec NOT_LA
+  {
+    $$ = BetweenExpr{Expr: $1, Not: true, Left: $5, Right: $7}
+  }
+| a_expr BETWEEN SYMMETRIC b_expr AND a_expr      %prec BETWEEN
+  {
+    $$ = BetweenExpr{Expr: $1, Symmetric: true, Left: $4, Right: $6}
+  }
+| a_expr NOT_LA BETWEEN SYMMETRIC b_expr AND a_expr   %prec NOT_LA
+  {
+    $$ = BetweenExpr{Expr: $1, Not: true, Symmetric: true, Left: $5, Right: $7}
+  }
 /* TODO
-      | a_expr BETWEEN opt_asymmetric b_expr AND a_expr   %prec BETWEEN
-      | a_expr NOT_LA BETWEEN opt_asymmetric b_expr AND a_expr %prec NOT_LA
-      | a_expr BETWEEN SYMMETRIC b_expr AND a_expr      %prec BETWEEN
-      | a_expr NOT_LA BETWEEN SYMMETRIC b_expr AND a_expr   %prec NOT_LA
       | a_expr IN_P in_expr
       | a_expr NOT_LA IN_P in_expr            %prec NOT_LA
       | a_expr subquery_Op sub_type select_with_parens  %prec Op
       | a_expr subquery_Op sub_type '(' a_expr ')'    %prec Op
       | a_expr IS DOCUMENT_P          %prec IS
       | a_expr IS NOT DOCUMENT_P        %prec IS
+*/
+
+/*
+ * Restricted expressions
+ *
+ * b_expr is a subset of the complete expression syntax defined by a_expr.
+ *
+ * Presently, AND, NOT, IS, and IN are the a_expr keywords that would
+ * cause trouble in the places where b_expr is used.  For simplicity, we
+ * just eliminate all the boolean-keyword-operator productions from b_expr.
+ */
+b_expr:
+  c_expr
+  {
+    $$ = $1
+  }
+/* TODO
+      | b_expr TYPECAST Typename
+        { $$ = makeTypeCast($1, $3, @2); }
+      | '+' b_expr          %prec UMINUS
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "+", NULL, $2, @1); }
+      | '-' b_expr          %prec UMINUS
+        { $$ = doNegate($2, @1); }
+      | b_expr '+' b_expr
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "+", $1, $3, @2); }
+      | b_expr '-' b_expr
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "-", $1, $3, @2); }
+      | b_expr '*' b_expr
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "*", $1, $3, @2); }
+      | b_expr '/' b_expr
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "/", $1, $3, @2); }
+      | b_expr '%' b_expr
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "%", $1, $3, @2); }
+      | b_expr '^' b_expr
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "^", $1, $3, @2); }
+      | b_expr '<' b_expr
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "<", $1, $3, @2); }
+      | b_expr '>' b_expr
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, ">", $1, $3, @2); }
+      | b_expr '=' b_expr
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "=", $1, $3, @2); }
+      | b_expr LESS_EQUALS b_expr
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "<=", $1, $3, @2); }
+      | b_expr GREATER_EQUALS b_expr
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, ">=", $1, $3, @2); }
+      | b_expr NOT_EQUALS b_expr
+        { $$ = (Node *) makeSimpleA_Expr(AEXPR_OP, "<>", $1, $3, @2); }
+      | b_expr qual_Op b_expr       %prec Op
+        { $$ = (Node *) makeA_Expr(AEXPR_OP, $2, $1, $3, @2); }
+      | qual_Op b_expr          %prec Op
+        { $$ = (Node *) makeA_Expr(AEXPR_OP, $1, NULL, $2, @1); }
+      | b_expr qual_Op          %prec POSTFIXOP
+        { $$ = (Node *) makeA_Expr(AEXPR_OP, $2, $1, NULL, @2); }
+      | b_expr IS DISTINCT FROM b_expr    %prec IS
+        {
+          $$ = (Node *) makeSimpleA_Expr(AEXPR_DISTINCT, "=", $1, $5, @2);
+        }
+      | b_expr IS NOT DISTINCT FROM b_expr  %prec IS
+        {
+          $$ = makeNotExpr((Node *) makeSimpleA_Expr(AEXPR_DISTINCT,
+                                 "=", $1, $6, @2),
+                   @2);
+        }
+      | b_expr IS OF '(' type_list ')'    %prec IS
+        {
+          $$ = (Node *) makeSimpleA_Expr(AEXPR_OF, "=", $1, (Node *) $5, @2);
+        }
+      | b_expr IS NOT OF '(' type_list ')'  %prec IS
+        {
+          $$ = (Node *) makeSimpleA_Expr(AEXPR_OF, "<>", $1, (Node *) $6, @2);
+        }
+      | b_expr IS DOCUMENT_P          %prec IS
+        {
+          $$ = makeXmlExpr(IS_DOCUMENT, NULL, NIL,
+                   list_make1($1), @2);
+        }
+      | b_expr IS NOT DOCUMENT_P        %prec IS
+        {
+          $$ = makeNotExpr(makeXmlExpr(IS_DOCUMENT, NULL, NIL,
+                         list_make1($1), @2),
+                   @2);
+        }
 */
 
 /*
@@ -1860,6 +1955,16 @@ opt_indirection:
     } else {
       $$ = Indirection{$2}
     }
+  }
+
+opt_asymmetric:
+  ASYMMETRIC
+  {
+    $$ = nil
+  }
+| /*EMPTY*/
+  {
+    $$ = nil
   }
 
 /*

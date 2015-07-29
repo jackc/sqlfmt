@@ -122,6 +122,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "cast_as.sql"},
 		{inputFile: "func_expr_expr_list.sql"},
 		{inputFile: "is_of_type_list.sql"},
+		{inputFile: "between.sql"},
 	}
 
 	for i, tt := range tests {

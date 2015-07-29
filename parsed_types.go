@@ -210,6 +210,38 @@ func (w WhenClause) RenderTo(r Renderer) {
 	r.Unindent()
 }
 
+type BetweenExpr struct {
+	Expr      Expr
+	Not       bool
+	Symmetric bool
+	Left      Expr
+	Right     Expr
+}
+
+func (b BetweenExpr) RenderTo(r Renderer) {
+	b.Expr.RenderTo(r)
+	r.Space()
+
+	if b.Not {
+		r.Text("not", "keyword")
+		r.Space()
+	}
+
+	r.Text("between", "keyword")
+	r.Space()
+
+	if b.Symmetric {
+		r.Text("symmetric", "keyword")
+		r.Space()
+	}
+
+	b.Left.RenderTo(r)
+	r.Space()
+	r.Text("and", "keyword")
+	r.Space()
+	b.Right.RenderTo(r)
+}
+
 type CaseExpr struct {
 	CaseArg     Expr
 	WhenClauses []WhenClause
