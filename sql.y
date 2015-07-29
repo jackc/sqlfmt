@@ -25,6 +25,7 @@ package sqlfmt
   whenClauses []WhenClause
   whenClause WhenClause
   pgType PgType
+  pgTypes []PgType
   valuesRow ValuesRow
   valuesClause ValuesClause
   funcApplication FuncApplication
@@ -145,6 +146,7 @@ package sqlfmt
   func_name
 
 %type <pgType> GenericType Numeric Typename SimpleTypename
+%type <pgTypes> type_list
 %type <optArrayBounds> opt_array_bounds
 
 
@@ -827,9 +829,15 @@ a_expr:
   {
     $$ = BinaryExpr{Left: $1, Operator: "is not distinct from", Right: $6}
   }
+| a_expr IS OF '(' type_list ')'      %prec IS
+  {
+    $$ = IsOfExpr{Expr: $1, Types: $5}
+  }
+| a_expr IS NOT OF '(' type_list ')'    %prec IS
+  {
+    $$ = IsOfExpr{Expr: $1, Not: true, Types: $6}
+  }
 /* TODO
-      | a_expr IS OF '(' type_list ')'      %prec IS
-      | a_expr IS NOT OF '(' type_list ')'    %prec IS
       | a_expr BETWEEN opt_asymmetric b_expr AND a_expr   %prec BETWEEN
       | a_expr NOT_LA BETWEEN opt_asymmetric b_expr AND a_expr %prec NOT_LA
       | a_expr BETWEEN SYMMETRIC b_expr AND a_expr      %prec BETWEEN
@@ -1107,6 +1115,16 @@ func_arg_expr:
 | param_name EQUALS_GREATER a_expr
   {
     $$ = FuncArg{Name: $1, NameOp: "=>", Expr: $3}
+  }
+
+type_list:
+  Typename
+  {
+    $$ = []PgType{$1}
+  }
+| type_list ',' Typename
+  {
+    $$ = append($1, $3)
   }
 
 array_expr:

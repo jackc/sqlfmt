@@ -644,6 +644,39 @@ func (cf CastFunc) RenderTo(r Renderer) {
 	r.Text(")", "rparen")
 }
 
+type IsOfExpr struct {
+	Expr  Expr
+	Not   bool
+	Types []PgType
+}
+
+func (io IsOfExpr) RenderTo(r Renderer) {
+	io.Expr.RenderTo(r)
+	r.Space()
+	r.Text("is", "keyword")
+	r.Space()
+
+	if io.Not {
+		r.Text("not", "keyword")
+		r.Space()
+	}
+
+	r.Text("of", "keyword")
+	r.Space()
+	r.Text("(", "lparen")
+
+	for i, t := range io.Types {
+		t.RenderTo(r)
+
+		if i < len(io.Types)-1 {
+			r.Text(",", "comma")
+			r.Space()
+		}
+	}
+
+	r.Text(")", "rparen")
+}
+
 type FilterClause struct {
 	Expr
 }
