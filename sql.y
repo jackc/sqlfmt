@@ -67,11 +67,12 @@ package sqlfmt
 %type <orderClause> opt_sort_clause sort_clause sortby_list
 %type <str> opt_asc_desc opt_nulls_order
 %type <placeholder> into_clause
-  opt_type_modifiers
   row_or_rows
   first_or_next
   within_group_clause
   opt_asymmetric
+
+%type <fields> opt_type_modifiers
 
 %type <filterClause> filter_clause
 
@@ -554,13 +555,11 @@ Numeric:
     $$->typmods = $2;
     $$->location = @1;
   }
+*/
 | NUMERIC opt_type_modifiers
   {
-    $$ = SystemTypeName("numeric");
-    $$->typmods = $2;
-    $$->location = @1;
+    $$ = PgType{Name: "numeric", TypeMods: $2}
   }
-*/
 | BOOLEAN_P
   {
     $$ = PgType{Name: "bool"}

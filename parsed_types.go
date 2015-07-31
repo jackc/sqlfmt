@@ -19,6 +19,7 @@ type Expr interface {
 type PgType struct {
 	Name        string
 	ArrayBounds []IntegerLiteral
+	TypeMods    []Expr
 }
 
 func (t PgType) RenderTo(r Renderer) {
@@ -27,6 +28,18 @@ func (t PgType) RenderTo(r Renderer) {
 		r.Text("[", "lbracket")
 		r.Text(string(ab), "integerLiteral")
 		r.Text("]", "lbracket")
+	}
+
+	if len(t.TypeMods) > 0 {
+		r.Text("(", "lparen")
+		for i, e := range t.TypeMods {
+			e.RenderTo(r)
+			if i < len(t.TypeMods)-1 {
+				r.Text(",", "comma")
+				r.Space()
+			}
+		}
+		r.Text(")", "rparen")
 	}
 }
 
