@@ -543,19 +543,15 @@ Numeric:
     $$ = SystemTypeName("float8");
     $$->location = @1;
   }
+*/
 | DECIMAL_P opt_type_modifiers
   {
-    $$ = SystemTypeName("numeric");
-    $$->typmods = $2;
-    $$->location = @1;
+    $$ = PgType{Name: "decimal", TypeMods: $2}
   }
 | DEC opt_type_modifiers
   {
-    $$ = SystemTypeName("numeric");
-    $$->typmods = $2;
-    $$->location = @1;
+    $$ = PgType{Name: "dec", TypeMods: $2}
   }
-*/
 | NUMERIC opt_type_modifiers
   {
     $$ = PgType{Name: "numeric", TypeMods: $2}

@@ -147,7 +147,7 @@ func TestIntegration(t *testing.T) {
 		lexer := sqlfmt.NewSqlLexer(string(input))
 		stmt, err := sqlfmt.Parse(lexer)
 		if err != nil {
-			t.Errorf("%d. %v", i, err)
+			t.Errorf("%d. Given %s, %v", i, tt.inputFile, err)
 			continue
 		}
 
