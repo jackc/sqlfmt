@@ -110,7 +110,7 @@ package sqlfmt
 %type <boolean> all_or_distinct
 
 %type <expr>  SignedIconst Sconst AexprConst
-%type <iconst> Iconst
+%type <iconst> Iconst opt_float
 
 %type <expr> case_expr case_arg case_default
 %type <whenClauses> when_clause_list
@@ -532,12 +532,14 @@ Numeric:
   {
     $$ = PgType{Name: "real"}
   }
-/* TODO
 | FLOAT_P opt_float
   {
-    $$ = $2;
-    $$->location = @1;
+    $$ = PgType{Name: "float"}
+    if $2 != IntegerLiteral("") {
+      $$.TypeMods = []Expr{$2}
+    }
   }
+/* TODO
 | DOUBLE_P PRECISION
   {
     $$ = SystemTypeName("float8");
@@ -561,8 +563,16 @@ Numeric:
     $$ = PgType{Name: "bool"}
   }
 
+opt_float:
+  '(' Iconst ')'
+  {
+    $$ = $2
+  }
+| /*EMPTY*/
+  {
+    $$ = IntegerLiteral("")
+  }
 /* TODO
-opt_float
 Bit
 ConstBit
 BitWithLength
