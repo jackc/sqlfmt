@@ -1093,3 +1093,11 @@ func (e ExistsExpr) RenderTo(r Renderer) {
 
 	SelectStmt(e).RenderTo(r)
 }
+
+type ArraySubselect SelectStmt
+
+func (a ArraySubselect) RenderTo(r Renderer) {
+	r.Text("array", "keyword")
+
+	SelectStmt(a).RenderTo(r)
+}

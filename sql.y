@@ -1012,9 +1012,10 @@ c_expr:
   {
     $$ = ExistsExpr(*$2)
   }
-/* TODO
 | ARRAY select_with_parens
-*/
+  {
+    $$ = ArraySubselect(*$2)
+  }
 | ARRAY array_expr {
   $$ = ArrayConstructorExpr($2)
 }

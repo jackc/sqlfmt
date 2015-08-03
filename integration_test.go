@@ -119,6 +119,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "array_index.sql"},
 		{inputFile: "array_slice.sql"},
 		{inputFile: "array_typecast.sql"},
+		{inputFile: "array_subselect.sql"},
 		{inputFile: "cast_as.sql"},
 		{inputFile: "func_expr_expr_list.sql"},
 		{inputFile: "is_of_type_list.sql"},
