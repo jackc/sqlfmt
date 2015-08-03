@@ -539,13 +539,10 @@ Numeric:
       $$.TypeMods = []Expr{$2}
     }
   }
-/* TODO
 | DOUBLE_P PRECISION
   {
-    $$ = SystemTypeName("float8");
-    $$->location = @1;
+    $$ = PgType{Name: "double precision"}
   }
-*/
 | DECIMAL_P opt_type_modifiers
   {
     $$ = PgType{Name: "decimal", TypeMods: $2}
