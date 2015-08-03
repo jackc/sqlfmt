@@ -1005,9 +1005,11 @@ c_expr:
   {
     $$ = $1
   }
-/* TODO
 | select_with_parens indirection
-*/
+  {
+    $1.ParenWrapped = false
+    $$ = ParenExpr{Expr: $1, Indirection: $2}
+  }
 | EXISTS select_with_parens
   {
     $$ = ExistsExpr(*$2)
