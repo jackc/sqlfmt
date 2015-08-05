@@ -492,10 +492,9 @@ ConstTypename:
  * constants for them.
  */
 GenericType:
-  /* TODO -- something with opt_type_modifiers */
   type_function_name opt_type_modifiers
   {
-    $$ = PgType{Name: $1}
+    $$ = PgType{Name: $1, TypeMods: $2}
   }
 /* TODO
 | type_function_name attrs opt_type_modifiers
