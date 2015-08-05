@@ -205,6 +205,17 @@ func (e UnaryExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
 }
 
+type PostfixExpr struct {
+	Expr     Expr
+	Operator string
+}
+
+func (e PostfixExpr) RenderTo(r Renderer) {
+	e.Expr.RenderTo(r)
+	r.Space()
+	r.Text(e.Operator, "operator")
+}
+
 type WhenClause struct {
 	When Expr
 	Then Expr

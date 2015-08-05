@@ -704,9 +704,10 @@ a_expr:
   {
     $$ = UnaryExpr{Operator: $1, Expr: $2}
   }
-/* TODO
-      | a_expr qual_Op          %prec POSTFIXOP
-*/
+| a_expr qual_Op          %prec POSTFIXOP
+  {
+    $$ = PostfixExpr{Expr: $1, Operator: $2}
+  }
 | a_expr AND a_expr
   {
     $$ = BooleanExpr{Left: $1, Operator: "and", Right: $3}

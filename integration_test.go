@@ -125,6 +125,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "is_of_type_list.sql"},
 		{inputFile: "between.sql"},
 		{inputFile: "custom_operators.sql"},
+		{inputFile: "postfix_operator.sql"},
 		{inputFile: "b_expr.sql"}, // b_expr is duplicated subset of a_expr -- test its clauses
 	}
 
