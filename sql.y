@@ -947,9 +947,10 @@ b_expr:
   {
     $$ = UnaryExpr{Operator: $1, Expr: $2}
   }
-/* TODO
 | b_expr qual_Op          %prec POSTFIXOP
-*/
+  {
+    $$ = PostfixExpr{Expr: $1, Operator: $2}
+  }
 | b_expr IS DISTINCT FROM b_expr    %prec IS
   {
     $$ = BinaryExpr{Left: $1, Operator: "is distinct from", Right: $5}
