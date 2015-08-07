@@ -635,6 +635,12 @@ func (lc LockingClause) RenderTo(r Renderer) {
 	}
 }
 
+type FuncExprNoParens string
+
+func (fe FuncExprNoParens) RenderTo(r Renderer) {
+	r.Text(string(fe), "keyword")
+}
+
 type FuncExpr struct {
 	FuncApplication
 	FilterClause *FilterClause

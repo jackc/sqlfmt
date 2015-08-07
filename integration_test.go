@@ -123,6 +123,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "array_subselect.sql"},
 		{inputFile: "cast_as.sql"},
 		{inputFile: "func_expr_expr_list.sql"},
+		{inputFile: "func_expr_no_parens.sql"},
 		{inputFile: "is_of_type_list.sql"},
 		{inputFile: "between.sql"},
 		{inputFile: "custom_operators.sql"},

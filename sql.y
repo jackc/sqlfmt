@@ -1209,22 +1209,63 @@ func_expr:
 func_expr_common_subexpr:
 /* TODO
 COLLATION FOR '(' a_expr ')'
-| CURRENT_DATE
+| */ CURRENT_DATE
+  {
+    $$ = FuncExprNoParens("current_date")
+  }
 | CURRENT_TIME
+  {
+    $$ = FuncExprNoParens("current_time")
+  }
+/* TODO
 | CURRENT_TIME '(' Iconst ')'
+*/
 | CURRENT_TIMESTAMP
+  {
+    $$ = FuncExprNoParens("current_timestamp")
+  }
+/* TODO
 | CURRENT_TIMESTAMP '(' Iconst ')'
+*/
 | LOCALTIME
+  {
+    $$ = FuncExprNoParens("localtime")
+  }
+/* TODO
 | LOCALTIME '(' Iconst ')'
+*/
 | LOCALTIMESTAMP
+  {
+    $$ = FuncExprNoParens("localtimestamp")
+  }
+/* TODO
 | LOCALTIMESTAMP '(' Iconst ')'
+*/
 | CURRENT_ROLE
+  {
+    $$ = FuncExprNoParens("current_role")
+  }
 | CURRENT_USER
+  {
+    $$ = FuncExprNoParens("current_user")
+  }
 | SESSION_USER
+  {
+    $$ = FuncExprNoParens("session_user")
+  }
 | USER
+  {
+    $$ = FuncExprNoParens("user")
+  }
 | CURRENT_CATALOG
+  {
+    $$ = FuncExprNoParens("current_catalog")
+  }
 | CURRENT_SCHEMA
-| */ CAST '(' a_expr AS Typename ')'
+  {
+    $$ = FuncExprNoParens("current_schema")
+  }
+| CAST '(' a_expr AS Typename ')'
   {
     $$ = CastFunc{Expr: $3, Type: $5}
   }
