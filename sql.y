@@ -1217,30 +1217,34 @@ COLLATION FOR '(' a_expr ')'
   {
     $$ = FuncExprNoParens("current_time")
   }
-/* TODO
 | CURRENT_TIME '(' Iconst ')'
-*/
+  {
+    $$ = FuncApplication{Name: "current_time", Args: []FuncArg{{Expr: $3}}}
+  }
 | CURRENT_TIMESTAMP
   {
     $$ = FuncExprNoParens("current_timestamp")
   }
-/* TODO
 | CURRENT_TIMESTAMP '(' Iconst ')'
-*/
+  {
+    $$ = FuncApplication{Name: "current_timestamp", Args: []FuncArg{{Expr: $3}}}
+  }
 | LOCALTIME
   {
     $$ = FuncExprNoParens("localtime")
   }
-/* TODO
 | LOCALTIME '(' Iconst ')'
-*/
+  {
+    $$ = FuncApplication{Name: "localtime", Args: []FuncArg{{Expr: $3}}}
+  }
 | LOCALTIMESTAMP
   {
     $$ = FuncExprNoParens("localtimestamp")
   }
-/* TODO
 | LOCALTIMESTAMP '(' Iconst ')'
-*/
+  {
+    $$ = FuncApplication{Name: "localtimestamp", Args: []FuncArg{{Expr: $3}}}
+  }
 | CURRENT_ROLE
   {
     $$ = FuncExprNoParens("current_role")

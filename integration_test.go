@@ -124,6 +124,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "cast_as.sql"},
 		{inputFile: "func_expr_expr_list.sql"},
 		{inputFile: "func_expr_no_parens.sql"},
+		{inputFile: "func_expr_one_arg.sql"},
 		{inputFile: "is_of_type_list.sql"},
 		{inputFile: "between.sql"},
 		{inputFile: "custom_operators.sql"},
