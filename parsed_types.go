@@ -22,6 +22,7 @@ type PgType struct {
 	ArrayWord   bool
 	ArrayBounds []IntegerLiteral
 	TypeMods    []Expr
+	CharSet     string
 }
 
 func (t PgType) RenderTo(r Renderer) {
@@ -53,6 +54,13 @@ func (t PgType) RenderTo(r Renderer) {
 			}
 		}
 		r.Text(")", "rparen")
+	}
+
+	if t.CharSet != "" {
+		r.Space()
+		r.Text("character set", "keyword")
+		r.Space()
+		r.Text(t.CharSet, "charset")
 	}
 }
 

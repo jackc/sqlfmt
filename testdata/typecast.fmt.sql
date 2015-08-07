@@ -12,6 +12,19 @@ select
   '{123,34}'::int array[4],
   '{123,34}'::setof int array[4],
   '{123,34}'::int array,
-  '{123,34}'::setof int array
+  '{123,34}'::setof int array,
+  'f'::char,
+  'fads'::varchar,
+  'fads'::char(10),
+  'fads'::varchar(10),
+  'f'::char,
+  'fads'::varchar,
+  'fads'::char(10),
+  'fads'::varchar(10),
+  'f'::char,
+  'fads'::varchar,
+  'f'::char,
+  'fads'::char(10),
+  'asdf'::varchar character set sql_text
 from
   baz

@@ -65,7 +65,7 @@ package sqlfmt
 %type <whereClause> where_clause
 %type <orderExpr> sortby
 %type <orderClause> opt_sort_clause sort_clause sortby_list
-%type <str> opt_asc_desc opt_nulls_order
+%type <str> opt_asc_desc opt_nulls_order opt_charset
 %type <placeholder> into_clause
   row_or_rows
   first_or_next
@@ -107,7 +107,7 @@ package sqlfmt
 
 %type <expr> having_clause
 
-%type <boolean> all_or_distinct
+%type <boolean> all_or_distinct opt_varying
 
 %type <expr>  SignedIconst Sconst AexprConst
 %type <iconst> Iconst opt_float
@@ -147,7 +147,16 @@ package sqlfmt
   reserved_keyword
   func_name
 
-%type <pgType> GenericType Numeric Typename SimpleTypename
+%type <pgType>
+  GenericType
+  Numeric
+  Typename
+  SimpleTypename
+  Character
+  CharacterWithLength
+  CharacterWithoutLength
+  character
+
 %type <pgTypes> type_list
 %type <optArrayBounds> opt_array_bounds
 
@@ -466,7 +475,9 @@ SimpleTypename:
 | Numeric          { $$ = $1 }
 /* TODO
 | Bit              { $$ = $1 }
-| Character        { $$ = $1 }
+*/
+| Character
+/* TODO
 | ConstDatetime    { $$ = $1 }
 | ConstInterval opt_interval
   {
@@ -589,13 +600,103 @@ Bit
 ConstBit
 BitWithLength
 BitWithoutLength
-Character
-ConstCharacter
-CharacterWithLength
-CharacterWithoutLength
-character
-opt_varying
-opt_charset
+*/
+/*
+ * SQL character data types
+ * The following implements CHAR() and VARCHAR().
+ */
+Character:
+  CharacterWithLength
+| CharacterWithoutLength
+
+/* TODO
+ConstCharacter:
+  CharacterWithLength
+| CharacterWithoutLength
+*/
+
+CharacterWithLength:
+  character '(' Iconst ')' opt_charset
+  {
+    $$ = $1
+    $$.TypeMods = []Expr{$3}
+    $$.CharSet = $5
+  }
+
+CharacterWithoutLength:
+  character opt_charset
+  {
+    $$ = $1
+    $$.CharSet = $2
+  }
+
+character:
+  CHARACTER opt_varying
+  {
+    if $2 {
+      $$ = PgType{Name: "varchar"}
+    } else {
+      $$ = PgType{Name: "char"}
+    }
+  }
+| CHAR_P opt_varying
+  {
+    if $2 {
+      $$ = PgType{Name: "varchar"}
+    } else {
+      $$ = PgType{Name: "char"}
+    }
+  }
+| VARCHAR
+  {
+    $$ = PgType{Name: "varchar"}
+  }
+| NATIONAL CHARACTER opt_varying
+  {
+    if $3 {
+      $$ = PgType{Name: "varchar"}
+    } else {
+      $$ = PgType{Name: "char"}
+    }
+  }
+| NATIONAL CHAR_P opt_varying
+  {
+    if $3 {
+      $$ = PgType{Name: "varchar"}
+    } else {
+      $$ = PgType{Name: "char"}
+    }
+  }
+| NCHAR opt_varying
+  {
+    if $2 {
+      $$ = PgType{Name: "varchar"}
+    } else {
+      $$ = PgType{Name: "char"}
+    }
+  }
+
+opt_varying:
+  VARYING
+  {
+    $$ = true
+  }
+| /*EMPTY*/
+  {
+    $$ = false
+  }
+
+opt_charset:
+  CHARACTER SET ColId
+  {
+    $$ = $3
+  }
+| /*EMPTY*/
+  {
+    $$ = ""
+  }
+
+/* TODO
 ConstDatetime
 ConstInterval
 opt_timezone
