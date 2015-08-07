@@ -357,6 +357,12 @@ top:
     $$ = $1
     yylex.(*sqlLex).stmt = $1
   }
+| SelectStmt ';'
+  {
+    $$ = $1
+    $$.Semicolon = true
+    yylex.(*sqlLex).stmt = $1
+  }
 
 opt_asc_desc:
   ASC          { $$ = "asc" }

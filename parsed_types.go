@@ -1097,6 +1097,7 @@ type SelectStmt struct {
 	LockingClause *LockingClause
 
 	ParenWrapped bool
+	Semicolon    bool
 }
 
 func (s SelectStmt) RenderTo(r Renderer) {
@@ -1120,6 +1121,11 @@ func (s SelectStmt) RenderTo(r Renderer) {
 
 	if s.ParenWrapped {
 		r.Text(")", "rparen")
+		r.NewLine()
+	}
+
+	if s.Semicolon {
+		r.Text(";", "semicolon")
 		r.NewLine()
 	}
 }

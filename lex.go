@@ -109,7 +109,7 @@ func blankState(l *sqlLex) stateFn {
 	switch r := l.next(); {
 	case r == 0:
 		return nil
-	case r == ',' || r == '.' || r == '(' || r == ')' || r == '[' || r == ']' || r == '%' || r == '^':
+	case r == ',' || r == '.' || r == '(' || r == ')' || r == '[' || r == ']' || r == '%' || r == '^' || r == ';':
 		return lexSimple
 	case r == '\'':
 		return lexStringLiteral

@@ -1,0 +1,5 @@
+select
+  foo
+from
+  bar
+;
