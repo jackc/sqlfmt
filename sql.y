@@ -423,13 +423,31 @@ Typename:
     $$.Setof = true
     $$.ArrayBounds = $3
   }
-      /* SQL standard syntax, currently only one-dimensional */
-/* TODO
-      | SimpleTypename ARRAY '[' Iconst ']'
-      | SETOF SimpleTypename ARRAY '[' Iconst ']'
-      | SimpleTypename ARRAY
-      | SETOF SimpleTypename ARRAY
-*/
+/* SQL standard syntax, currently only one-dimensional */
+| SimpleTypename ARRAY '[' Iconst ']'
+  {
+    $$ = $1
+    $$.ArrayWord = true
+    $$.ArrayBounds = []IntegerLiteral{$4}
+  }
+| SETOF SimpleTypename ARRAY '[' Iconst ']'
+  {
+    $$ = $2
+    $$.Setof = true
+    $$.ArrayWord = true
+    $$.ArrayBounds = []IntegerLiteral{$5}
+  }
+| SimpleTypename ARRAY
+  {
+    $$ = $1
+    $$.ArrayWord = true
+  }
+| SETOF SimpleTypename ARRAY
+  {
+    $$ = $2
+    $$.Setof = true
+    $$.ArrayWord = true
+  }
 
 opt_array_bounds:
   opt_array_bounds '[' ']'
