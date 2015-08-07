@@ -18,11 +18,17 @@ type Expr interface {
 
 type PgType struct {
 	Name        string
+	Setof       bool
 	ArrayBounds []IntegerLiteral
 	TypeMods    []Expr
 }
 
 func (t PgType) RenderTo(r Renderer) {
+	if t.Setof {
+		r.Text("setof", "keyword")
+		r.Space()
+	}
+
 	r.Text(t.Name, "typename")
 	for _, ab := range t.ArrayBounds {
 		r.Text("[", "lbracket")

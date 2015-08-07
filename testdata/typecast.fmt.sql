@@ -7,6 +7,7 @@ select
   '424.234'::dec(8, 3),
   '324.5'::float(20),
   '23.23'::double precision,
-  'asdf'::customtype(3)
+  'asdf'::customtype(3),
+  '1942'::setof int
 from
   baz

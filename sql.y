@@ -417,14 +417,12 @@ Typename:
     $$ = $1
     $$.ArrayBounds = $2
   }
-/* TODO
-      | SETOF SimpleTypename opt_array_bounds
-        {
-          $$ = $2;
-          $$->arrayBounds = $3;
-          $$->setof = TRUE;
-        }
-*/
+| SETOF SimpleTypename opt_array_bounds
+  {
+    $$ = $2
+    $$.Setof = true
+    $$.ArrayBounds = $3
+  }
       /* SQL standard syntax, currently only one-dimensional */
 /* TODO
       | SimpleTypename ARRAY '[' Iconst ']'
