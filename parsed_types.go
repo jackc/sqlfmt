@@ -108,6 +108,12 @@ func (s IntegerLiteral) RenderTo(r Renderer) {
 	r.Text(string(s), "integerLiteral")
 }
 
+type FloatConst string
+
+func (s FloatConst) RenderTo(r Renderer) {
+	r.Text(string(s), "floatConstant")
+}
+
 type BoolLiteral bool
 
 func (b BoolLiteral) RenderTo(r Renderer) {

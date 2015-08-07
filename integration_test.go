@@ -16,6 +16,7 @@ func TestIntegration(t *testing.T) {
 		inputFile          string
 		expectedOutputFile string
 	}{
+		{inputFile: "float_constant.sql"},
 		{inputFile: "simple_select_without_from.sql"},
 		{inputFile: "simple_select_with_from.sql"},
 		{inputFile: "select_from_aliased.sql"},

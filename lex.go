@@ -129,8 +129,16 @@ func blankState(l *sqlLex) stateFn {
 }
 
 func lexNumber(l *sqlLex) stateFn {
+	typ := ICONST
 	l.acceptRunFunc(unicode.IsDigit)
-	t := token{src: l.src[l.start:l.pos], typ: ICONST}
+	r := l.next()
+	if r == '.' {
+		l.acceptRunFunc(unicode.IsDigit)
+		typ = FCONST
+	} else {
+		l.unnext()
+	}
+	t := token{src: l.src[l.start:l.pos], typ: typ}
 	l.append(t)
 	l.start = l.pos
 	return blankState

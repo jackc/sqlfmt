@@ -2169,9 +2169,10 @@ Iconst
   {
     $$ = $1
   }
-/* TODO
 | FCONST
-*/
+  {
+    $$ = FloatConst($1)
+  }
 | Sconst
   {
     $$ = $1
