@@ -2376,9 +2376,36 @@ Iconst
 /* TODO
 | BCONST
 | XCONST
-| func_name Sconst
-| func_name '(' func_arg_list opt_sort_clause ')' Sconst
 */
+| func_name Sconst
+  {
+    $$ = ConstTypeExpr{Typename: PgType{Name: $1}, Expr: $2}
+  }
+| func_name '(' func_arg_list opt_sort_clause ')' Sconst
+  {
+    pgType := PgType{Name: $1}
+
+    /*
+     * We must use func_arg_list and opt_sort_clause in the
+     * production to avoid reduce/reduce conflicts, but we
+     * don't actually wish to allow NamedArgExpr in this
+     * context, nor ORDER BY.
+     */
+
+    for _, arg := range $3 {
+      if arg.Name != "" {
+        yylex.Error("type modifier cannot have parameter name")
+      }
+
+      pgType.TypeMods = append(pgType.TypeMods, Expr(arg))
+    }
+
+    if $4 != nil {
+      yylex.Error("type modifier cannot have ORDER BY")
+    }
+
+    $$ = ConstTypeExpr{Typename: pgType, Expr: $6}
+  }
 | ConstTypename Sconst
   {
     $$ = ConstTypeExpr{Typename: $1, Expr: $2}
