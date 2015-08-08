@@ -156,6 +156,9 @@ package sqlfmt
   CharacterWithLength
   CharacterWithoutLength
   character
+  BitWithLength
+  BitWithoutLength
+  Bit
 
 %type <pgTypes> type_list
 %type <optArrayBounds> opt_array_bounds
@@ -477,11 +480,9 @@ opt_array_bounds:
   {  $$ = nil }
 
 SimpleTypename:
-  GenericType      { $$ = $1 }
-| Numeric          { $$ = $1 }
-/* TODO
-| Bit              { $$ = $1 }
-*/
+  GenericType
+| Numeric
+| Bit
 | Character
 /* TODO
 | ConstDatetime    { $$ = $1 }
@@ -601,12 +602,38 @@ opt_float:
   {
     $$ = IntegerLiteral("")
   }
+
+Bit:
+  BitWithLength
+| BitWithoutLength
+
 /* TODO
-Bit
 ConstBit
-BitWithLength
-BitWithoutLength
 */
+
+BitWithLength:
+  BIT opt_varying '(' expr_list ')'
+  {
+    $$ = PgType{}
+    if $2 {
+      $$.Name = "varbit"
+    } else {
+      $$.Name = "bit"
+    }
+    $$.TypeMods = $4
+  }
+
+BitWithoutLength:
+  BIT opt_varying
+  {
+    $$ = PgType{}
+    if $2 {
+      $$ = PgType{Name: "varbit"}
+    } else {
+      $$ = PgType{Name: "bit"}
+    }
+  }
+
 /*
  * SQL character data types
  * The following implements CHAR() and VARCHAR().
