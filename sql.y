@@ -159,6 +159,9 @@ package sqlfmt
   BitWithLength
   BitWithoutLength
   Bit
+  ConstTypename
+  ConstBit
+  ConstCharacter
 
 %type <pgTypes> type_list
 %type <optArrayBounds> opt_array_bounds
@@ -510,11 +513,11 @@ SimpleTypename:
  * the generic-type-name case in AExprConst to avoid premature
  * reduce/reduce conflicts against function names.
  */
-/* TODO
 ConstTypename:
-      Numeric                 { $$ = $1; }
-      | ConstBit                { $$ = $1; }
-      | ConstCharacter            { $$ = $1; }
+  Numeric
+  | ConstBit
+  | ConstCharacter
+/* TODO
       | ConstDatetime             { $$ = $1; }
 */
 
@@ -607,9 +610,9 @@ Bit:
   BitWithLength
 | BitWithoutLength
 
-/* TODO
-ConstBit
-*/
+ConstBit:
+  BitWithLength
+| BitWithoutLength
 
 BitWithLength:
   BIT opt_varying '(' expr_list ')'
@@ -642,11 +645,9 @@ Character:
   CharacterWithLength
 | CharacterWithoutLength
 
-/* TODO
 ConstCharacter:
   CharacterWithLength
 | CharacterWithoutLength
-*/
 
 CharacterWithLength:
   character '(' Iconst ')' opt_charset
@@ -2377,7 +2378,12 @@ Iconst
 | XCONST
 | func_name Sconst
 | func_name '(' func_arg_list opt_sort_clause ')' Sconst
+*/
 | ConstTypename Sconst
+  {
+    $$ = ConstTypeExpr{Typename: $1, Expr: $2}
+  }
+/* TODO
 | ConstInterval Sconst opt_interval
 | ConstInterval '(' Iconst ')' Sconst
 */

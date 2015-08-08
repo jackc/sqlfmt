@@ -86,6 +86,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "case_full.sql"},
 		{inputFile: "case_implicit.sql"},
 		{inputFile: "typecast.sql"},
+		{inputFile: "const_type_name.sql"},
 		{inputFile: "unary.sql"},
 		{inputFile: "values.sql"},
 		{inputFile: "values_order.sql"},

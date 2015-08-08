@@ -351,6 +351,17 @@ func (t TypecastExpr) RenderTo(r Renderer) {
 	t.Typename.RenderTo(r)
 }
 
+type ConstTypeExpr struct {
+	Typename PgType
+	Expr     Expr
+}
+
+func (t ConstTypeExpr) RenderTo(r Renderer) {
+	t.Typename.RenderTo(r)
+	r.Space()
+	t.Expr.RenderTo(r)
+}
+
 type CollateExpr struct {
 	Expr      Expr
 	Collation AnyName
