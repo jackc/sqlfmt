@@ -1,1 +1,1 @@
-select foo @> bar, @foo
+select foo @> bar, @foo, 'foo' || 'bar'
