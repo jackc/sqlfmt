@@ -109,12 +109,14 @@ func blankState(l *sqlLex) stateFn {
 	switch r := l.next(); {
 	case r == 0:
 		return nil
-	case r == ',' || r == '.' || r == '(' || r == ')' || r == '[' || r == ']' || r == '%' || r == '^' || r == ';':
+	case r == ',' || r == '(' || r == ')' || r == '[' || r == ']' || r == ';':
 		return lexSimple
 	case r == '\'':
 		return lexStringLiteral
 	case r == '"':
 		return lexQuotedIdentifier
+	case r == ':' || r == '.':
+		return lexAlmostOperator
 	case isOperator(r):
 		return lexOperator
 	case unicode.IsDigit(r):
@@ -204,6 +206,29 @@ func lexQuotedIdentifier(l *sqlLex) stateFn {
 	}
 }
 
+// lexAlmostOperator is for operator-like ':' and '.' which aren't operators
+func lexAlmostOperator(l *sqlLex) stateFn {
+	l.next()
+
+	t := token{src: l.src[l.start:l.pos]}
+	switch {
+	case t.src == "::":
+		t.typ = TYPECAST
+	case t.src == "..":
+		t.typ = DOT_DOT
+	case t.src == ":=":
+		t.typ = COLON_EQUALS
+	default:
+		l.unnext()
+		t.typ = int(t.src[0])
+	}
+	t.src = l.src[l.start:l.pos]
+
+	l.append(t)
+	l.start = l.pos
+	return blankState
+}
+
 func lexOperator(l *sqlLex) stateFn {
 	l.acceptRunFunc(isOperator)
 
@@ -211,12 +236,6 @@ func lexOperator(l *sqlLex) stateFn {
 	switch {
 	case t.src == "+" || t.src == "-" || t.src == "*" || t.src == "/" || t.src == "%" || t.src == "^" || t.src == "<" || t.src == ">" || t.src == "=" || t.src == "[" || t.src == "]" || t.src == ":":
 		t.typ = int(t.src[0])
-	case t.src == "::":
-		t.typ = TYPECAST
-	case t.src == "..":
-		t.typ = DOT_DOT
-	case t.src == ":=":
-		t.typ = COLON_EQUALS
 	case t.src == "=>":
 		t.typ = EQUALS_GREATER
 	case t.src == "<=":
@@ -260,7 +279,8 @@ func isAlphanumeric(r rune) bool {
 	return r == '_' || unicode.In(r, unicode.Letter, unicode.Digit)
 }
 
-// TODO - ensure this is complete list of operator characters
 func isOperator(r rune) bool {
-	return r == '+' || r == '-' || r == '*' || r == '/' || r == '=' || r == '<' || r == '>' || r == '!' || r == ':' || r == '@' || r == '%' || r == '|'
+	// list of operator characters from
+	// http://www.postgresql.org/docs/9.4/static/sql-createoperator.html
+	return strings.IndexRune("+-*/<>=~!@#%^&|`?", r) != -1
 }
