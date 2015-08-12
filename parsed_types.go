@@ -17,12 +17,13 @@ type Expr interface {
 }
 
 type PgType struct {
-	Name        string
-	Setof       bool
-	ArrayWord   bool
-	ArrayBounds []IntegerLiteral
-	TypeMods    []Expr
-	CharSet     string
+	Name         string
+	Setof        bool
+	ArrayWord    bool
+	ArrayBounds  []IntegerLiteral
+	TypeMods     []Expr
+	CharSet      string
+	WithTimeZone bool
 }
 
 func (t PgType) RenderTo(r Renderer) {
@@ -54,6 +55,11 @@ func (t PgType) RenderTo(r Renderer) {
 			}
 		}
 		r.Text(")", "rparen")
+	}
+
+	if t.WithTimeZone {
+		r.Space()
+		r.Text("with time zone", "keyword")
 	}
 
 	if t.CharSet != "" {

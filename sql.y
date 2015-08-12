@@ -107,7 +107,7 @@ package sqlfmt
 
 %type <expr> having_clause
 
-%type <boolean> all_or_distinct opt_varying
+%type <boolean> all_or_distinct opt_varying opt_timezone
 
 %type <expr>  SignedIconst Sconst AexprConst
 %type <iconst> Iconst opt_float
@@ -162,6 +162,7 @@ package sqlfmt
   ConstTypename
   ConstBit
   ConstCharacter
+  ConstDatetime
 
 %type <pgTypes> type_list
 %type <optArrayBounds> opt_array_bounds
@@ -487,8 +488,8 @@ SimpleTypename:
 | Numeric
 | Bit
 | Character
+| ConstDatetime
 /* TODO
-| ConstDatetime    { $$ = $1 }
 | ConstInterval opt_interval
   {
     $$ = $1;
@@ -517,9 +518,7 @@ ConstTypename:
   Numeric
   | ConstBit
   | ConstCharacter
-/* TODO
-      | ConstDatetime             { $$ = $1; }
-*/
+  | ConstDatetime
 
 /*
  * GenericType covers all type names that don't have special syntax mandated
@@ -730,10 +729,46 @@ opt_charset:
     $$ = ""
   }
 
+/*
+ * SQL date/time types
+ */
+ConstDatetime:
+  TIMESTAMP '(' Iconst ')' opt_timezone
+  {
+    $$ = PgType{Name: "timestamp", TypeMods: []Expr{$3}, WithTimeZone: $5}
+  }
+| TIMESTAMP opt_timezone
+  {
+    $$ = PgType{Name: "timestamp", WithTimeZone: $2}
+  }
+| TIME '(' Iconst ')' opt_timezone
+  {
+    $$ = PgType{Name: "time", TypeMods: []Expr{$3}, WithTimeZone: $5}
+  }
+| TIME opt_timezone
+  {
+    $$ = PgType{Name: "time", WithTimeZone: $2}
+  }
+
 /* TODO
-ConstDatetime
 ConstInterval
-opt_timezone
+*/
+
+opt_timezone:
+  WITH_LA TIME ZONE
+  {
+    $$ = true
+  }
+| WITHOUT TIME ZONE
+  {
+    $$ = false
+  }
+| /*EMPTY*/
+  {
+    $$ = false
+  }
+
+/* TODO
 opt_interval
 interval_second
 */
