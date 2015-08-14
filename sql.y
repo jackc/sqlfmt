@@ -26,6 +26,7 @@ package sqlfmt
   whenClause WhenClause
   pgType PgType
   pgTypes []PgType
+  row Row
   valuesRow ValuesRow
   valuesClause ValuesClause
   funcApplication FuncApplication
@@ -118,6 +119,7 @@ package sqlfmt
 
 %type <expr> ctext_expr
 %type <valuesRow> ctext_expr_list ctext_row
+%type <row> row explicit_row implicit_row
 
 %type <funcApplication> func_application
 %type <funcArgs> func_arg_list
@@ -983,9 +985,10 @@ a_expr:
   {
     $$ = IsNullExpr{Expr: $1, Not: true}
   }
-/* TODO
-      | row OVERLAPS row
-*/
+| row OVERLAPS row
+  {
+    $$ = BinaryExpr{Left: $1, Operator: "overlaps", Right: $3}
+  }
 | a_expr IS TRUE_P              %prec IS
   {
     $$ = IsBoolOpExpr{Expr: $1, Op: "true"}
@@ -1208,9 +1211,15 @@ c_expr:
 | ARRAY array_expr {
   $$ = ArrayConstructorExpr($2)
 }
-/* TODO
 | explicit_row
+  {
+    $$ = $1
+  }
 | implicit_row
+  {
+    $$ = $1
+  }
+/* TODO
 | GROUPING '(' expr_list ')'
 */
 
@@ -2115,6 +2124,44 @@ filter_clause:
     $$ = &FilterClause{Expr: $4}
   }
 | /*EMPTY*/ { $$ = nil }
+
+
+
+/* Explicit row production.
+ *
+ * SQL99 allows an optional ROW keyword, so we can now do single-element rows
+ * without conflicting with the parenthesized a_expr production.  Without the
+ * ROW keyword, there must be more than one a_expr inside the parens.
+ */
+row:
+  ROW '(' expr_list ')'
+  {
+    $$ = Row{RowWord: true, Exprs: $3}
+  }
+| ROW '(' ')'
+  {
+    $$ = Row{RowWord: true, Exprs: nil}
+  }
+| '(' expr_list ',' a_expr ')'
+  {
+    $$ = Row{Exprs: append($2, $4)}
+  }
+
+explicit_row:
+  ROW '(' expr_list ')'
+  {
+    $$ = Row{RowWord: true, Exprs: $3}
+  }
+| ROW '(' ')'
+  {
+    $$ = Row{RowWord: true, Exprs: nil}
+  }
+
+implicit_row:
+  '(' expr_list ',' a_expr ')'
+  {
+    $$ = Row{Exprs: append($2, $4)}
+  }
 
 
 all_Op:

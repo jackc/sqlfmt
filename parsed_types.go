@@ -803,6 +803,30 @@ func (d DefaultExpr) RenderTo(r Renderer) {
 	r.Text("default", "keyword")
 }
 
+type Row struct {
+	RowWord bool
+	Exprs   []Expr
+}
+
+func (row Row) RenderTo(r Renderer) {
+	if row.RowWord {
+		r.Text("row", "keyword")
+		r.Space()
+	}
+
+	r.Text("(", "lparen")
+
+	for i, e := range row.Exprs {
+		e.RenderTo(r)
+		if i < len(row.Exprs)-1 {
+			r.Text(",", "comma")
+			r.Space()
+		}
+	}
+
+	r.Text(")", "rparen")
+}
+
 type ValuesRow []Expr
 
 func (vr ValuesRow) RenderTo(r Renderer) {

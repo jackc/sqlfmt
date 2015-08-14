@@ -132,6 +132,8 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "postfix_operator.sql"},
 		{inputFile: "b_expr.sql"}, // b_expr is duplicated subset of a_expr -- test its clauses
 		{inputFile: "semicolon.sql"},
+		{inputFile: "row.sql"},
+		{inputFile: "overlaps.sql"},
 	}
 
 	for i, tt := range tests {
