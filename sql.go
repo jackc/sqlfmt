@@ -952,7 +952,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line sql.y:3089
+//line sql.y:3091
 
 // The parser expects the lexer to return 0 on EOF.  Give it a name
 // for clarity.
@@ -4498,178 +4498,178 @@ yydefault:
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 180:
-		//line sql.y:1252
+		//line sql.y:1254
 		{
 			yyVAL.expr = ParenExpr{Expr: yyS[yypt-2].expr, Indirection: yyS[yypt-0].indirection}
 		}
 	case 181:
-		//line sql.y:1255
+		//line sql.y:1257
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 182:
-		//line sql.y:1256
+		//line sql.y:1258
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 183:
-		//line sql.y:1258
+		//line sql.y:1260
 		{
 			yyVAL.expr = yyS[yypt-0].sqlSelect
 		}
 	case 184:
-		//line sql.y:1262
+		//line sql.y:1264
 		{
 			yyS[yypt-1].sqlSelect.ParenWrapped = false
 			yyVAL.expr = ParenExpr{Expr: yyS[yypt-1].sqlSelect, Indirection: yyS[yypt-0].indirection}
 		}
 	case 185:
-		//line sql.y:1267
+		//line sql.y:1269
 		{
 			yyVAL.expr = ExistsExpr(*yyS[yypt-0].sqlSelect)
 		}
 	case 186:
-		//line sql.y:1271
+		//line sql.y:1273
 		{
 			yyVAL.expr = ArraySubselect(*yyS[yypt-0].sqlSelect)
 		}
 	case 187:
-		//line sql.y:1274
+		//line sql.y:1276
 		{
 			yyVAL.expr = ArrayConstructorExpr(yyS[yypt-0].arrayExpr)
 		}
 	case 188:
-		//line sql.y:1278
+		//line sql.y:1280
 		{
 			yyVAL.expr = yyS[yypt-0].row
 		}
 	case 189:
-		//line sql.y:1282
+		//line sql.y:1284
 		{
 			yyVAL.expr = yyS[yypt-0].row
 		}
 	case 190:
-		//line sql.y:1293
+		//line sql.y:1295
 		{
 			yyVAL.funcApplication = FuncApplication{Name: yyS[yypt-2].str}
 		}
 	case 191:
-		//line sql.y:1297
+		//line sql.y:1299
 		{
 			yyVAL.funcApplication = FuncApplication{Name: yyS[yypt-4].str, Args: yyS[yypt-2].funcArgs, OrderClause: yyS[yypt-1].orderClause}
 		}
 	case 192:
-		//line sql.y:1305
+		//line sql.y:1307
 		{
 			yyVAL.funcApplication = FuncApplication{Name: yyS[yypt-5].str, Args: yyS[yypt-2].funcArgs, OrderClause: yyS[yypt-1].orderClause}
 		}
 	case 193:
-		//line sql.y:1309
+		//line sql.y:1311
 		{
 			yyVAL.funcApplication = FuncApplication{Name: yyS[yypt-5].str, Distinct: true, Args: yyS[yypt-2].funcArgs, OrderClause: yyS[yypt-1].orderClause}
 		}
 	case 194:
-		//line sql.y:1313
+		//line sql.y:1315
 		{
 			yyVAL.funcApplication = FuncApplication{Name: yyS[yypt-3].str, Star: true}
 		}
 	case 195:
-		//line sql.y:1329
+		//line sql.y:1331
 		{
 			yyVAL.expr = &FuncExpr{FuncApplication: yyS[yypt-2].funcApplication, FilterClause: yyS[yypt-1].filterClause, OverClause: yyS[yypt-0].overClause}
 		}
 	case 196:
-		//line sql.y:1333
+		//line sql.y:1335
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 197:
-		//line sql.y:1346
+		//line sql.y:1348
 		{
 			yyVAL.expr = FuncApplication{Name: "collation for", Args: []FuncArg{{Expr: yyS[yypt-1].expr}}}
 		}
 	case 198:
-		//line sql.y:1350
+		//line sql.y:1352
 		{
 			yyVAL.expr = FuncExprNoParens("current_date")
 		}
 	case 199:
-		//line sql.y:1354
+		//line sql.y:1356
 		{
 			yyVAL.expr = FuncExprNoParens("current_time")
 		}
 	case 200:
-		//line sql.y:1358
+		//line sql.y:1360
 		{
 			yyVAL.expr = FuncApplication{Name: "current_time", Args: []FuncArg{{Expr: yyS[yypt-1].iconst}}}
 		}
 	case 201:
-		//line sql.y:1362
+		//line sql.y:1364
 		{
 			yyVAL.expr = FuncExprNoParens("current_timestamp")
 		}
 	case 202:
-		//line sql.y:1366
+		//line sql.y:1368
 		{
 			yyVAL.expr = FuncApplication{Name: "current_timestamp", Args: []FuncArg{{Expr: yyS[yypt-1].iconst}}}
 		}
 	case 203:
-		//line sql.y:1370
+		//line sql.y:1372
 		{
 			yyVAL.expr = FuncExprNoParens("localtime")
 		}
 	case 204:
-		//line sql.y:1374
+		//line sql.y:1376
 		{
 			yyVAL.expr = FuncApplication{Name: "localtime", Args: []FuncArg{{Expr: yyS[yypt-1].iconst}}}
 		}
 	case 205:
-		//line sql.y:1378
+		//line sql.y:1380
 		{
 			yyVAL.expr = FuncExprNoParens("localtimestamp")
 		}
 	case 206:
-		//line sql.y:1382
+		//line sql.y:1384
 		{
 			yyVAL.expr = FuncApplication{Name: "localtimestamp", Args: []FuncArg{{Expr: yyS[yypt-1].iconst}}}
 		}
 	case 207:
-		//line sql.y:1386
+		//line sql.y:1388
 		{
 			yyVAL.expr = FuncExprNoParens("current_role")
 		}
 	case 208:
-		//line sql.y:1390
+		//line sql.y:1392
 		{
 			yyVAL.expr = FuncExprNoParens("current_user")
 		}
 	case 209:
-		//line sql.y:1394
+		//line sql.y:1396
 		{
 			yyVAL.expr = FuncExprNoParens("session_user")
 		}
 	case 210:
-		//line sql.y:1398
+		//line sql.y:1400
 		{
 			yyVAL.expr = FuncExprNoParens("user")
 		}
 	case 211:
-		//line sql.y:1402
+		//line sql.y:1404
 		{
 			yyVAL.expr = FuncExprNoParens("current_catalog")
 		}
 	case 212:
-		//line sql.y:1406
+		//line sql.y:1408
 		{
 			yyVAL.expr = FuncExprNoParens("current_schema")
 		}
 	case 213:
-		//line sql.y:1410
+		//line sql.y:1412
 		{
 			yyVAL.expr = CastFunc{Expr: yyS[yypt-3].expr, Type: yyS[yypt-1].pgType}
 		}
 	case 214:
-		//line sql.y:1426
+		//line sql.y:1428
 		{
 			fa := FuncApplication{Name: "coalesce"}
 			for _, e := range yyS[yypt-1].fields {
@@ -4678,7 +4678,7 @@ yydefault:
 			yyVAL.expr = fa
 		}
 	case 215:
-		//line sql.y:1434
+		//line sql.y:1436
 		{
 			fa := FuncApplication{Name: "greatest"}
 			for _, e := range yyS[yypt-1].fields {
@@ -4687,7 +4687,7 @@ yydefault:
 			yyVAL.expr = fa
 		}
 	case 216:
-		//line sql.y:1442
+		//line sql.y:1444
 		{
 			fa := FuncApplication{Name: "least"}
 			for _, e := range yyS[yypt-1].fields {
@@ -4696,7 +4696,7 @@ yydefault:
 			yyVAL.expr = fa
 		}
 	case 217:
-		//line sql.y:1450
+		//line sql.y:1452
 		{
 			fa := FuncApplication{Name: "xmlconcat"}
 			for _, e := range yyS[yypt-1].fields {
@@ -4705,137 +4705,137 @@ yydefault:
 			yyVAL.expr = fa
 		}
 	case 218:
-		//line sql.y:1476
+		//line sql.y:1478
 		{
 			yyVAL.identifiers = []string{yyS[yypt-0].str}
 		}
 	case 219:
-		//line sql.y:1480
+		//line sql.y:1482
 		{
 			yyVAL.identifiers = append(yyS[yypt-2].identifiers, yyS[yypt-0].str)
 		}
 	case 220:
-		//line sql.y:1486
+		//line sql.y:1488
 		{
 			yyVAL.expr = JoinExpr{Left: yyS[yypt-2].expr, Join: ",", Right: yyS[yypt-0].expr}
 		}
 	case 221:
-		//line sql.y:1490
+		//line sql.y:1492
 		{
 			yyVAL.expr = JoinExpr{Left: yyS[yypt-3].expr, Join: "cross join", Right: yyS[yypt-0].expr}
 		}
 	case 222:
-		//line sql.y:1494
+		//line sql.y:1496
 		{
 			yyVAL.expr = JoinExpr{Left: yyS[yypt-3].expr, Join: "natural join", Right: yyS[yypt-0].expr}
 		}
 	case 223:
-		//line sql.y:1498
+		//line sql.y:1500
 		{
 			yyVAL.expr = JoinExpr{Left: yyS[yypt-6].expr, Join: "join", Right: yyS[yypt-4].expr, Using: yyS[yypt-1].identifiers}
 		}
 	case 224:
-		//line sql.y:1502
+		//line sql.y:1504
 		{
 			yyVAL.expr = JoinExpr{Left: yyS[yypt-4].expr, Join: "join", Right: yyS[yypt-2].expr, On: yyS[yypt-0].expr}
 		}
 	case 225:
-		//line sql.y:1508
+		//line sql.y:1510
 		{
 			yyVAL.fromClause = &FromClause{Expr: yyS[yypt-0].expr}
 		}
 	case 226:
-		//line sql.y:1512
+		//line sql.y:1514
 		{
 			yyVAL.fromClause = &FromClause{Expr: yyS[yypt-0].expr}
 		}
 	case 227:
-		//line sql.y:1515
+		//line sql.y:1517
 		{
 			yyVAL.fromClause = nil
 		}
 	case 228:
-		//line sql.y:1519
+		//line sql.y:1521
 		{
 			yyVAL.str = "nowait"
 		}
 	case 229:
-		//line sql.y:1520
+		//line sql.y:1522
 		{
 			yyVAL.str = "skip locked"
 		}
 	case 230:
-		//line sql.y:1521
+		//line sql.y:1523
 		{
 			yyVAL.str = ""
 		}
 	case 231:
-		//line sql.y:1526
+		//line sql.y:1528
 		{
 			yyVAL.fields = []Expr{yyS[yypt-0].expr}
 		}
 	case 232:
-		//line sql.y:1530
+		//line sql.y:1532
 		{
 			yyVAL.fields = append(yyS[yypt-2].fields, yyS[yypt-0].expr)
 		}
 	case 233:
-		//line sql.y:1537
+		//line sql.y:1539
 		{
 			yyVAL.funcArgs = []FuncArg{yyS[yypt-0].funcArg}
 		}
 	case 234:
-		//line sql.y:1541
+		//line sql.y:1543
 		{
 			yyVAL.funcArgs = append(yyS[yypt-2].funcArgs, yyS[yypt-0].funcArg)
 		}
 	case 235:
-		//line sql.y:1547
+		//line sql.y:1549
 		{
 			yyVAL.funcArg = FuncArg{Expr: yyS[yypt-0].expr}
 		}
 	case 236:
-		//line sql.y:1551
+		//line sql.y:1553
 		{
 			yyVAL.funcArg = FuncArg{Name: yyS[yypt-2].str, NameOp: ":=", Expr: yyS[yypt-0].expr}
 		}
 	case 237:
-		//line sql.y:1555
+		//line sql.y:1557
 		{
 			yyVAL.funcArg = FuncArg{Name: yyS[yypt-2].str, NameOp: "=>", Expr: yyS[yypt-0].expr}
 		}
 	case 238:
-		//line sql.y:1561
+		//line sql.y:1563
 		{
 			yyVAL.pgTypes = []PgType{yyS[yypt-0].pgType}
 		}
 	case 239:
-		//line sql.y:1565
+		//line sql.y:1567
 		{
 			yyVAL.pgTypes = append(yyS[yypt-2].pgTypes, yyS[yypt-0].pgType)
 		}
 	case 240:
-		//line sql.y:1571
+		//line sql.y:1573
 		{
 			yyVAL.arrayExpr = ArrayExpr(yyS[yypt-1].fields)
 		}
 	case 241:
-		//line sql.y:1575
+		//line sql.y:1577
 		{
 			yyVAL.arrayExpr = yyS[yypt-1].arrayExpr
 		}
 	case 242:
-		//line sql.y:1579
+		//line sql.y:1581
 		{
 			yyVAL.arrayExpr = ArrayExpr{}
 		}
 	case 243:
-		//line sql.y:1585
+		//line sql.y:1587
 		{
 			yyVAL.arrayExpr = ArrayExpr{yyS[yypt-0].arrayExpr}
 		}
 	case 244:
-		//line sql.y:1589
+		//line sql.y:1591
 		{
 			yyVAL.arrayExpr = append(yyS[yypt-2].arrayExpr, yyS[yypt-0].arrayExpr)
 		}
@@ -4844,31 +4844,31 @@ yydefault:
 	case 246:
 		yyVAL.sqlSelect = yyS[yypt-0].sqlSelect
 	case 247:
-		//line sql.y:1645
+		//line sql.y:1647
 		{
 			yyS[yypt-1].sqlSelect.ParenWrapped = true
 			yyVAL.sqlSelect = yyS[yypt-1].sqlSelect
 		}
 	case 248:
-		//line sql.y:1649
+		//line sql.y:1651
 		{
 			yyVAL.sqlSelect = yyS[yypt-1].sqlSelect
 		}
 	case 249:
-		//line sql.y:1653
+		//line sql.y:1655
 		{
 			ss := &SelectStmt{}
 			ss.SimpleSelect = *yyS[yypt-0].simpleSelect
 			yyVAL.sqlSelect = ss
 		}
 	case 250:
-		//line sql.y:1659
+		//line sql.y:1661
 		{
 			yyS[yypt-1].sqlSelect.OrderClause = yyS[yypt-0].orderClause
 			yyVAL.sqlSelect = yyS[yypt-1].sqlSelect
 		}
 	case 251:
-		//line sql.y:1664
+		//line sql.y:1666
 		{
 			yyS[yypt-3].sqlSelect.OrderClause = yyS[yypt-2].orderClause
 			yyS[yypt-3].sqlSelect.LockingClause = yyS[yypt-1].lockingClause
@@ -4876,7 +4876,7 @@ yydefault:
 			yyVAL.sqlSelect = yyS[yypt-3].sqlSelect
 		}
 	case 252:
-		//line sql.y:1671
+		//line sql.y:1673
 		{
 			yyS[yypt-3].sqlSelect.OrderClause = yyS[yypt-2].orderClause
 			yyS[yypt-3].sqlSelect.LimitClause = yyS[yypt-1].limitClause
@@ -4884,7 +4884,7 @@ yydefault:
 			yyVAL.sqlSelect = yyS[yypt-3].sqlSelect
 		}
 	case 253:
-		//line sql.y:1680
+		//line sql.y:1682
 		{
 			ss := &SelectStmt{}
 			ss.SimpleSelect = *yyS[yypt-0].simpleSelect
@@ -4893,7 +4893,7 @@ yydefault:
 	case 254:
 		yyVAL.sqlSelect = yyS[yypt-0].sqlSelect
 	case 255:
-		//line sql.y:1714
+		//line sql.y:1716
 		{
 			ss := &SimpleSelect{}
 			ss.TargetList = yyS[yypt-6].fields
@@ -4905,7 +4905,7 @@ yydefault:
 			yyVAL.simpleSelect = ss
 		}
 	case 256:
-		//line sql.y:1727
+		//line sql.y:1729
 		{
 			ss := &SimpleSelect{}
 			ss.DistinctList = yyS[yypt-7].fields
@@ -4918,21 +4918,21 @@ yydefault:
 			yyVAL.simpleSelect = ss
 		}
 	case 257:
-		//line sql.y:1739
+		//line sql.y:1741
 		{
 			ss := &SimpleSelect{}
 			ss.ValuesClause = yyS[yypt-0].valuesClause
 			yyVAL.simpleSelect = ss
 		}
 	case 258:
-		//line sql.y:1745
+		//line sql.y:1747
 		{
 			ss := &SimpleSelect{}
 			ss.Table = yyS[yypt-0].relationExpr
 			yyVAL.simpleSelect = ss
 		}
 	case 259:
-		//line sql.y:1751
+		//line sql.y:1753
 		{
 			ss := &SimpleSelect{}
 			ss.LeftSelect = yyS[yypt-3].sqlSelect
@@ -4942,7 +4942,7 @@ yydefault:
 			yyVAL.simpleSelect = ss
 		}
 	case 260:
-		//line sql.y:1760
+		//line sql.y:1762
 		{
 			ss := &SimpleSelect{}
 			ss.LeftSelect = yyS[yypt-3].sqlSelect
@@ -4952,7 +4952,7 @@ yydefault:
 			yyVAL.simpleSelect = ss
 		}
 	case 261:
-		//line sql.y:1769
+		//line sql.y:1771
 		{
 			ss := &SimpleSelect{}
 			ss.LeftSelect = yyS[yypt-3].sqlSelect
@@ -4962,666 +4962,666 @@ yydefault:
 			yyVAL.simpleSelect = ss
 		}
 	case 262:
-		//line sql.y:1793
+		//line sql.y:1795
 		{
 			yyVAL.placeholder = nil
 		}
 	case 263:
-		//line sql.y:1798
+		//line sql.y:1800
 		{
 			yyVAL.boolean = true
 		}
 	case 264:
-		//line sql.y:1799
+		//line sql.y:1801
 		{
 			yyVAL.boolean = false
 		}
 	case 265:
-		//line sql.y:1800
+		//line sql.y:1802
 		{
 			yyVAL.boolean = false
 		}
 	case 266:
-		//line sql.y:1805
+		//line sql.y:1807
 		{
 			yyVAL.fields = make([]Expr, 0)
 		}
 	case 267:
-		//line sql.y:1806
+		//line sql.y:1808
 		{
 			yyVAL.fields = yyS[yypt-1].fields
 		}
 	case 268:
-		//line sql.y:1809
+		//line sql.y:1811
 		{
 			yyVAL.placeholder = nil
 		}
 	case 269:
-		//line sql.y:1810
+		//line sql.y:1812
 		{
 			yyVAL.placeholder = nil
 		}
 	case 270:
-		//line sql.y:1813
+		//line sql.y:1815
 		{
 			yyVAL.orderClause = yyS[yypt-0].orderClause
 		}
 	case 271:
-		//line sql.y:1814
+		//line sql.y:1816
 		{
 			yyVAL.orderClause = nil
 		}
 	case 272:
-		//line sql.y:1817
+		//line sql.y:1819
 		{
 			yyVAL.orderClause = yyS[yypt-0].orderClause
 		}
 	case 273:
-		//line sql.y:1821
+		//line sql.y:1823
 		{
 			yyVAL.orderClause = &OrderClause{Exprs: []OrderExpr{yyS[yypt-0].orderExpr}}
 		}
 	case 274:
-		//line sql.y:1825
+		//line sql.y:1827
 		{
 			yyS[yypt-2].orderClause.Exprs = append(yyS[yypt-2].orderClause.Exprs, yyS[yypt-0].orderExpr)
 			yyVAL.orderClause = yyS[yypt-2].orderClause
 		}
 	case 275:
-		//line sql.y:1833
+		//line sql.y:1835
 		{
 			yyVAL.orderExpr = OrderExpr{Expr: yyS[yypt-3].expr, Using: yyS[yypt-1].str, Nulls: yyS[yypt-0].str}
 		}
 	case 276:
-		//line sql.y:1837
+		//line sql.y:1839
 		{
 			yyVAL.orderExpr = OrderExpr{Expr: yyS[yypt-2].expr, Order: yyS[yypt-1].str, Nulls: yyS[yypt-0].str}
 		}
 	case 277:
-		//line sql.y:1862
+		//line sql.y:1864
 		{
 			yyVAL.groupByClause = &GroupByClause{Exprs: yyS[yypt-0].fields}
 		}
 	case 278:
-		//line sql.y:1863
+		//line sql.y:1865
 		{
 			yyVAL.groupByClause = nil
 		}
 	case 279:
-		//line sql.y:1867
+		//line sql.y:1869
 		{
 			yyVAL.fields = []Expr{yyS[yypt-0].expr}
 		}
 	case 280:
-		//line sql.y:1871
+		//line sql.y:1873
 		{
 			yyVAL.fields = append(yyS[yypt-2].fields, yyS[yypt-0].expr)
 		}
 	case 281:
 		yyVAL.expr = yyS[yypt-0].expr
 	case 282:
-		//line sql.y:1884
+		//line sql.y:1886
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 283:
-		//line sql.y:1885
+		//line sql.y:1887
 		{
 			yyVAL.expr = nil
 		}
 	case 284:
-		//line sql.y:1888
+		//line sql.y:1890
 		{
 			yyVAL.lockingClause = yyS[yypt-0].lockingClause
 		}
 	case 285:
-		//line sql.y:1889
+		//line sql.y:1891
 		{
 			yyVAL.lockingClause = nil
 		}
 	case 286:
-		//line sql.y:1892
+		//line sql.y:1894
 		{
 			yyVAL.lockingClause = yyS[yypt-0].lockingClause
 		}
 	case 287:
-		//line sql.y:1893
+		//line sql.y:1895
 		{
 			yyVAL.lockingClause = nil
 		}
 	case 288:
-		//line sql.y:1897
+		//line sql.y:1899
 		{
 			yyVAL.lockingClause = &LockingClause{Locks: []LockingItem{yyS[yypt-0].lockingItem}}
 		}
 	case 289:
-		//line sql.y:1901
+		//line sql.y:1903
 		{
 			yyS[yypt-1].lockingClause.Locks = append(yyS[yypt-1].lockingClause.Locks, yyS[yypt-0].lockingItem)
 			yyVAL.lockingClause = yyS[yypt-1].lockingClause
 		}
 	case 290:
-		//line sql.y:1908
+		//line sql.y:1910
 		{
 			yyVAL.lockingItem = LockingItem{Strength: yyS[yypt-2].str, LockedRels: yyS[yypt-1].identifiers, WaitPolicy: yyS[yypt-0].str}
 		}
 	case 291:
-		//line sql.y:1913
+		//line sql.y:1915
 		{
 			yyVAL.str = "update"
 		}
 	case 292:
-		//line sql.y:1914
+		//line sql.y:1916
 		{
 			yyVAL.str = "no key update"
 		}
 	case 293:
-		//line sql.y:1915
+		//line sql.y:1917
 		{
 			yyVAL.str = "share"
 		}
 	case 294:
-		//line sql.y:1916
+		//line sql.y:1918
 		{
 			yyVAL.str = "key share"
 		}
 	case 295:
-		//line sql.y:1919
+		//line sql.y:1921
 		{
 			yyVAL.identifiers = yyS[yypt-0].identifiers
 		}
 	case 296:
-		//line sql.y:1920
+		//line sql.y:1922
 		{
 			yyVAL.identifiers = nil
 		}
 	case 297:
-		//line sql.y:1928
+		//line sql.y:1930
 		{
 			yyVAL.windowDefinitions = yyS[yypt-0].windowDefinitions
 		}
 	case 298:
-		//line sql.y:1931
+		//line sql.y:1933
 		{
 			yyVAL.windowDefinitions = nil
 		}
 	case 299:
-		//line sql.y:1935
+		//line sql.y:1937
 		{
 			yyVAL.windowDefinitions = []WindowDefinition{yyS[yypt-0].windowDefinition}
 		}
 	case 300:
-		//line sql.y:1939
+		//line sql.y:1941
 		{
 			yyVAL.windowDefinitions = append(yyS[yypt-2].windowDefinitions, yyS[yypt-0].windowDefinition)
 		}
 	case 301:
-		//line sql.y:1945
+		//line sql.y:1947
 		{
 			yyVAL.windowDefinition = WindowDefinition{Name: yyS[yypt-2].str, Specification: yyS[yypt-0].windowSpecification}
 		}
 	case 302:
-		//line sql.y:1951
+		//line sql.y:1953
 		{
 			spec := yyS[yypt-0].windowSpecification
 			yyVAL.overClause = &OverClause{Specification: &spec}
 		}
 	case 303:
-		//line sql.y:1956
+		//line sql.y:1958
 		{
 			yyVAL.overClause = &OverClause{Name: yyS[yypt-0].str}
 		}
 	case 304:
-		//line sql.y:1959
+		//line sql.y:1961
 		{
 			yyVAL.overClause = nil
 		}
 	case 305:
-		//line sql.y:1963
+		//line sql.y:1965
 		{
 			yyVAL.windowSpecification = WindowSpecification{ExistingName: yyS[yypt-4].str, PartitionClause: yyS[yypt-3].partitionClause, OrderClause: yyS[yypt-2].orderClause, FrameClause: yyS[yypt-1].frameClause}
 		}
 	case 306:
-		//line sql.y:1978
+		//line sql.y:1980
 		{
 			yyVAL.str = yyS[yypt-0].str
 		}
 	case 307:
-		//line sql.y:1979
+		//line sql.y:1981
 		{
 			yyVAL.str = ""
 		}
 	case 308:
-		//line sql.y:1982
+		//line sql.y:1984
 		{
 			yyVAL.partitionClause = PartitionClause(yyS[yypt-0].fields)
 		}
 	case 309:
-		//line sql.y:1983
+		//line sql.y:1985
 		{
 			yyVAL.partitionClause = nil
 		}
 	case 310:
-		//line sql.y:1994
+		//line sql.y:1996
 		{
 			yyS[yypt-0].frameClause.Mode = "range"
 			yyVAL.frameClause = yyS[yypt-0].frameClause
 		}
 	case 311:
-		//line sql.y:1999
+		//line sql.y:2001
 		{
 			yyS[yypt-0].frameClause.Mode = "rows"
 			yyVAL.frameClause = yyS[yypt-0].frameClause
 		}
 	case 312:
-		//line sql.y:2004
+		//line sql.y:2006
 		{
 			yyVAL.frameClause = nil
 		}
 	case 313:
-		//line sql.y:2010
+		//line sql.y:2012
 		{
 			yyVAL.frameClause = &FrameClause{Start: yyS[yypt-0].frameBound}
 		}
 	case 314:
-		//line sql.y:2014
+		//line sql.y:2016
 		{
 			yyVAL.frameClause = &FrameClause{Start: yyS[yypt-2].frameBound, End: yyS[yypt-0].frameBound}
 		}
 	case 315:
-		//line sql.y:2025
+		//line sql.y:2027
 		{
 			yyVAL.frameBound = &FrameBound{Direction: "preceding"}
 		}
 	case 316:
-		//line sql.y:2029
+		//line sql.y:2031
 		{
 			yyVAL.frameBound = &FrameBound{Direction: "following"}
 		}
 	case 317:
-		//line sql.y:2033
+		//line sql.y:2035
 		{
 			yyVAL.frameBound = &FrameBound{CurrentRow: true}
 		}
 	case 318:
-		//line sql.y:2037
+		//line sql.y:2039
 		{
 			yyVAL.frameBound = &FrameBound{BoundExpr: yyS[yypt-1].expr, Direction: "preceding"}
 		}
 	case 319:
-		//line sql.y:2041
+		//line sql.y:2043
 		{
 			yyVAL.frameBound = &FrameBound{BoundExpr: yyS[yypt-1].expr, Direction: "following"}
 		}
 	case 320:
-		//line sql.y:2049
+		//line sql.y:2051
 		{
 			yyVAL.relationExpr = &RelationExpr{Name: yyS[yypt-0].str}
 		}
 	case 321:
-		//line sql.y:2053
+		//line sql.y:2055
 		{
 			yyVAL.relationExpr = &RelationExpr{Name: yyS[yypt-1].str, Star: true}
 		}
 	case 322:
-		//line sql.y:2057
+		//line sql.y:2059
 		{
 			yyVAL.relationExpr = &RelationExpr{Name: yyS[yypt-0].str, Only: true}
 		}
 	case 323:
-		//line sql.y:2061
+		//line sql.y:2063
 		{
 			yyVAL.relationExpr = &RelationExpr{Name: yyS[yypt-1].str, Only: true}
 		}
 	case 324:
-		//line sql.y:2069
+		//line sql.y:2071
 		{
 			yyVAL.limitClause = &LimitClause{Limit: yyS[yypt-1].expr, Offset: yyS[yypt-0].expr}
 		}
 	case 325:
-		//line sql.y:2073
+		//line sql.y:2075
 		{
 			yyVAL.limitClause = &LimitClause{Limit: yyS[yypt-0].expr, Offset: yyS[yypt-1].expr}
 		}
 	case 326:
-		//line sql.y:2077
+		//line sql.y:2079
 		{
 			yyVAL.limitClause = &LimitClause{Limit: yyS[yypt-0].expr}
 		}
 	case 327:
-		//line sql.y:2081
+		//line sql.y:2083
 		{
 			yyVAL.limitClause = &LimitClause{Offset: yyS[yypt-0].expr}
 		}
 	case 328:
 		yyVAL.limitClause = yyS[yypt-0].limitClause
 	case 329:
-		//line sql.y:2088
+		//line sql.y:2090
 		{
 			yyVAL.limitClause = nil
 		}
 	case 330:
-		//line sql.y:2092
+		//line sql.y:2094
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 331:
-		//line sql.y:2097
+		//line sql.y:2099
 		{
 			yyVAL.expr = yyS[yypt-2].expr
 		}
 	case 332:
-		//line sql.y:2103
+		//line sql.y:2105
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 333:
-		//line sql.y:2108
+		//line sql.y:2110
 		{
 			yyVAL.expr = yyS[yypt-1].expr
 		}
 	case 334:
-		//line sql.y:2113
+		//line sql.y:2115
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 335:
-		//line sql.y:2115
+		//line sql.y:2117
 		{
 			yyVAL.expr = nil
 		}
 	case 336:
-		//line sql.y:2120
+		//line sql.y:2122
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 337:
-		//line sql.y:2129
+		//line sql.y:2131
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 338:
-		//line sql.y:2130
+		//line sql.y:2132
 		{
 			yyVAL.expr = yyS[yypt-1].expr
 		}
 	case 339:
-		//line sql.y:2131
+		//line sql.y:2133
 		{
 			yyVAL.expr = IntegerConst("1")
 		}
 	case 340:
-		//line sql.y:2138
+		//line sql.y:2140
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 341:
-		//line sql.y:2142
+		//line sql.y:2144
 		{
 			yyVAL.placeholder = 0
 		}
 	case 342:
-		//line sql.y:2143
+		//line sql.y:2145
 		{
 			yyVAL.placeholder = 0
 		}
 	case 343:
-		//line sql.y:2146
+		//line sql.y:2148
 		{
 			yyVAL.placeholder = 0
 		}
 	case 344:
-		//line sql.y:2147
+		//line sql.y:2149
 		{
 			yyVAL.placeholder = 0
 		}
 	case 345:
-		//line sql.y:2151
+		//line sql.y:2153
 		{
 			yyVAL.valuesClause = ValuesClause{yyS[yypt-0].valuesRow}
 		}
 	case 346:
-		//line sql.y:2155
+		//line sql.y:2157
 		{
 			yyVAL.valuesClause = append(yyS[yypt-2].valuesClause, yyS[yypt-0].valuesRow)
 		}
 	case 347:
-		//line sql.y:2172
+		//line sql.y:2174
 		{
 			yyVAL.whereClause = &WhereClause{Expr: yyS[yypt-0].expr}
 		}
 	case 348:
-		//line sql.y:2173
+		//line sql.y:2175
 		{
 			yyVAL.whereClause = nil
 		}
 	case 349:
-		//line sql.y:2182
+		//line sql.y:2184
 		{
 			panic("TODO")
 		}
 	case 350:
-		//line sql.y:2183
+		//line sql.y:2185
 		{
 			yyVAL.placeholder = nil
 		}
 	case 351:
-		//line sql.y:2188
+		//line sql.y:2190
 		{
 			yyVAL.filterClause = &FilterClause{Expr: yyS[yypt-1].expr}
 		}
 	case 352:
-		//line sql.y:2191
+		//line sql.y:2193
 		{
 			yyVAL.filterClause = nil
 		}
 	case 353:
-		//line sql.y:2203
+		//line sql.y:2205
 		{
 			yyVAL.row = Row{RowWord: true, Exprs: yyS[yypt-1].fields}
 		}
 	case 354:
-		//line sql.y:2207
+		//line sql.y:2209
 		{
 			yyVAL.row = Row{RowWord: true, Exprs: nil}
 		}
 	case 355:
-		//line sql.y:2211
+		//line sql.y:2213
 		{
 			yyVAL.row = Row{Exprs: append(yyS[yypt-3].fields, yyS[yypt-1].expr)}
 		}
 	case 356:
-		//line sql.y:2217
+		//line sql.y:2219
 		{
 			yyVAL.row = Row{RowWord: true, Exprs: yyS[yypt-1].fields}
 		}
 	case 357:
-		//line sql.y:2221
+		//line sql.y:2223
 		{
 			yyVAL.row = Row{RowWord: true, Exprs: nil}
 		}
 	case 358:
-		//line sql.y:2227
+		//line sql.y:2229
 		{
 			yyVAL.row = Row{Exprs: append(yyS[yypt-3].fields, yyS[yypt-1].expr)}
 		}
 	case 359:
-		//line sql.y:2233
+		//line sql.y:2235
 		{
 			yyVAL.str = string(yyS[yypt-0].str)
 		}
 	case 360:
-		//line sql.y:2234
+		//line sql.y:2236
 		{
 			yyVAL.str = string(yyS[yypt-0].str)
 		}
 	case 361:
-		//line sql.y:2237
+		//line sql.y:2239
 		{
 			yyVAL.str = "+"
 		}
 	case 362:
-		//line sql.y:2238
+		//line sql.y:2240
 		{
 			yyVAL.str = "-"
 		}
 	case 363:
-		//line sql.y:2239
+		//line sql.y:2241
 		{
 			yyVAL.str = "*"
 		}
 	case 364:
-		//line sql.y:2240
+		//line sql.y:2242
 		{
 			yyVAL.str = "/"
 		}
 	case 365:
-		//line sql.y:2241
+		//line sql.y:2243
 		{
 			yyVAL.str = "%"
 		}
 	case 366:
-		//line sql.y:2242
+		//line sql.y:2244
 		{
 			yyVAL.str = "^"
 		}
 	case 367:
-		//line sql.y:2243
+		//line sql.y:2245
 		{
 			yyVAL.str = "<"
 		}
 	case 368:
-		//line sql.y:2244
+		//line sql.y:2246
 		{
 			yyVAL.str = ">"
 		}
 	case 369:
-		//line sql.y:2245
+		//line sql.y:2247
 		{
 			yyVAL.str = "="
 		}
 	case 370:
-		//line sql.y:2246
+		//line sql.y:2248
 		{
 			yyVAL.str = "<="
 		}
 	case 371:
-		//line sql.y:2247
+		//line sql.y:2249
 		{
 			yyVAL.str = ">="
 		}
 	case 372:
-		//line sql.y:2248
+		//line sql.y:2250
 		{
 			yyVAL.str = "<>"
 		}
 	case 373:
-		//line sql.y:2251
+		//line sql.y:2253
 		{
 			yyVAL.str = string(yyS[yypt-0].str)
 		}
 	case 374:
-		//line sql.y:2252
+		//line sql.y:2254
 		{
 			yyVAL.str = yyS[yypt-1].str
 		}
 	case 375:
-		//line sql.y:2255
+		//line sql.y:2257
 		{
 			yyVAL.str = string(yyS[yypt-0].str)
 		}
 	case 376:
-		//line sql.y:2256
+		//line sql.y:2258
 		{
 			yyVAL.str = yyS[yypt-1].str
 		}
 	case 377:
-		//line sql.y:2268
+		//line sql.y:2270
 		{
 			yyVAL.expr = CaseExpr{CaseArg: yyS[yypt-3].expr, WhenClauses: yyS[yypt-2].whenClauses, Default: yyS[yypt-1].expr}
 		}
 	case 378:
-		//line sql.y:2275
+		//line sql.y:2277
 		{
 			yyVAL.whenClauses = []WhenClause{yyS[yypt-0].whenClause}
 		}
 	case 379:
-		//line sql.y:2279
+		//line sql.y:2281
 		{
 			yyVAL.whenClauses = append(yyS[yypt-1].whenClauses, yyS[yypt-0].whenClause)
 		}
 	case 380:
-		//line sql.y:2285
+		//line sql.y:2287
 		{
 			yyVAL.whenClause = WhenClause{When: yyS[yypt-2].expr, Then: yyS[yypt-0].expr}
 		}
 	case 381:
-		//line sql.y:2290
+		//line sql.y:2292
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 382:
-		//line sql.y:2291
+		//line sql.y:2293
 		{
 			yyVAL.expr = nil
 		}
 	case 383:
-		//line sql.y:2294
+		//line sql.y:2296
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 384:
-		//line sql.y:2295
+		//line sql.y:2297
 		{
 			yyVAL.expr = nil
 		}
 	case 385:
-		//line sql.y:2299
+		//line sql.y:2301
 		{
 			yyVAL.columnRef = ColumnRef{Name: yyS[yypt-0].str}
 		}
 	case 386:
-		//line sql.y:2303
+		//line sql.y:2305
 		{
 			yyVAL.columnRef = ColumnRef{Name: yyS[yypt-1].str, Indirection: yyS[yypt-0].indirection}
 		}
 	case 387:
-		//line sql.y:2311
+		//line sql.y:2313
 		{
 			yyVAL.indirectionEl = IndirectionEl{Name: yyS[yypt-0].str}
 		}
 	case 388:
-		//line sql.y:2315
+		//line sql.y:2317
 		{
 			yyVAL.indirectionEl = IndirectionEl{Name: "*"}
 		}
 	case 389:
-		//line sql.y:2319
+		//line sql.y:2321
 		{
 			yyVAL.indirectionEl = IndirectionEl{LowerSubscript: yyS[yypt-1].expr}
 		}
 	case 390:
-		//line sql.y:2323
+		//line sql.y:2325
 		{
 			yyVAL.indirectionEl = IndirectionEl{LowerSubscript: yyS[yypt-3].expr, UpperSubscript: yyS[yypt-1].expr}
 		}
 	case 391:
-		//line sql.y:2328
+		//line sql.y:2330
 		{
 			yyVAL.indirection = Indirection{yyS[yypt-0].indirectionEl}
 		}
 	case 392:
-		//line sql.y:2329
+		//line sql.y:2331
 		{
 			yyVAL.indirection = append(yyS[yypt-1].indirection, yyS[yypt-0].indirectionEl)
 		}
 	case 393:
-		//line sql.y:2332
+		//line sql.y:2334
 		{
 			yyVAL.indirection = nil
 		}
 	case 394:
-		//line sql.y:2334
+		//line sql.y:2336
 		{
 			if yyS[yypt-1].indirection != nil {
 				yyVAL.indirection = append(yyS[yypt-1].indirection, yyS[yypt-0].indirectionEl)
@@ -5630,144 +5630,144 @@ yydefault:
 			}
 		}
 	case 395:
-		//line sql.y:2344
+		//line sql.y:2346
 		{
 			yyVAL.placeholder = nil
 		}
 	case 396:
-		//line sql.y:2348
+		//line sql.y:2350
 		{
 			yyVAL.placeholder = nil
 		}
 	case 397:
-		//line sql.y:2360
+		//line sql.y:2362
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 398:
-		//line sql.y:2361
+		//line sql.y:2363
 		{
 			yyVAL.expr = DefaultExpr(true)
 		}
 	case 399:
-		//line sql.y:2365
+		//line sql.y:2367
 		{
 			yyVAL.valuesRow = ValuesRow{yyS[yypt-0].expr}
 		}
 	case 400:
-		//line sql.y:2369
+		//line sql.y:2371
 		{
 			yyVAL.valuesRow = append(yyS[yypt-2].valuesRow, yyS[yypt-0].expr)
 		}
 	case 401:
-		//line sql.y:2380
+		//line sql.y:2382
 		{
 			yyVAL.valuesRow = yyS[yypt-1].valuesRow
 		}
 	case 402:
-		//line sql.y:2391
+		//line sql.y:2393
 		{
 			yyVAL.fields = yyS[yypt-0].fields
 		}
 	case 403:
-		//line sql.y:2392
+		//line sql.y:2394
 		{
 			yyVAL.fields = nil
 		}
 	case 404:
-		//line sql.y:2395
+		//line sql.y:2397
 		{
 			yyVAL.fields = []Expr{yyS[yypt-0].expr}
 		}
 	case 405:
-		//line sql.y:2397
+		//line sql.y:2399
 		{
 			yyVAL.fields = append(yyS[yypt-2].fields, yyS[yypt-0].expr)
 		}
 	case 406:
-		//line sql.y:2403
+		//line sql.y:2405
 		{
 			yyVAL.expr = AliasedExpr{Expr: yyS[yypt-2].expr, Alias: yyS[yypt-0].str}
 		}
 	case 407:
-		//line sql.y:2407
+		//line sql.y:2409
 		{
 			yyVAL.expr = AliasedExpr{Expr: yyS[yypt-1].expr, Alias: yyS[yypt-0].str}
 		}
 	case 408:
 		yyVAL.expr = yyS[yypt-0].expr
 	case 409:
-		//line sql.y:2412
+		//line sql.y:2414
 		{
 			yyVAL.expr = ColumnRef{Name: "*"}
 		}
 	case 410:
-		//line sql.y:2426
+		//line sql.y:2428
 		{
 			yyVAL.identifiers = []string{yyS[yypt-0].str}
 		}
 	case 411:
-		//line sql.y:2430
+		//line sql.y:2432
 		{
 			yyVAL.identifiers = append(yyS[yypt-2].identifiers, yyS[yypt-0].str)
 		}
 	case 412:
-		//line sql.y:2443
+		//line sql.y:2445
 		{
 			yyVAL.str = yyS[yypt-0].str
 		}
 	case 413:
-		//line sql.y:2475
+		//line sql.y:2477
 		{
 			yyVAL.identifiers = []string{yyS[yypt-0].str}
 		}
 	case 414:
-		//line sql.y:2477
+		//line sql.y:2479
 		{
 			yyVAL.identifiers = append(yyS[yypt-2].identifiers, yyS[yypt-0].str)
 		}
 	case 415:
-		//line sql.y:2482
+		//line sql.y:2484
 		{
 			yyVAL.str = yyS[yypt-0].str
 		}
 	case 416:
-		//line sql.y:2485
+		//line sql.y:2487
 		{
 			yyVAL.str = yyS[yypt-0].str
 		}
 	case 417:
-		//line sql.y:2498
+		//line sql.y:2500
 		{
 			yyVAL.str = yyS[yypt-0].str
 		}
 	case 418:
-		//line sql.y:2502
+		//line sql.y:2504
 		{
 			panic("TODO")
 		}
 	case 419:
-		//line sql.y:2512
+		//line sql.y:2514
 		{
 			yyVAL.expr = yyS[yypt-0].iconst
 		}
 	case 420:
-		//line sql.y:2516
+		//line sql.y:2518
 		{
 			yyVAL.expr = FloatConst(yyS[yypt-0].str)
 		}
 	case 421:
-		//line sql.y:2520
+		//line sql.y:2522
 		{
 			yyVAL.expr = yyS[yypt-0].expr
 		}
 	case 422:
-		//line sql.y:2528
+		//line sql.y:2530
 		{
 			yyVAL.expr = ConstTypeExpr{Typename: PgType{Name: yyS[yypt-1].str}, Expr: yyS[yypt-0].expr}
 		}
 	case 423:
-		//line sql.y:2532
+		//line sql.y:2534
 		{
 			pgType := PgType{Name: yyS[yypt-5].str}
 
@@ -5793,57 +5793,57 @@ yydefault:
 			yyVAL.expr = ConstTypeExpr{Typename: pgType, Expr: yyS[yypt-0].expr}
 		}
 	case 424:
-		//line sql.y:2556
+		//line sql.y:2558
 		{
 			yyVAL.expr = ConstTypeExpr{Typename: yyS[yypt-1].pgType, Expr: yyS[yypt-0].expr}
 		}
 	case 425:
-		//line sql.y:2560
+		//line sql.y:2562
 		{
 			yyVAL.expr = ConstIntervalExpr{Value: yyS[yypt-1].expr, OptInterval: yyS[yypt-0].optInterval}
 		}
 	case 426:
-		//line sql.y:2564
+		//line sql.y:2566
 		{
 			yyVAL.expr = ConstIntervalExpr{Precision: yyS[yypt-2].iconst, Value: yyS[yypt-0].expr}
 		}
 	case 427:
-		//line sql.y:2568
+		//line sql.y:2570
 		{
 			yyVAL.expr = BoolConst(true)
 		}
 	case 428:
-		//line sql.y:2572
+		//line sql.y:2574
 		{
 			yyVAL.expr = BoolConst(false)
 		}
 	case 429:
-		//line sql.y:2576
+		//line sql.y:2578
 		{
 			yyVAL.expr = NullConst{}
 		}
 	case 430:
-		//line sql.y:2580
+		//line sql.y:2582
 		{
 			yyVAL.iconst = IntegerConst(yyS[yypt-0].str)
 		}
 	case 431:
-		//line sql.y:2581
+		//line sql.y:2583
 		{
 			yyVAL.expr = StringConst(yyS[yypt-0].str)
 		}
 	case 432:
-		//line sql.y:2584
+		//line sql.y:2586
 		{
 			yyVAL.expr = yyS[yypt-0].iconst
 		}
 	case 433:
-		//line sql.y:2585
+		//line sql.y:2587
 		{
 			yyVAL.expr = "+" + yyS[yypt-0].iconst
 		}
 	case 434:
-		//line sql.y:2586
+		//line sql.y:2588
 		{
 			yyVAL.expr = "-" + yyS[yypt-0].iconst
 		}
@@ -5860,27 +5860,27 @@ yydefault:
 	case 440:
 		yyVAL.str = yyS[yypt-0].str
 	case 445:
-		//line sql.y:2625
-		{
-			yyVAL.str = yyS[yypt-0].str
-		}
-	case 446:
-		//line sql.y:2626
-		{
-			yyVAL.str = yyS[yypt-0].str
-		}
-	case 447:
 		//line sql.y:2627
 		{
 			yyVAL.str = yyS[yypt-0].str
 		}
-	case 448:
+	case 446:
 		//line sql.y:2628
 		{
 			yyVAL.str = yyS[yypt-0].str
 		}
-	case 449:
+	case 447:
 		//line sql.y:2629
+		{
+			yyVAL.str = yyS[yypt-0].str
+		}
+	case 448:
+		//line sql.y:2630
+		{
+			yyVAL.str = yyS[yypt-0].str
+		}
+	case 449:
+		//line sql.y:2631
 		{
 			yyVAL.str = yyS[yypt-0].str
 		}

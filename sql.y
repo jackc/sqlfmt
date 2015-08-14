@@ -1244,7 +1244,9 @@ b_expr:
 c_expr:
   columnref   { $$ = $1 }
 | AexprConst  { $$ = $1 }
-/* TODO
+/*
+  PARAM does not occur directly is the grammar -- it is used for output
+  params of functions. See outfuncs.c in PostgreSQL source.
 | PARAM opt_indirection
 */
 
