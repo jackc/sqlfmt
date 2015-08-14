@@ -92,6 +92,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "values_order.sql"},
 		{inputFile: "values_default.sql"},
 		{inputFile: "collate.sql"},
+		{inputFile: "collation_for.sql"},
 		{inputFile: "at_time_zone.sql"},
 		{inputFile: "like.sql"},
 		{inputFile: "is_null.sql"},

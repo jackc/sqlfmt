@@ -1279,9 +1279,11 @@ func_expr:
  * Special expressions that are considered to be functions.
  */
 func_expr_common_subexpr:
-/* TODO
-COLLATION FOR '(' a_expr ')'
-| */ CURRENT_DATE
+  COLLATION FOR '(' a_expr ')'
+  {
+    $$ = FuncApplication{Name: "collation for", Args: []FuncArg{{Expr: $4}}}
+  }
+| CURRENT_DATE
   {
     $$ = FuncExprNoParens("current_date")
   }
