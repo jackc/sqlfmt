@@ -2583,10 +2583,8 @@ Sconst:   SCONST { $$ = StringConst($1) }
 
 SignedIconst:
   Iconst      { $$ = $1 }
-/* TODO - determine what to do with numbers
-| '+' Iconst  { $$ = + $2 }
-| '-' Iconst  { $$ = - $2 }
-*/
+| '+' Iconst  { $$ = "+" + $2 }
+| '-' Iconst  { $$ = "-" + $2 }
 
 /*
  * Name classification hierarchy.
