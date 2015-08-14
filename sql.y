@@ -107,6 +107,7 @@ package sqlfmt
 %type <groupByClause> group_clause
 %type <fields>  group_by_list
 %type <expr> group_by_item
+%type <expr> in_expr
 
 %type <expr> having_clause
 
@@ -1106,9 +1107,15 @@ a_expr:
   {
     $$ = BetweenExpr{Expr: $1, Not: true, Symmetric: true, Left: $5, Right: $7}
   }
+| a_expr IN_P in_expr
+  {
+    $$ = InExpr{Value: $1, In: $3}
+  }
+| a_expr NOT_LA IN_P in_expr            %prec NOT_LA
+  {
+    $$ = InExpr{Value: $1, Not: true, In: $4}
+  }
 /* TODO
-      | a_expr IN_P in_expr
-      | a_expr NOT_LA IN_P in_expr            %prec NOT_LA
       | a_expr subquery_Op sub_type select_with_parens  %prec Op
       | a_expr subquery_Op sub_type '(' a_expr ')'    %prec Op
       | a_expr IS DOCUMENT_P          %prec IS
@@ -2255,6 +2262,15 @@ qual_all_Op:
   all_Op { $$ = string($1) }
 | OPERATOR '(' any_operator ')' { $$ = $3 }
 
+in_expr:
+  select_with_parens
+  {
+    $$ = $1
+  }
+| '(' expr_list ')'
+  {
+    $$ = ValuesRow($2)
+  }
 
 /*
  * Define SQL-style CASE clause.

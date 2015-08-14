@@ -272,6 +272,27 @@ func (w WhenClause) RenderTo(r Renderer) {
 	r.Unindent()
 }
 
+type InExpr struct {
+	Value Expr
+	Not   bool
+	In    Expr
+}
+
+func (i InExpr) RenderTo(r Renderer) {
+	i.Value.RenderTo(r)
+	r.Space()
+
+	if i.Not {
+		r.Text("not", "keyword")
+		r.Space()
+	}
+
+	r.Text("in", "keyword")
+	r.Space()
+
+	i.In.RenderTo(r)
+}
+
 type BetweenExpr struct {
 	Expr      Expr
 	Not       bool

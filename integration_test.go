@@ -136,6 +136,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "row.sql"},
 		{inputFile: "overlaps.sql"},
 		{inputFile: "interval.sql"},
+		{inputFile: "in.sql"}, // TODO - fix formatting when spacing / new line is improved
 	}
 
 	for i, tt := range tests {
