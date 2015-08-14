@@ -29,6 +29,8 @@ select
   '1'::bit,
   '1010'::bit(4),
   '1010'::varbit,
-  '1010'::varbit
+  '1010'::varbit,
+  '00:30:00'::interval hour to minute,
+  '00:15:00'::interval(2)
 from
   baz

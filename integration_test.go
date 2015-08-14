@@ -135,6 +135,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "semicolon.sql"},
 		{inputFile: "row.sql"},
 		{inputFile: "overlaps.sql"},
+		{inputFile: "interval.sql"},
 	}
 
 	for i, tt := range tests {

@@ -18,6 +18,7 @@ type Expr interface {
 
 type PgType struct {
 	Name         string
+	OptInterval  *OptInterval
 	Setof        bool
 	ArrayWord    bool
 	ArrayBounds  []IntegerLiteral
@@ -33,6 +34,11 @@ func (t PgType) RenderTo(r Renderer) {
 	}
 
 	r.Text(t.Name, "typename")
+
+	if t.OptInterval != nil {
+		r.Space()
+		t.OptInterval.RenderTo(r)
+	}
 
 	if t.ArrayWord {
 		r.Space()
@@ -366,6 +372,68 @@ func (t ConstTypeExpr) RenderTo(r Renderer) {
 	t.Typename.RenderTo(r)
 	r.Space()
 	t.Expr.RenderTo(r)
+}
+
+type ConstIntervalExpr struct {
+	Precision   IntegerLiteral
+	Value       Expr
+	OptInterval *OptInterval
+}
+
+func (i ConstIntervalExpr) RenderTo(r Renderer) {
+	r.Text("interval", "keyword")
+	if i.Precision != "" {
+		r.Text("(", "lparen")
+		i.Precision.RenderTo(r)
+		r.Text(")", "lparen")
+	}
+
+	r.Space()
+	i.Value.RenderTo(r)
+
+	if i.OptInterval != nil {
+		r.Space()
+		i.OptInterval.RenderTo(r)
+	}
+}
+
+type OptInterval struct {
+	Left   string
+	Right  string
+	Second *IntervalSecond
+}
+
+func (oi OptInterval) RenderTo(r Renderer) {
+	if oi.Left != "" {
+		r.Text(oi.Left, "keyword")
+	}
+
+	if oi.Right != "" {
+		r.Space()
+		r.Text("to", "keyword")
+		r.Space()
+		r.Text(oi.Right, "keyword")
+	}
+
+	if oi.Second != nil {
+		if oi.Left != "" {
+			r.Space()
+		}
+		oi.Second.RenderTo(r)
+	}
+}
+
+type IntervalSecond struct {
+	Precision IntegerLiteral
+}
+
+func (is IntervalSecond) RenderTo(r Renderer) {
+	r.Text("second", "keyword")
+	if is.Precision != "" {
+		r.Text("(", "lparen")
+		is.Precision.RenderTo(r)
+		r.Text(")", "rparen")
+	}
 }
 
 type CollateExpr struct {

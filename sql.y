@@ -47,6 +47,8 @@ package sqlfmt
   indirection Indirection
   iconst IntegerLiteral
   optArrayBounds []IntegerLiteral
+  optInterval *OptInterval
+  intervalSecond *IntervalSecond
 }
 
 %type <sqlSelect> top
@@ -134,6 +136,9 @@ package sqlfmt
 %type <partitionClause> opt_partition_clause
 %type <frameClause> opt_frame_clause frame_extent
 %type <frameBound> frame_bound
+
+%type <optInterval> opt_interval
+%type <intervalSecond> interval_second
 
 %type <arrayExpr> array_expr array_expr_list
 
@@ -491,19 +496,15 @@ SimpleTypename:
 | Bit
 | Character
 | ConstDatetime
-/* TODO
 | ConstInterval opt_interval
   {
-    $$ = $1;
-    $$->typmods = $2;
+    $$ = PgType{Name: "interval", OptInterval: $2}
   }
 | ConstInterval '(' Iconst ')'
   {
-    $$ = $1;
-    $$->typmods = list_make2(makeIntConst(INTERVAL_FULL_RANGE, -1),
-                 makeIntConst($3, @3));
+    $$ = PgType{Name: "interval", TypeMods: []Expr{$3}}
   }
-*/
+
 
 /* We have a separate ConstTypename to allow defaulting fixed-length
  * types such as CHAR() and BIT() to an unspecified length.
@@ -752,9 +753,8 @@ ConstDatetime:
     $$ = PgType{Name: "time", WithTimeZone: $2}
   }
 
-/* TODO
-ConstInterval
-*/
+ConstInterval:
+  INTERVAL
 
 opt_timezone:
   WITH_LA TIME ZONE
@@ -770,10 +770,73 @@ opt_timezone:
     $$ = false
   }
 
-/* TODO
-opt_interval
-interval_second
-*/
+opt_interval:
+  YEAR_P
+  {
+    $$ = &OptInterval{Left: "year"}
+  }
+| MONTH_P
+  {
+    $$ = &OptInterval{Left: "month"}
+  }
+| DAY_P
+  {
+    $$ = &OptInterval{Left: "day"}
+  }
+| HOUR_P
+  {
+    $$ = &OptInterval{Left: "hour"}
+  }
+| MINUTE_P
+  {
+    $$ = &OptInterval{Left: "minute"}
+  }
+| interval_second
+  {
+    $$ = &OptInterval{Second: $1}
+  }
+| YEAR_P TO MONTH_P
+  {
+    $$ = &OptInterval{Left: "year", Right: "month"}
+  }
+| DAY_P TO HOUR_P
+  {
+    $$ = &OptInterval{Left: "day", Right: "hour"}
+  }
+| DAY_P TO MINUTE_P
+  {
+    $$ = &OptInterval{Left: "day", Right: "minute"}
+  }
+| DAY_P TO interval_second
+  {
+    $$ = &OptInterval{Left: "day", Second: $3}
+  }
+| HOUR_P TO MINUTE_P
+  {
+    $$ = &OptInterval{Left: "hour", Right: "minute"}
+  }
+| HOUR_P TO interval_second
+  {
+    $$ = &OptInterval{Left: "hour", Second: $3}
+  }
+| MINUTE_P TO interval_second
+  {
+    $$ = &OptInterval{Left: "minute", Second: $3}
+  }
+| /*EMPTY*/
+  {
+    $$ = nil
+  }
+
+interval_second:
+  SECOND_P
+  {
+    $$ = &IntervalSecond{}
+  }
+| SECOND_P '(' Iconst ')'
+  {
+    $$ = &IntervalSecond{Precision: $3}
+  }
 
 
 /*****************************************************************************
@@ -2494,10 +2557,14 @@ Iconst
   {
     $$ = ConstTypeExpr{Typename: $1, Expr: $2}
   }
-/* TODO
 | ConstInterval Sconst opt_interval
+  {
+    $$ = ConstIntervalExpr{Value: $2, OptInterval: $3}
+  }
 | ConstInterval '(' Iconst ')' Sconst
-*/
+  {
+    $$ = ConstIntervalExpr{Precision: $3, Value: $5}
+  }
 | TRUE_P
   {
     $$ = BoolLiteral(true)
