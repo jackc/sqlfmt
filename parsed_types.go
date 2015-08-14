@@ -21,7 +21,7 @@ type PgType struct {
 	OptInterval  *OptInterval
 	Setof        bool
 	ArrayWord    bool
-	ArrayBounds  []IntegerLiteral
+	ArrayBounds  []IntegerConst
 	TypeMods     []Expr
 	CharSet      string
 	WithTimeZone bool
@@ -47,7 +47,7 @@ func (t PgType) RenderTo(r Renderer) {
 
 	for _, ab := range t.ArrayBounds {
 		r.Text("[", "lbracket")
-		r.Text(string(ab), "integerLiteral")
+		r.Text(string(ab), "IntegerConst")
 		r.Text("]", "lbracket")
 	}
 
@@ -129,16 +129,16 @@ func (ie IndirectionEl) RenderTo(r Renderer) {
 	}
 }
 
-type StringLiteral string
+type StringConst string
 
-func (s StringLiteral) RenderTo(r Renderer) {
-	r.Text(string(s), "stringLiteral")
+func (s StringConst) RenderTo(r Renderer) {
+	r.Text(string(s), "StringConst")
 }
 
-type IntegerLiteral string
+type IntegerConst string
 
-func (s IntegerLiteral) RenderTo(r Renderer) {
-	r.Text(string(s), "integerLiteral")
+func (s IntegerConst) RenderTo(r Renderer) {
+	r.Text(string(s), "IntegerConst")
 }
 
 type FloatConst string
@@ -147,20 +147,20 @@ func (s FloatConst) RenderTo(r Renderer) {
 	r.Text(string(s), "floatConstant")
 }
 
-type BoolLiteral bool
+type BoolConst bool
 
-func (b BoolLiteral) RenderTo(r Renderer) {
+func (b BoolConst) RenderTo(r Renderer) {
 	if b {
-		r.Text("true", "boolLiteral")
+		r.Text("true", "BoolConst")
 	} else {
-		r.Text("false", "boolLiteral")
+		r.Text("false", "BoolConst")
 	}
 }
 
-type NullLiteral struct{}
+type NullConst struct{}
 
-func (n NullLiteral) RenderTo(r Renderer) {
-	r.Text("null", "nullLiteral")
+func (n NullConst) RenderTo(r Renderer) {
+	r.Text("null", "NullConst")
 }
 
 type BooleanExpr struct {
@@ -375,7 +375,7 @@ func (t ConstTypeExpr) RenderTo(r Renderer) {
 }
 
 type ConstIntervalExpr struct {
-	Precision   IntegerLiteral
+	Precision   IntegerConst
 	Value       Expr
 	OptInterval *OptInterval
 }
@@ -424,7 +424,7 @@ func (oi OptInterval) RenderTo(r Renderer) {
 }
 
 type IntervalSecond struct {
-	Precision IntegerLiteral
+	Precision IntegerConst
 }
 
 func (is IntervalSecond) RenderTo(r Renderer) {

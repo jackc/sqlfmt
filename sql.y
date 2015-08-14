@@ -45,8 +45,8 @@ package sqlfmt
   anyName AnyName
   indirectionEl IndirectionEl
   indirection Indirection
-  iconst IntegerLiteral
-  optArrayBounds []IntegerLiteral
+  iconst IntegerConst
+  optArrayBounds []IntegerConst
   optInterval *OptInterval
   intervalSecond *IntervalSecond
 }
@@ -457,14 +457,14 @@ Typename:
   {
     $$ = $1
     $$.ArrayWord = true
-    $$.ArrayBounds = []IntegerLiteral{$4}
+    $$.ArrayBounds = []IntegerConst{$4}
   }
 | SETOF SimpleTypename ARRAY '[' Iconst ']'
   {
     $$ = $2
     $$.Setof = true
     $$.ArrayWord = true
-    $$.ArrayBounds = []IntegerLiteral{$5}
+    $$.ArrayBounds = []IntegerConst{$5}
   }
 | SimpleTypename ARRAY
   {
@@ -573,7 +573,7 @@ Numeric:
 | FLOAT_P opt_float
   {
     $$ = PgType{Name: "float"}
-    if $2 != IntegerLiteral("") {
+    if $2 != IntegerConst("") {
       $$.TypeMods = []Expr{$2}
     }
   }
@@ -605,7 +605,7 @@ opt_float:
   }
 | /*EMPTY*/
   {
-    $$ = IntegerLiteral("")
+    $$ = IntegerConst("")
   }
 
 Bit:
@@ -2128,7 +2128,7 @@ select_offset_value:
 opt_select_fetch_first_value:
   SignedIconst       { $$ = $1 }
 | '(' a_expr ')'     { $$ = $2 }
-| /*EMPTY*/          { $$ = IntegerLiteral("1") }
+| /*EMPTY*/          { $$ = IntegerConst("1") }
 
 /*
  * Again, the trailing ROW/ROWS in this case prevent the full expression
@@ -2567,19 +2567,19 @@ Iconst
   }
 | TRUE_P
   {
-    $$ = BoolLiteral(true)
+    $$ = BoolConst(true)
   }
 | FALSE_P
   {
-    $$ = BoolLiteral(false)
+    $$ = BoolConst(false)
   }
 | NULL_P
   {
-    $$ = NullLiteral{}
+    $$ = NullConst{}
   }
 
-Iconst:   ICONST { $$ = IntegerLiteral($1) }
-Sconst:   SCONST { $$ = StringLiteral($1) }
+Iconst:   ICONST { $$ = IntegerConst($1) }
+Sconst:   SCONST { $$ = StringConst($1) }
 
 SignedIconst:
   Iconst      { $$ = $1 }

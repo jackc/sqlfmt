@@ -112,7 +112,7 @@ func blankState(l *sqlLex) stateFn {
 	case r == ',' || r == '(' || r == ')' || r == '[' || r == ']' || r == ';':
 		return lexSimple
 	case r == '\'':
-		return lexStringLiteral
+		return lexStringConst
 	case r == '"':
 		return lexQuotedIdentifier
 	case r == ':' || r == '.':
@@ -162,7 +162,7 @@ func lexAlphanumeric(l *sqlLex) stateFn {
 	return blankState
 }
 
-func lexStringLiteral(l *sqlLex) stateFn {
+func lexStringConst(l *sqlLex) stateFn {
 	for {
 		var r rune
 		r = l.next()

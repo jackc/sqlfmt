@@ -47,8 +47,8 @@ type yySymType struct {
 	anyName             AnyName
 	indirectionEl       IndirectionEl
 	indirection         Indirection
-	iconst              IntegerLiteral
-	optArrayBounds      []IntegerLiteral
+	iconst              IntegerConst
+	optArrayBounds      []IntegerConst
 	optInterval         *OptInterval
 	intervalSecond      *IntervalSecond
 }
@@ -3706,7 +3706,7 @@ yydefault:
 		{
 			yyVAL.pgType = yyS[yypt-4].pgType
 			yyVAL.pgType.ArrayWord = true
-			yyVAL.pgType.ArrayBounds = []IntegerLiteral{yyS[yypt-1].iconst}
+			yyVAL.pgType.ArrayBounds = []IntegerConst{yyS[yypt-1].iconst}
 		}
 	case 20:
 		//line sql.y:463
@@ -3714,7 +3714,7 @@ yydefault:
 			yyVAL.pgType = yyS[yypt-4].pgType
 			yyVAL.pgType.Setof = true
 			yyVAL.pgType.ArrayWord = true
-			yyVAL.pgType.ArrayBounds = []IntegerLiteral{yyS[yypt-1].iconst}
+			yyVAL.pgType.ArrayBounds = []IntegerConst{yyS[yypt-1].iconst}
 		}
 	case 21:
 		//line sql.y:470
@@ -3816,7 +3816,7 @@ yydefault:
 		//line sql.y:574
 		{
 			yyVAL.pgType = PgType{Name: "float"}
-			if yyS[yypt-0].iconst != IntegerLiteral("") {
+			if yyS[yypt-0].iconst != IntegerConst("") {
 				yyVAL.pgType.TypeMods = []Expr{yyS[yypt-0].iconst}
 			}
 		}
@@ -3853,7 +3853,7 @@ yydefault:
 	case 52:
 		//line sql.y:607
 		{
-			yyVAL.iconst = IntegerLiteral("")
+			yyVAL.iconst = IntegerConst("")
 		}
 	case 53:
 		yyVAL.pgType = yyS[yypt-0].pgType
@@ -5343,7 +5343,7 @@ yydefault:
 	case 339:
 		//line sql.y:2131
 		{
-			yyVAL.expr = IntegerLiteral("1")
+			yyVAL.expr = IntegerConst("1")
 		}
 	case 340:
 		//line sql.y:2138
@@ -5805,27 +5805,27 @@ yydefault:
 	case 427:
 		//line sql.y:2568
 		{
-			yyVAL.expr = BoolLiteral(true)
+			yyVAL.expr = BoolConst(true)
 		}
 	case 428:
 		//line sql.y:2572
 		{
-			yyVAL.expr = BoolLiteral(false)
+			yyVAL.expr = BoolConst(false)
 		}
 	case 429:
 		//line sql.y:2576
 		{
-			yyVAL.expr = NullLiteral{}
+			yyVAL.expr = NullConst{}
 		}
 	case 430:
 		//line sql.y:2580
 		{
-			yyVAL.iconst = IntegerLiteral(yyS[yypt-0].str)
+			yyVAL.iconst = IntegerConst(yyS[yypt-0].str)
 		}
 	case 431:
 		//line sql.y:2581
 		{
-			yyVAL.expr = StringLiteral(yyS[yypt-0].str)
+			yyVAL.expr = StringConst(yyS[yypt-0].str)
 		}
 	case 432:
 		//line sql.y:2584
