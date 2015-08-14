@@ -178,14 +178,14 @@ func (e BooleanExpr) RenderTo(r Renderer) {
 
 type BinaryExpr struct {
 	Left     Expr
-	Operator string
+	Operator AnyName
 	Right    Expr
 }
 
 func (e BinaryExpr) RenderTo(r Renderer) {
 	e.Left.RenderTo(r)
 	r.Space()
-	r.Text(e.Operator, "operator")
+	e.Operator.RenderTo(r)
 	r.Space()
 	e.Right.RenderTo(r)
 }
@@ -234,24 +234,57 @@ func (e TextOpWithEscapeExpr) RenderTo(r Renderer) {
 }
 
 type UnaryExpr struct {
-	Operator string
+	Operator AnyName
 	Expr     Expr
 }
 
 func (e UnaryExpr) RenderTo(r Renderer) {
-	r.Text(e.Operator, "operator")
+	e.Operator.RenderTo(r)
 	e.Expr.RenderTo(r)
 }
 
 type PostfixExpr struct {
 	Expr     Expr
-	Operator string
+	Operator AnyName
 }
 
 func (e PostfixExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
 	r.Space()
-	r.Text(e.Operator, "operator")
+	e.Operator.RenderTo(r)
+}
+
+type SubqueryOpExpr struct {
+	Value Expr
+	Op    SubqueryOp
+	Type  string
+	Query Expr
+}
+
+func (s SubqueryOpExpr) RenderTo(r Renderer) {
+	s.Value.RenderTo(r)
+	r.Space()
+	s.Op.RenderTo(r)
+	r.Space()
+	r.Text(s.Type, "keyword")
+	r.Space()
+	s.Query.RenderTo(r)
+}
+
+type SubqueryOp struct {
+	Operator bool
+	Name     AnyName
+}
+
+func (s SubqueryOp) RenderTo(r Renderer) {
+	if s.Operator {
+		r.Text("operator", "keyword")
+		r.Text("(", "lparen")
+	}
+	s.Name.RenderTo(r)
+	if s.Operator {
+		r.Text(")", "lparen")
+	}
 }
 
 type WhenClause struct {
@@ -602,7 +635,7 @@ func (e WhereClause) RenderTo(r Renderer) {
 type OrderExpr struct {
 	Expr  Expr
 	Order string
-	Using string
+	Using AnyName
 	Nulls string
 }
 
@@ -612,11 +645,11 @@ func (e OrderExpr) RenderTo(r Renderer) {
 		r.Space()
 		r.Text(e.Order, "keyword")
 	}
-	if e.Using != "" {
+	if len(e.Using) > 0 {
 		r.Space()
 		r.Text("using", "keyword")
 		r.Space()
-		r.Text(e.Using, "operator")
+		e.Using.RenderTo(r)
 	}
 	if e.Nulls != "" {
 		r.Space()

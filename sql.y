@@ -49,6 +49,7 @@ package sqlfmt
   optArrayBounds []IntegerConst
   optInterval *OptInterval
   intervalSecond *IntervalSecond
+  subqueryOp SubqueryOp
 }
 
 %type <sqlSelect> top
@@ -102,7 +103,8 @@ package sqlfmt
 %type <indirection> indirection opt_indirection
 %type <str> attr_name qualified_name ColId name param_name
 
-%type <str> MathOp qual_Op qual_all_Op all_Op
+%type <str> MathOp all_Op sub_type
+%type <anyName> qual_Op qual_all_Op
 
 %type <groupByClause> group_clause
 %type <fields>  group_by_list
@@ -144,7 +146,9 @@ package sqlfmt
 %type <arrayExpr> array_expr array_expr_list
 
 %type <columnRef> columnref
-%type <anyName> any_name attrs
+%type <anyName> any_name attrs any_operator
+
+%type <subqueryOp> subquery_Op
 
 %type <str>
   ColLabel
@@ -174,10 +178,6 @@ package sqlfmt
 
 %type <pgTypes> type_list
 %type <optArrayBounds> opt_array_bounds
-
-
-%token  <str> any_operator
-
 
 /*
  * Non-keyword token types.  These are hard-wired into the "flex" lexer.
@@ -430,6 +430,15 @@ attrs:
     $$ = append($1, $3)
   }
 
+any_operator:
+  all_Op
+  {
+    $$ = AnyName{$1}
+  }
+| ColId '.' any_operator
+  {
+    $$ = append(AnyName{$1}, $3...)
+  }
 
 /*****************************************************************************
  *
@@ -891,59 +900,59 @@ a_expr:
 */
 | '+' a_expr          %prec UMINUS
   {
-    $$ = UnaryExpr{Operator: "+", Expr: $2}
+    $$ = UnaryExpr{Operator: AnyName{"+"}, Expr: $2}
   }
 | '-' a_expr          %prec UMINUS
   {
-    $$ = UnaryExpr{Operator: "-", Expr: $2}
+    $$ = UnaryExpr{Operator: AnyName{"-"}, Expr: $2}
   }
 | a_expr '+' a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "+", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"+"}, Right: $3}
   }
 | a_expr '-' a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "-", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"-"}, Right: $3}
   }
 | a_expr '*' a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "*", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"*"}, Right: $3}
   }
 | a_expr '/' a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "/", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"/"}, Right: $3}
   }
 | a_expr '%' a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "%", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"%"}, Right: $3}
   }
 | a_expr '^' a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "^", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"^"}, Right: $3}
   }
 | a_expr '<' a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "<", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"<"}, Right: $3}
   }
 | a_expr '>' a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: ">", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{">"}, Right: $3}
   }
 | a_expr '=' a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "=", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"="}, Right: $3}
   }
 | a_expr LESS_EQUALS a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "<=", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"<="}, Right: $3}
   }
 | a_expr GREATER_EQUALS a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: ">=", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{">="}, Right: $3}
   }
 | a_expr NOT_EQUALS a_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "!=", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"!="}, Right: $3}
   }
 | a_expr qual_Op a_expr       %prec Op
   {
@@ -1049,7 +1058,7 @@ a_expr:
   }
 | row OVERLAPS row
   {
-    $$ = BinaryExpr{Left: $1, Operator: "overlaps", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"overlaps"}, Right: $3}
   }
 | a_expr IS TRUE_P              %prec IS
   {
@@ -1077,11 +1086,11 @@ a_expr:
   }
 | a_expr IS DISTINCT FROM a_expr      %prec IS
   {
-    $$ = BinaryExpr{Left: $1, Operator: "is distinct from", Right: $5}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"is distinct from"}, Right: $5}
   }
 | a_expr IS NOT DISTINCT FROM a_expr    %prec IS
   {
-    $$ = BinaryExpr{Left: $1, Operator: "is not distinct from", Right: $6}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"is not distinct from"}, Right: $6}
   }
 | a_expr IS OF '(' type_list ')'      %prec IS
   {
@@ -1115,9 +1124,15 @@ a_expr:
   {
     $$ = InExpr{Value: $1, Not: true, In: $4}
   }
+| a_expr subquery_Op sub_type select_with_parens  %prec Op
+  {
+    $$ = SubqueryOpExpr{Value: $1, Op: $2, Type: $3, Query: $4}
+  }
+| a_expr subquery_Op sub_type '(' a_expr ')'    %prec Op
+  {
+    $$ = SubqueryOpExpr{Value: $1, Op: $2, Type: $3, Query: ParenExpr{Expr: $5}}
+  }
 /* TODO
-      | a_expr subquery_Op sub_type select_with_parens  %prec Op
-      | a_expr subquery_Op sub_type '(' a_expr ')'    %prec Op
       | a_expr IS DOCUMENT_P          %prec IS
       | a_expr IS NOT DOCUMENT_P        %prec IS
 */
@@ -1142,59 +1157,59 @@ b_expr:
   }
 | '+' b_expr          %prec UMINUS
   {
-    $$ = UnaryExpr{Operator: "+", Expr: $2}
+    $$ = UnaryExpr{Operator: AnyName{"+"}, Expr: $2}
   }
 | '-' b_expr          %prec UMINUS
   {
-    $$ = UnaryExpr{Operator: "-", Expr: $2}
+    $$ = UnaryExpr{Operator: AnyName{"-"}, Expr: $2}
   }
 | b_expr '+' b_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "+", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"+"}, Right: $3}
   }
 | b_expr '-' b_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "-", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"-"}, Right: $3}
   }
 | b_expr '*' b_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "*", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"*"}, Right: $3}
   }
 | b_expr '/' b_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "/", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"/"}, Right: $3}
   }
 | b_expr '%' b_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "%", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"%"}, Right: $3}
   }
 | b_expr '^' b_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "^", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"^"}, Right: $3}
   }
 | b_expr '<' b_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "<", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"<"}, Right: $3}
   }
 | b_expr '>' b_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: ">", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{">"}, Right: $3}
   }
 | b_expr '=' b_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "=", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"="}, Right: $3}
   }
 | b_expr LESS_EQUALS b_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "<=", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"<="}, Right: $3}
   }
 | b_expr GREATER_EQUALS b_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: ">=", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{">="}, Right: $3}
   }
 | b_expr NOT_EQUALS b_expr
   {
-    $$ = BinaryExpr{Left: $1, Operator: "!=", Right: $3}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"!="}, Right: $3}
   }
 | b_expr qual_Op b_expr       %prec Op
   {
@@ -1210,11 +1225,11 @@ b_expr:
   }
 | b_expr IS DISTINCT FROM b_expr    %prec IS
   {
-    $$ = BinaryExpr{Left: $1, Operator: "is distinct from", Right: $5}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"is distinct from"}, Right: $5}
   }
 | b_expr IS NOT DISTINCT FROM b_expr  %prec IS
   {
-    $$ = BinaryExpr{Left: $1, Operator: "is not distinct from", Right: $6}
+    $$ = BinaryExpr{Left: $1, Operator: AnyName{"is not distinct from"}, Right: $6}
   }
 | b_expr IS OF '(' type_list ')'    %prec IS
   {
@@ -1527,6 +1542,39 @@ opt_nowait_or_skip:
 | SKIP LOCKED   { $$ = "skip locked" }
 | /*EMPTY*/     { $$ = "" }
 
+subquery_Op:
+  all_Op
+  {
+    $$ = SubqueryOp{Name: AnyName{$1}}
+  }
+| OPERATOR '(' any_operator ')'
+  {
+    $$ = SubqueryOp{Operator: true, Name: $3}
+  }
+| LIKE
+  {
+    $$ = SubqueryOp{Name: AnyName{"like"}}
+  }
+| NOT_LA LIKE
+  {
+    $$ = SubqueryOp{Name: AnyName{"not like"}}
+  }
+| ILIKE
+  {
+    $$ = SubqueryOp{Name: AnyName{"ilike"}}
+  }
+| NOT_LA ILIKE
+  {
+    $$ = SubqueryOp{Name: AnyName{"not ilike"}}
+  }
+/* cannot put SIMILAR TO here, because SIMILAR TO is a hack.
+ * the regular expression is preprocessed by a function (similar_escape),
+ * and the ~ operator for posix regular expressions is used.
+ *        x SIMILAR TO y     ->    x ~ similar_escape(y)
+ * this transformation is made on the fly by the parser upwards.
+ * however the SubLink structure which handles any/some/all stuff
+ * is not ready for such a thing.
+ */
 
 expr_list:
   a_expr
@@ -2235,6 +2283,10 @@ implicit_row:
     $$ = Row{Exprs: append($2, $4)}
   }
 
+sub_type:
+  ANY  { $$ = "any" }
+| SOME { $$ = "some" }
+| ALL  { $$ = "all" }
 
 all_Op:
   Op { $$ = string($1) }
@@ -2255,11 +2307,11 @@ MathOp:
 | NOT_EQUALS      { $$ = "<>" }
 
 qual_Op:
-  Op { $$ = string($1) }
+  Op { $$ = AnyName{$1} }
 | OPERATOR '(' any_operator ')' { $$ = $3 }
 
 qual_all_Op:
-  all_Op { $$ = string($1) }
+  all_Op { $$ = AnyName{$1} }
 | OPERATOR '(' any_operator ')' { $$ = $3 }
 
 in_expr:
