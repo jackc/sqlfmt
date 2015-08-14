@@ -8,6 +8,7 @@ select
   '324.5'::float(20),
   '23.23'::double precision,
   'asdf'::customtype(3),
+  'asdf'::myschema.customtype,
   '1942'::setof int,
   '{123,34}'::int array[4],
   '{123,34}'::setof int array[4],

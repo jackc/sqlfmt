@@ -498,11 +498,11 @@ SimpleTypename:
 | ConstDatetime
 | ConstInterval opt_interval
   {
-    $$ = PgType{Name: "interval", OptInterval: $2}
+    $$ = PgType{Name: AnyName{"interval"}, OptInterval: $2}
   }
 | ConstInterval '(' Iconst ')'
   {
-    $$ = PgType{Name: "interval", TypeMods: []Expr{$3}}
+    $$ = PgType{Name: AnyName{"interval"}, TypeMods: []Expr{$3}}
   }
 
 
@@ -533,14 +533,12 @@ ConstTypename:
 GenericType:
   type_function_name opt_type_modifiers
   {
-    $$ = PgType{Name: $1, TypeMods: $2}
+    $$ = PgType{Name: AnyName{$1}, TypeMods: $2}
   }
-/* TODO
 | type_function_name attrs opt_type_modifiers
   {
-    panic("TODO")
+    $$ = PgType{Name: append(AnyName{$1}, $2...), TypeMods: $3}
   }
-*/
 
 opt_type_modifiers:
   '(' expr_list ')'   { $$ = $2 }
@@ -552,50 +550,50 @@ opt_type_modifiers:
 Numeric:
   INT_P
   {
-    $$ = PgType{Name: "int"}
+    $$ = PgType{Name: AnyName{"int"}}
   }
 | INTEGER
   {
-    $$ = PgType{Name: "integer"}
+    $$ = PgType{Name: AnyName{"integer"}}
   }
 | SMALLINT
   {
-    $$ = PgType{Name: "smallint"}
+    $$ = PgType{Name: AnyName{"smallint"}}
   }
 | BIGINT
   {
-    $$ = PgType{Name: "bigint"}
+    $$ = PgType{Name: AnyName{"bigint"}}
   }
 | REAL
   {
-    $$ = PgType{Name: "real"}
+    $$ = PgType{Name: AnyName{"real"}}
   }
 | FLOAT_P opt_float
   {
-    $$ = PgType{Name: "float"}
+    $$ = PgType{Name: AnyName{"float"}}
     if $2 != IntegerConst("") {
       $$.TypeMods = []Expr{$2}
     }
   }
 | DOUBLE_P PRECISION
   {
-    $$ = PgType{Name: "double precision"}
+    $$ = PgType{Name: AnyName{"double precision"}}
   }
 | DECIMAL_P opt_type_modifiers
   {
-    $$ = PgType{Name: "decimal", TypeMods: $2}
+    $$ = PgType{Name: AnyName{"decimal"}, TypeMods: $2}
   }
 | DEC opt_type_modifiers
   {
-    $$ = PgType{Name: "dec", TypeMods: $2}
+    $$ = PgType{Name: AnyName{"dec"}, TypeMods: $2}
   }
 | NUMERIC opt_type_modifiers
   {
-    $$ = PgType{Name: "numeric", TypeMods: $2}
+    $$ = PgType{Name: AnyName{"numeric"}, TypeMods: $2}
   }
 | BOOLEAN_P
   {
-    $$ = PgType{Name: "bool"}
+    $$ = PgType{Name: AnyName{"bool"}}
   }
 
 opt_float:
@@ -621,9 +619,9 @@ BitWithLength:
   {
     $$ = PgType{}
     if $2 {
-      $$.Name = "varbit"
+      $$.Name = AnyName{"varbit"}
     } else {
-      $$.Name = "bit"
+      $$.Name = AnyName{"bit"}
     }
     $$.TypeMods = $4
   }
@@ -633,9 +631,9 @@ BitWithoutLength:
   {
     $$ = PgType{}
     if $2 {
-      $$ = PgType{Name: "varbit"}
+      $$ = PgType{Name: AnyName{"varbit"}}
     } else {
-      $$ = PgType{Name: "bit"}
+      $$ = PgType{Name: AnyName{"bit"}}
     }
   }
 
@@ -670,45 +668,45 @@ character:
   CHARACTER opt_varying
   {
     if $2 {
-      $$ = PgType{Name: "varchar"}
+      $$ = PgType{Name: AnyName{"varchar"}}
     } else {
-      $$ = PgType{Name: "char"}
+      $$ = PgType{Name: AnyName{"char"}}
     }
   }
 | CHAR_P opt_varying
   {
     if $2 {
-      $$ = PgType{Name: "varchar"}
+      $$ = PgType{Name: AnyName{"varchar"}}
     } else {
-      $$ = PgType{Name: "char"}
+      $$ = PgType{Name: AnyName{"char"}}
     }
   }
 | VARCHAR
   {
-    $$ = PgType{Name: "varchar"}
+    $$ = PgType{Name: AnyName{"varchar"}}
   }
 | NATIONAL CHARACTER opt_varying
   {
     if $3 {
-      $$ = PgType{Name: "varchar"}
+      $$ = PgType{Name: AnyName{"varchar"}}
     } else {
-      $$ = PgType{Name: "char"}
+      $$ = PgType{Name: AnyName{"char"}}
     }
   }
 | NATIONAL CHAR_P opt_varying
   {
     if $3 {
-      $$ = PgType{Name: "varchar"}
+      $$ = PgType{Name: AnyName{"varchar"}}
     } else {
-      $$ = PgType{Name: "char"}
+      $$ = PgType{Name: AnyName{"char"}}
     }
   }
 | NCHAR opt_varying
   {
     if $2 {
-      $$ = PgType{Name: "varchar"}
+      $$ = PgType{Name: AnyName{"varchar"}}
     } else {
-      $$ = PgType{Name: "char"}
+      $$ = PgType{Name: AnyName{"char"}}
     }
   }
 
@@ -738,19 +736,19 @@ opt_charset:
 ConstDatetime:
   TIMESTAMP '(' Iconst ')' opt_timezone
   {
-    $$ = PgType{Name: "timestamp", TypeMods: []Expr{$3}, WithTimeZone: $5}
+    $$ = PgType{Name: AnyName{"timestamp"}, TypeMods: []Expr{$3}, WithTimeZone: $5}
   }
 | TIMESTAMP opt_timezone
   {
-    $$ = PgType{Name: "timestamp", WithTimeZone: $2}
+    $$ = PgType{Name: AnyName{"timestamp"}, WithTimeZone: $2}
   }
 | TIME '(' Iconst ')' opt_timezone
   {
-    $$ = PgType{Name: "time", TypeMods: []Expr{$3}, WithTimeZone: $5}
+    $$ = PgType{Name: AnyName{"time"}, TypeMods: []Expr{$3}, WithTimeZone: $5}
   }
 | TIME opt_timezone
   {
-    $$ = PgType{Name: "time", WithTimeZone: $2}
+    $$ = PgType{Name: AnyName{"time"}, WithTimeZone: $2}
   }
 
 ConstInterval:
@@ -2528,11 +2526,11 @@ Iconst
 */
 | func_name Sconst
   {
-    $$ = ConstTypeExpr{Typename: PgType{Name: $1}, Expr: $2}
+    $$ = ConstTypeExpr{Typename: PgType{Name: AnyName{$1}}, Expr: $2}
   }
 | func_name '(' func_arg_list opt_sort_clause ')' Sconst
   {
-    pgType := PgType{Name: $1}
+    pgType := PgType{Name: AnyName{$1}}
 
     /*
      * We must use func_arg_list and opt_sort_clause in the

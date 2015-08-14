@@ -17,7 +17,7 @@ type Expr interface {
 }
 
 type PgType struct {
-	Name         string
+	Name         AnyName
 	OptInterval  *OptInterval
 	Setof        bool
 	ArrayWord    bool
@@ -33,7 +33,7 @@ func (t PgType) RenderTo(r Renderer) {
 		r.Space()
 	}
 
-	r.Text(t.Name, "typename")
+	t.Name.RenderTo(r)
 
 	if t.OptInterval != nil {
 		r.Space()
@@ -82,8 +82,7 @@ func (an AnyName) RenderTo(r Renderer) {
 	for i, n := range an {
 		r.Text(n, "identifer")
 		if i < len(an)-1 {
-			r.Text(",", "comma")
-			r.Space()
+			r.Text(".", "period")
 		}
 	}
 }
