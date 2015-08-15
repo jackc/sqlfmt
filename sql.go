@@ -4625,25 +4625,25 @@ yydefault:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		//line sql.y:1044
 		{
-			yyVAL.expr = IsNullExpr{Expr: yyDollar[1].expr}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Op: "null"}
 		}
 	case 140:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		//line sql.y:1048
 		{
-			yyVAL.expr = IsNullExpr{Expr: yyDollar[1].expr}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Op: "null"}
 		}
 	case 141:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		//line sql.y:1052
 		{
-			yyVAL.expr = IsNullExpr{Expr: yyDollar[1].expr, Not: true}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Not: true, Op: "null"}
 		}
 	case 142:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		//line sql.y:1056
 		{
-			yyVAL.expr = IsNullExpr{Expr: yyDollar[1].expr, Not: true}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Not: true, Op: "null"}
 		}
 	case 143:
 		yyDollar = yyS[yypt-3 : yypt+1]
@@ -4655,37 +4655,37 @@ yydefault:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		//line sql.y:1064
 		{
-			yyVAL.expr = IsBoolOpExpr{Expr: yyDollar[1].expr, Op: "true"}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Op: "true"}
 		}
 	case 145:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		//line sql.y:1068
 		{
-			yyVAL.expr = IsBoolOpExpr{Expr: yyDollar[1].expr, Not: true, Op: "true"}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Not: true, Op: "true"}
 		}
 	case 146:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		//line sql.y:1072
 		{
-			yyVAL.expr = IsBoolOpExpr{Expr: yyDollar[1].expr, Op: "false"}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Op: "false"}
 		}
 	case 147:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		//line sql.y:1076
 		{
-			yyVAL.expr = IsBoolOpExpr{Expr: yyDollar[1].expr, Not: true, Op: "false"}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Not: true, Op: "false"}
 		}
 	case 148:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		//line sql.y:1080
 		{
-			yyVAL.expr = IsBoolOpExpr{Expr: yyDollar[1].expr, Op: "unknown"}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Op: "unknown"}
 		}
 	case 149:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		//line sql.y:1084
 		{
-			yyVAL.expr = IsBoolOpExpr{Expr: yyDollar[1].expr, Not: true, Op: "unknown"}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Not: true, Op: "unknown"}
 		}
 	case 150:
 		yyDollar = yyS[yypt-5 : yypt+1]
@@ -4763,13 +4763,13 @@ yydefault:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		//line sql.y:1136
 		{
-			yyVAL.expr = IsDocumentExpr{Expr: yyDollar[1].expr}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Op: "document"}
 		}
 	case 163:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		//line sql.y:1140
 		{
-			yyVAL.expr = IsDocumentExpr{Expr: yyDollar[1].expr, Not: true}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Not: true, Op: "document"}
 		}
 	case 164:
 		yyDollar = yyS[yypt-1 : yypt+1]
@@ -4913,13 +4913,13 @@ yydefault:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		//line sql.y:1247
 		{
-			yyVAL.expr = IsDocumentExpr{Expr: yyDollar[1].expr}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Op: "document"}
 		}
 	case 188:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		//line sql.y:1251
 		{
-			yyVAL.expr = IsDocumentExpr{Expr: yyDollar[1].expr, Not: true}
+			yyVAL.expr = IsExpr{Expr: yyDollar[1].expr, Not: true, Op: "document"}
 		}
 	case 189:
 		yyDollar = yyS[yypt-1 : yypt+1]

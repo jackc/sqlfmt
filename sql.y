@@ -1042,19 +1042,19 @@ a_expr:
  */
 | a_expr IS NULL_P              %prec IS
   {
-    $$ = IsNullExpr{Expr: $1}
+    $$ = IsExpr{Expr: $1, Op: "null"}
   }
 | a_expr ISNULL
   {
-    $$ = IsNullExpr{Expr: $1}
+    $$ = IsExpr{Expr: $1, Op: "null"}
   }
 | a_expr IS NOT NULL_P            %prec IS
   {
-    $$ = IsNullExpr{Expr: $1, Not: true}
+    $$ = IsExpr{Expr: $1, Not: true, Op: "null"}
   }
 | a_expr NOTNULL
   {
-    $$ = IsNullExpr{Expr: $1, Not: true}
+    $$ = IsExpr{Expr: $1, Not: true, Op: "null"}
   }
 | row OVERLAPS row
   {
@@ -1062,27 +1062,27 @@ a_expr:
   }
 | a_expr IS TRUE_P              %prec IS
   {
-    $$ = IsBoolOpExpr{Expr: $1, Op: "true"}
+    $$ = IsExpr{Expr: $1, Op: "true"}
   }
 | a_expr IS NOT TRUE_P            %prec IS
   {
-    $$ = IsBoolOpExpr{Expr: $1, Not: true, Op: "true"}
+    $$ = IsExpr{Expr: $1, Not: true, Op: "true"}
   }
 | a_expr IS FALSE_P             %prec IS
   {
-    $$ = IsBoolOpExpr{Expr: $1, Op: "false"}
+    $$ = IsExpr{Expr: $1, Op: "false"}
   }
 | a_expr IS NOT FALSE_P           %prec IS
   {
-    $$ = IsBoolOpExpr{Expr: $1, Not: true, Op: "false"}
+    $$ = IsExpr{Expr: $1, Not: true, Op: "false"}
   }
 | a_expr IS UNKNOWN             %prec IS
   {
-    $$ = IsBoolOpExpr{Expr: $1, Op: "unknown"}
+    $$ = IsExpr{Expr: $1, Op: "unknown"}
   }
 | a_expr IS NOT UNKNOWN           %prec IS
   {
-    $$ = IsBoolOpExpr{Expr: $1, Not: true, Op: "unknown"}
+    $$ = IsExpr{Expr: $1, Not: true, Op: "unknown"}
   }
 | a_expr IS DISTINCT FROM a_expr      %prec IS
   {
@@ -1134,11 +1134,11 @@ a_expr:
   }
 | a_expr IS DOCUMENT_P          %prec IS
   {
-    $$ = IsDocumentExpr{Expr: $1}
+    $$ = IsExpr{Expr: $1, Op: "document"}
   }
 | a_expr IS NOT DOCUMENT_P        %prec IS
   {
-    $$ = IsDocumentExpr{Expr: $1, Not: true}
+    $$ = IsExpr{Expr: $1, Not: true, Op: "document"}
   }
 
 /*
@@ -1245,11 +1245,11 @@ b_expr:
   }
 | b_expr IS DOCUMENT_P          %prec IS
   {
-    $$ = IsDocumentExpr{Expr: $1}
+    $$ = IsExpr{Expr: $1, Op: "document"}
   }
 | b_expr IS NOT DOCUMENT_P        %prec IS
   {
-    $$ = IsDocumentExpr{Expr: $1, Not: true}
+    $$ = IsExpr{Expr: $1, Not: true, Op: "document"}
   }
 
 /*

@@ -512,30 +512,13 @@ func (e NotExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
 }
 
-type IsNullExpr struct {
+type IsExpr struct {
 	Expr Expr
 	Not  bool
+	Op   string // null, document, true, false, etc.
 }
 
-func (e IsNullExpr) RenderTo(r Renderer) {
-	e.Expr.RenderTo(r)
-	r.Space()
-	r.Text("is", "keyword")
-	r.Space()
-	if e.Not {
-		r.Text("not", "keyword")
-		r.Space()
-	}
-	r.Text("null", "keyword")
-}
-
-type IsBoolOpExpr struct {
-	Expr Expr
-	Not  bool
-	Op   string
-}
-
-func (e IsBoolOpExpr) RenderTo(r Renderer) {
+func (e IsExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
 	r.Space()
 	r.Text("is", "keyword")
@@ -545,23 +528,6 @@ func (e IsBoolOpExpr) RenderTo(r Renderer) {
 		r.Space()
 	}
 	r.Text(e.Op, "keyword")
-}
-
-type IsDocumentExpr struct {
-	Expr Expr
-	Not  bool
-}
-
-func (e IsDocumentExpr) RenderTo(r Renderer) {
-	e.Expr.RenderTo(r)
-	r.Space()
-	r.Text("is", "keyword")
-	r.Space()
-	if e.Not {
-		r.Text("not", "keyword")
-		r.Space()
-	}
-	r.Text("document", "keyword")
 }
 
 type AliasedExpr struct {
