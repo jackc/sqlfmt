@@ -19,7 +19,9 @@ foo is distinct from bar,
 foo is not distinct from bar,
 true is of (integer, bool),
 'asdf' is not of (integer, bool),
-foo between 5! and bar
+foo between 5! and bar,
+false between foo is document and bar,
+false between foo is not document and bar
 
 
 from baz

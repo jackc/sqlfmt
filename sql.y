@@ -1132,10 +1132,14 @@ a_expr:
   {
     $$ = SubqueryOpExpr{Value: $1, Op: $2, Type: $3, Query: ParenExpr{Expr: $5}}
   }
-/* TODO
-      | a_expr IS DOCUMENT_P          %prec IS
-      | a_expr IS NOT DOCUMENT_P        %prec IS
-*/
+| a_expr IS DOCUMENT_P          %prec IS
+  {
+    $$ = IsDocumentExpr{Expr: $1}
+  }
+| a_expr IS NOT DOCUMENT_P        %prec IS
+  {
+    $$ = IsDocumentExpr{Expr: $1, Not: true}
+  }
 
 /*
  * Restricted expressions
@@ -1239,19 +1243,14 @@ b_expr:
   {
     $$ = IsOfExpr{Expr: $1, Not: true, Types: $6}
   }
-/* TODO
 | b_expr IS DOCUMENT_P          %prec IS
   {
-    $$ = makeXmlExpr(IS_DOCUMENT, NULL, NIL,
-             list_make1($1), @2);
+    $$ = IsDocumentExpr{Expr: $1}
   }
 | b_expr IS NOT DOCUMENT_P        %prec IS
   {
-    $$ = makeNotExpr(makeXmlExpr(IS_DOCUMENT, NULL, NIL,
-                   list_make1($1), @2),
-             @2);
+    $$ = IsDocumentExpr{Expr: $1, Not: true}
   }
-*/
 
 /*
  * Productions that can be used in both a_expr and b_expr.

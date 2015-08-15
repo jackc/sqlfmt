@@ -547,6 +547,23 @@ func (e IsBoolOpExpr) RenderTo(r Renderer) {
 	r.Text(e.Op, "keyword")
 }
 
+type IsDocumentExpr struct {
+	Expr Expr
+	Not  bool
+}
+
+func (e IsDocumentExpr) RenderTo(r Renderer) {
+	e.Expr.RenderTo(r)
+	r.Space()
+	r.Text("is", "keyword")
+	r.Space()
+	if e.Not {
+		r.Text("not", "keyword")
+		r.Space()
+	}
+	r.Text("document", "keyword")
+}
+
 type AliasedExpr struct {
 	Expr  Expr
 	Alias string

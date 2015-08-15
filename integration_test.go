@@ -98,6 +98,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "is_null.sql"},
 		{inputFile: "is_bool_op.sql"},
 		{inputFile: "is_distinct_from.sql"},
+		{inputFile: "is_document.sql"},
 		{inputFile: "union.sql"},
 		{inputFile: "intersect.sql"},
 		{inputFile: "except.sql"},
