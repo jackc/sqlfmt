@@ -489,6 +489,28 @@ func (is IntervalSecond) RenderTo(r Renderer) {
 	}
 }
 
+type ExtractExpr ExtractList
+
+func (ee ExtractExpr) RenderTo(r Renderer) {
+	r.Text("extract", "keyword")
+	r.Text("(", "lparen")
+	ExtractList(ee).RenderTo(r)
+	r.Text(")", "rparen")
+}
+
+type ExtractList struct {
+	Extract Expr
+	Time    Expr
+}
+
+func (el ExtractList) RenderTo(r Renderer) {
+	el.Extract.RenderTo(r)
+	r.Space()
+	r.Text("from", "keyword")
+	r.Space()
+	el.Time.RenderTo(r)
+}
+
 type CollateExpr struct {
 	Expr      Expr
 	Collation AnyName

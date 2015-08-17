@@ -50,6 +50,7 @@ package sqlfmt
   optInterval *OptInterval
   intervalSecond *IntervalSecond
   subqueryOp SubqueryOp
+  extractList *ExtractList
 }
 
 %type <sqlSelect> top
@@ -81,6 +82,9 @@ package sqlfmt
 %type <filterClause> filter_clause
 
 %type <relationExpr> relation_expr
+
+%type <extractList> extract_list
+%type <expr> extract_arg
 
 
 %type <limitClause> select_limit opt_select_limit
@@ -1431,8 +1435,11 @@ func_expr_common_subexpr:
   {
     $$ = CastFunc{Expr: $3, Type: $5}
   }
-/* TODO
 | EXTRACT '(' extract_list ')'
+  {
+    $$ = ExtractExpr(*$3)
+  }
+/* TODO
 | OVERLAY '(' overlay_list ')'
 | POSITION '(' position_list ')'
 | SUBSTRING '(' substr_list ')'
@@ -1643,6 +1650,29 @@ array_expr_list:
   {
     $$ = append($1, $3)
   }
+
+extract_list:
+  extract_arg FROM a_expr
+  {
+    $$ = &ExtractList{Extract: $1, Time: $3}
+  }
+| /*EMPTY*/
+  {
+    $$ = nil
+  }
+
+/* Allow delimited string Sconst in extract_arg as an SQL extension.
+ * - thomas 2001-04-12
+ */
+extract_arg:
+  IDENT     { $$ = AnyName{$1} }
+| YEAR_P    { $$ = AnyName{"year"} }
+| MONTH_P   { $$ = AnyName{"month"} }
+| DAY_P     { $$ = AnyName{"day"} }
+| HOUR_P    { $$ = AnyName{"hour"} }
+| MINUTE_P  { $$ = AnyName{"minute"} }
+| SECOND_P  { $$ = AnyName{"second"} }
+| Sconst    { $$ = $1 }
 
 /*****************************************************************************
  *
