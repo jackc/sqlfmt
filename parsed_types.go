@@ -546,6 +546,28 @@ func (ol OverlayList) RenderTo(r Renderer) {
 	}
 }
 
+type PositionExpr PositionList
+
+func (pe PositionExpr) RenderTo(r Renderer) {
+	r.Text("position", "keyword")
+	r.Text("(", "lparen")
+	PositionList(pe).RenderTo(r)
+	r.Text(")", "rparen")
+}
+
+type PositionList struct {
+	Substring Expr
+	String    Expr
+}
+
+func (pl PositionList) RenderTo(r Renderer) {
+	pl.Substring.RenderTo(r)
+	r.Space()
+	r.Text("in", "keyword")
+	r.Space()
+	pl.String.RenderTo(r)
+}
+
 type CollateExpr struct {
 	Expr      Expr
 	Collation AnyName

@@ -52,6 +52,7 @@ package sqlfmt
   subqueryOp SubqueryOp
   extractList *ExtractList
   overlayList OverlayList
+  positionList *PositionList
 }
 
 %type <sqlSelect> top
@@ -89,6 +90,8 @@ package sqlfmt
 
 %type <overlayList> overlay_list
 %type <expr> overlay_placing substr_from substr_for
+
+%type <positionList> position_list
 
 %type <limitClause> select_limit opt_select_limit
 
@@ -1446,8 +1449,11 @@ func_expr_common_subexpr:
   {
     $$ = OverlayExpr($3)
   }
-/* TODO
 | POSITION '(' position_list ')'
+  {
+    $$ = PositionExpr(*$3)
+  }
+/* TODO
 | SUBSTRING '(' substr_list ')'
 | TREAT '(' a_expr AS Typename ')'
 | TRIM '(' BOTH trim_list ')'
@@ -1701,6 +1707,15 @@ overlay_placing:
   {
     $$ = $2
   }
+
+/* position_list uses b_expr not a_expr to avoid conflict with general IN */
+
+position_list:
+  b_expr IN_P b_expr
+  {
+    $$ = &PositionList{Substring: $1, String: $3}
+  }
+| /*EMPTY*/  { $$ = nil }
 
 
 substr_from:
