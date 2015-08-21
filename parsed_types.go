@@ -948,12 +948,13 @@ func (fa FuncArg) RenderTo(r Renderer) {
 }
 
 type CastFunc struct {
+	Name string
 	Expr Expr
 	Type PgType
 }
 
 func (cf CastFunc) RenderTo(r Renderer) {
-	r.Text("cast", "keyword")
+	r.Text(cf.Name, "keyword")
 	r.Text("(", "lparen")
 	cf.Expr.RenderTo(r)
 	r.Space()

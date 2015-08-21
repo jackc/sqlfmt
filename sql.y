@@ -1442,7 +1442,7 @@ func_expr_common_subexpr:
   }
 | CAST '(' a_expr AS Typename ')'
   {
-    $$ = CastFunc{Expr: $3, Type: $5}
+    $$ = CastFunc{Name: "cast", Expr: $3, Type: $5}
   }
 | EXTRACT '(' extract_list ')'
   {
@@ -1470,8 +1470,11 @@ func_expr_common_subexpr:
       $$ = FuncApplication{Name: "substring", Args: args}
     }
   }
-/* TODO
 | TREAT '(' a_expr AS Typename ')'
+  {
+    $$ = CastFunc{Name: "treat", Expr: $3, Type: $5}
+  }
+/* TODO
 | TRIM '(' BOTH trim_list ')'
 | TRIM '(' LEADING trim_list ')'
 | TRIM '(' TRAILING trim_list ')'
