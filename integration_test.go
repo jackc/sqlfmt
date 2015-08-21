@@ -142,6 +142,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "extract.sql"},
 		{inputFile: "overlay.sql"},
 		{inputFile: "position.sql"},
+		{inputFile: "substring.sql"},
 	}
 
 	for i, tt := range tests {

@@ -568,6 +568,36 @@ func (pl PositionList) RenderTo(r Renderer) {
 	pl.String.RenderTo(r)
 }
 
+type SubstrExpr SubstrList
+
+func (se SubstrExpr) RenderTo(r Renderer) {
+	r.Text("substring", "keyword")
+	r.Text("(", "lparen")
+	SubstrList(se).RenderTo(r)
+	r.Text(")", "rparen")
+}
+
+type SubstrList struct {
+	Source Expr
+	From   Expr
+	For    Expr
+}
+
+func (sl SubstrList) RenderTo(r Renderer) {
+	sl.Source.RenderTo(r)
+	r.Space()
+	r.Text("from", "keyword")
+	r.Space()
+	sl.From.RenderTo(r)
+
+	if sl.For != nil {
+		r.Space()
+		r.Text("for", "keyword")
+		r.Space()
+		sl.For.RenderTo(r)
+	}
+}
+
 type CollateExpr struct {
 	Expr      Expr
 	Collation AnyName

@@ -53,6 +53,7 @@ package sqlfmt
   extractList *ExtractList
   overlayList OverlayList
   positionList *PositionList
+  substrList SubstrList
 }
 
 %type <sqlSelect> top
@@ -92,6 +93,8 @@ package sqlfmt
 %type <expr> overlay_placing substr_from substr_for
 
 %type <positionList> position_list
+
+%type <placeholder> substr_list
 
 %type <limitClause> select_limit opt_select_limit
 
@@ -1453,8 +1456,21 @@ func_expr_common_subexpr:
   {
     $$ = PositionExpr(*$3)
   }
-/* TODO
 | SUBSTRING '(' substr_list ')'
+  {
+    if $3 == nil {
+      $$ = FuncApplication{Name: "substring"}
+    } else if se, ok := $3.(SubstrList); ok {
+      $$ = SubstrExpr(se)
+    } else {
+      var args []FuncArg
+      for _, a := range $3.([]Expr) {
+        args = append(args, FuncArg{Expr: a})
+      }
+      $$ = FuncApplication{Name: "substring", Args: args}
+    }
+  }
+/* TODO
 | TREAT '(' a_expr AS Typename ')'
 | TRIM '(' BOTH trim_list ')'
 | TRIM '(' LEADING trim_list ')'
@@ -1717,6 +1733,44 @@ position_list:
   }
 | /*EMPTY*/  { $$ = nil }
 
+/* SUBSTRING() arguments
+ * SQL9x defines a specific syntax for arguments to SUBSTRING():
+ * o substring(text from int for int)
+ * o substring(text from int) get entire string from starting point "int"
+ * o substring(text for int) get first "int" characters of string
+ * o substring(text from pattern) get entire string matching pattern
+ * o substring(text from pattern for escape) same with specified escape char
+ * We also want to support generic substring functions which accept
+ * the usual generic list of arguments. So we will accept both styles
+ * here, and convert the SQL9x style to the generic list for further
+ * processing. - thomas 2000-11-28
+ */
+substr_list:
+a_expr substr_from substr_for
+  {
+    $$ = SubstrList{Source: $1, From: $2, For: $3}
+  }
+| a_expr substr_for substr_from
+  {
+    /* not legal per SQL99, but might as well allow it */
+    $$ = SubstrList{Source: $1, From: $3, For: $2}
+  }
+| a_expr substr_from
+  {
+    $$ = SubstrList{Source: $1, From: $2}
+  }
+| a_expr substr_for
+  {
+    $$ = SubstrList{Source: $1, For: $2}
+  }
+| expr_list
+  {
+    $$ = $1
+  }
+| /*EMPTY*/
+  {
+    $$ = nil
+  }
 
 substr_from:
   FROM a_expr
