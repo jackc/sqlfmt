@@ -51,6 +51,7 @@ package sqlfmt
   intervalSecond *IntervalSecond
   subqueryOp SubqueryOp
   extractList *ExtractList
+  overlayList OverlayList
 }
 
 %type <sqlSelect> top
@@ -86,6 +87,8 @@ package sqlfmt
 %type <extractList> extract_list
 %type <expr> extract_arg
 
+%type <overlayList> overlay_list
+%type <expr> overlay_placing substr_from substr_for
 
 %type <limitClause> select_limit opt_select_limit
 
@@ -1439,8 +1442,11 @@ func_expr_common_subexpr:
   {
     $$ = ExtractExpr(*$3)
   }
-/* TODO
 | OVERLAY '(' overlay_list ')'
+  {
+    $$ = OverlayExpr($3)
+  }
+/* TODO
 | POSITION '(' position_list ')'
 | SUBSTRING '(' substr_list ')'
 | TREAT '(' a_expr AS Typename ')'
@@ -1673,6 +1679,41 @@ extract_arg:
 | MINUTE_P  { $$ = AnyName{"minute"} }
 | SECOND_P  { $$ = AnyName{"second"} }
 | Sconst    { $$ = $1 }
+
+/* OVERLAY() arguments
+ * SQL99 defines the OVERLAY() function:
+ * o overlay(text placing text from int for int)
+ * o overlay(text placing text from int)
+ * and similarly for binary strings
+ */
+overlay_list:
+  a_expr overlay_placing substr_from substr_for
+  {
+    $$ = OverlayList{Dest: $1, Placing: $2, From: $3, For: $4}
+  }
+| a_expr overlay_placing substr_from
+  {
+    $$ = OverlayList{Dest: $1, Placing: $2, From: $3}
+  }
+
+overlay_placing:
+  PLACING a_expr
+  {
+    $$ = $2
+  }
+
+
+substr_from:
+  FROM a_expr
+  {
+    $$ = $2
+  }
+
+substr_for:
+  FOR a_expr
+  {
+    $$ = $2
+  }
 
 /*****************************************************************************
  *

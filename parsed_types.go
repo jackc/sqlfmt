@@ -511,6 +511,41 @@ func (el ExtractList) RenderTo(r Renderer) {
 	el.Time.RenderTo(r)
 }
 
+type OverlayExpr OverlayList
+
+func (oe OverlayExpr) RenderTo(r Renderer) {
+	r.Text("overlay", "keyword")
+	r.Text("(", "lparen")
+	OverlayList(oe).RenderTo(r)
+	r.Text(")", "rparen")
+}
+
+type OverlayList struct {
+	Dest    Expr
+	Placing Expr
+	From    Expr
+	For     Expr
+}
+
+func (ol OverlayList) RenderTo(r Renderer) {
+	ol.Dest.RenderTo(r)
+	r.Space()
+	r.Text("placing", "keyword")
+	r.Space()
+	ol.Placing.RenderTo(r)
+	r.Space()
+	r.Text("from", "keyword")
+	r.Space()
+	ol.From.RenderTo(r)
+
+	if ol.For != nil {
+		r.Space()
+		r.Text("for", "keyword")
+		r.Space()
+		ol.For.RenderTo(r)
+	}
+}
+
 type CollateExpr struct {
 	Expr      Expr
 	Collation AnyName
