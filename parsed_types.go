@@ -829,6 +829,25 @@ func (rv XmlRootVersion) RenderTo(r Renderer) {
 	}
 }
 
+type XmlSerialize struct {
+	XmlType string
+	Content Expr
+	Type    PgType
+}
+
+func (s XmlSerialize) RenderTo(r Renderer) {
+	r.Text("xmlserialize", "keyword")
+	r.Text("(", "lparen")
+	r.Text(s.XmlType, "keyword")
+	r.Space()
+	s.Content.RenderTo(r)
+	r.Space()
+	r.Text("as", "keyword")
+	r.Space()
+	s.Type.RenderTo(r)
+	r.Text(")", "rparen")
+}
+
 type CollateExpr struct {
 	Expr      Expr
 	Collation AnyName

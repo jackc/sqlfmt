@@ -1583,9 +1583,10 @@ func_expr_common_subexpr:
   {
     $$ = XmlRoot{Xml: $3, Version: $5, Standalone: $6}
   }
-/* TODO
 | XMLSERIALIZE '(' document_or_content a_expr AS SimpleTypename ')'
-*/
+  {
+    $$ = XmlSerialize{XmlType: $3, Content: $4, Type: $6}
+  }
 
 /*
  * SQL/XML support
