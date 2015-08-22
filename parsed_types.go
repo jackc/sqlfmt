@@ -792,6 +792,43 @@ func (p XmlPi) RenderTo(r Renderer) {
 	r.Text(")", "rparen")
 }
 
+type XmlRoot struct {
+	Xml        Expr
+	Version    XmlRootVersion
+	Standalone string
+}
+
+func (x XmlRoot) RenderTo(r Renderer) {
+	r.Text("xmlroot", "keyword")
+	r.Text("(", "lparen")
+	x.Xml.RenderTo(r)
+	r.Text(",", "comma")
+	r.Space()
+	x.Version.RenderTo(r)
+	if x.Standalone != "" {
+		r.Text(",", "comma")
+		r.Space()
+		r.Text("standalone", "keyword")
+		r.Space()
+		r.Text(x.Standalone, "keyword")
+	}
+	r.Text(")", "rparen")
+}
+
+type XmlRootVersion struct {
+	Expr Expr
+}
+
+func (rv XmlRootVersion) RenderTo(r Renderer) {
+	r.Text("version", "keyword")
+	r.Space()
+	if rv.Expr != nil {
+		rv.Expr.RenderTo(r)
+	} else {
+		r.Text("no value", "keyword")
+	}
+}
+
 type CollateExpr struct {
 	Expr      Expr
 	Collation AnyName

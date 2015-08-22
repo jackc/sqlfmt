@@ -59,6 +59,7 @@ package sqlfmt
   xmlAttributeEls []XmlAttributeEl
   xmlAttributeEl XmlAttributeEl
   xmlExistsArgument XmlExistsArgument
+  xmlRootVersion XmlRootVersion
 }
 
 %type <sqlSelect> top
@@ -175,6 +176,9 @@ package sqlfmt
 %type <xmlAttributeEl> xml_attribute_el
 %type <xmlExistsArgument> xmlexists_argument
 %type <str> document_or_content xml_whitespace_option
+%type <xmlRootVersion> xml_root_version
+%type <str> opt_xml_root_standalone
+
 
 %type <str>
   ColLabel
@@ -1575,14 +1579,32 @@ func_expr_common_subexpr:
   {
     $$ = XmlPi{Name: $4, Content: $6}
   }
-/* TODO
 | XMLROOT '(' a_expr ',' xml_root_version opt_xml_root_standalone ')'
+  {
+    $$ = XmlRoot{Xml: $3, Version: $5, Standalone: $6}
+  }
+/* TODO
 | XMLSERIALIZE '(' document_or_content a_expr AS SimpleTypename ')'
 */
 
 /*
  * SQL/XML support
  */
+xml_root_version:
+  VERSION_P a_expr
+  {
+    $$ = XmlRootVersion{Expr: $2}
+  }
+| VERSION_P NO VALUE_P
+  {
+    $$ = XmlRootVersion{}
+  }
+
+opt_xml_root_standalone:
+  ',' STANDALONE_P YES_P      { $$ = "yes" }
+| ',' STANDALONE_P NO         { $$ = "no" }
+| ',' STANDALONE_P NO VALUE_P { $$ = "no value"}
+| /*EMPTY*/                   { $$ = "" }
 
 xml_attributes:
   XMLATTRIBUTES '(' xml_attribute_list ')'
