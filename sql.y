@@ -174,6 +174,7 @@ package sqlfmt
 %type <xmlAttributeEls> xml_attribute_list
 %type <xmlAttributeEl> xml_attribute_el
 %type <xmlExistsArgument> xmlexists_argument
+%type <str> document_or_content xml_whitespace_option
 
 %type <str>
   ColLabel
@@ -1562,8 +1563,11 @@ func_expr_common_subexpr:
   {
     $$ = XmlForest($3)
   }
-/* TODO
 | XMLPARSE '(' document_or_content a_expr xml_whitespace_option ')'
+  {
+    $$ = XmlParse{Type: $3, Content: $4, WhitespaceOption: $5}
+  }
+/* TODO
 | XMLPI '(' NAME_P ColLabel ')'
 | XMLPI '(' NAME_P ColLabel ',' a_expr ')'
 | XMLROOT '(' a_expr ',' xml_root_version opt_xml_root_standalone ')'
@@ -1599,6 +1603,15 @@ xml_attribute_el:
   {
     $$ = XmlAttributeEl{Value: $1}
   }
+
+document_or_content:
+  DOCUMENT_P { $$ = "document" }
+| CONTENT_P { $$ = "content" }
+
+xml_whitespace_option:
+  PRESERVE WHITESPACE_P { $$ = "preserve whitespace" }
+| STRIP_P WHITESPACE_P  { $$ = "strip whitespace" }
+| /*EMPTY*/             { $$ = "" }
 
 /* We allow several variants for SQL and other compatibility. */
 xmlexists_argument:

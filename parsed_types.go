@@ -752,6 +752,26 @@ func (attrs xmlAttributes) RenderTo(r Renderer) {
 	}
 }
 
+type XmlParse struct {
+	Type             string
+	Content          Expr
+	WhitespaceOption string
+}
+
+func (p XmlParse) RenderTo(r Renderer) {
+	r.Text("xmlparse", "keyword")
+	r.Text("(", "lparen")
+	r.Text(p.Type, "keyword")
+	r.Space()
+	p.Content.RenderTo(r)
+	if p.WhitespaceOption != "" {
+		r.Space()
+		r.Text(p.WhitespaceOption, "keyword")
+	}
+
+	r.Text(")", "lparen")
+}
+
 type CollateExpr struct {
 	Expr      Expr
 	Collation AnyName
