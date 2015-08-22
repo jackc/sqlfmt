@@ -58,6 +58,7 @@ package sqlfmt
   xmlAttributes XmlAttributes
   xmlAttributeEls []XmlAttributeEl
   xmlAttributeEl XmlAttributeEl
+  xmlExistsArgument XmlExistsArgument
 }
 
 %type <sqlSelect> top
@@ -172,6 +173,7 @@ package sqlfmt
 %type <xmlAttributes> xml_attributes
 %type <xmlAttributeEls> xml_attribute_list
 %type <xmlAttributeEl> xml_attribute_el
+%type <xmlExistsArgument> xmlexists_argument
 
 %type <str>
   ColLabel
@@ -1552,8 +1554,11 @@ func_expr_common_subexpr:
   {
     $$ = XmlElement{Name: $4, Attributes: $6, Body: $8}
   }
-/* TODO
 | XMLEXISTS '(' c_expr xmlexists_argument ')'
+  {
+    $$ = XmlExists{Path: $3, Body: $4}
+  }
+/* TODO
 | XMLFOREST '(' xml_attribute_list ')'
 | XMLPARSE '(' document_or_content a_expr xml_whitespace_option ')'
 | XMLPI '(' NAME_P ColLabel ')'
@@ -1592,6 +1597,24 @@ xml_attribute_el:
     $$ = XmlAttributeEl{Value: $1}
   }
 
+/* We allow several variants for SQL and other compatibility. */
+xmlexists_argument:
+  PASSING c_expr
+  {
+    $$ = XmlExistsArgument{Arg: $2}
+  }
+| PASSING c_expr BY REF
+  {
+    $$ = XmlExistsArgument{Arg: $2, RightByRef: true}
+  }
+| PASSING BY REF c_expr
+  {
+    $$ = XmlExistsArgument{LeftByRef: true, Arg: $4}
+  }
+| PASSING BY REF c_expr BY REF
+  {
+    $$ = XmlExistsArgument{LeftByRef: true, Arg: $4, RightByRef: true}
+  }
 
 
 identifierSeq:

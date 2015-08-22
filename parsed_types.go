@@ -700,6 +700,43 @@ func (el XmlAttributeEl) RenderTo(r Renderer) {
 	}
 }
 
+type XmlExists struct {
+	Path Expr
+	Body XmlExistsArgument
+}
+
+func (e XmlExists) RenderTo(r Renderer) {
+	r.Text("xmlexists", "keyword")
+	r.Text("(", "lparen")
+	e.Path.RenderTo(r)
+	r.Space()
+	e.Body.RenderTo(r)
+	r.Text(")", "rparen")
+}
+
+type XmlExistsArgument struct {
+	LeftByRef  bool
+	Arg        Expr
+	RightByRef bool
+}
+
+func (a XmlExistsArgument) RenderTo(r Renderer) {
+	r.Text("passing", "keyword")
+	r.Space()
+
+	if a.LeftByRef {
+		r.Text("by ref", "keyword")
+		r.Space()
+	}
+
+	a.Arg.RenderTo(r)
+
+	if a.RightByRef {
+		r.Space()
+		r.Text("by ref", "keyword")
+	}
+}
+
 type CollateExpr struct {
 	Expr      Expr
 	Collation AnyName
