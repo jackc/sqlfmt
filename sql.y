@@ -1558,8 +1558,11 @@ func_expr_common_subexpr:
   {
     $$ = XmlExists{Path: $3, Body: $4}
   }
-/* TODO
 | XMLFOREST '(' xml_attribute_list ')'
+  {
+    $$ = XmlForest($3)
+  }
+/* TODO
 | XMLPARSE '(' document_or_content a_expr xml_whitespace_option ')'
 | XMLPI '(' NAME_P ColLabel ')'
 | XMLPI '(' NAME_P ColLabel ',' a_expr ')'

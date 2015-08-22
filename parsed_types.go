@@ -675,13 +675,7 @@ type XmlAttributes []XmlAttributeEl
 func (attrs XmlAttributes) RenderTo(r Renderer) {
 	r.Text("xmlattributes", "keyword")
 	r.Text("(", "lparen")
-	for i, a := range attrs {
-		a.RenderTo(r)
-		if i+1 < len(attrs) {
-			r.Text(",", "comma")
-			r.Space()
-		}
-	}
+	xmlAttributes(attrs).RenderTo(r)
 	r.Text(")", "rparen")
 }
 
@@ -734,6 +728,27 @@ func (a XmlExistsArgument) RenderTo(r Renderer) {
 	if a.RightByRef {
 		r.Space()
 		r.Text("by ref", "keyword")
+	}
+}
+
+type XmlForest []XmlAttributeEl
+
+func (f XmlForest) RenderTo(r Renderer) {
+	r.Text("xmlforest", "keyword")
+	r.Text("(", "lparen")
+	xmlAttributes(f).RenderTo(r)
+	r.Text(")", "rparen")
+}
+
+type xmlAttributes []XmlAttributeEl
+
+func (attrs xmlAttributes) RenderTo(r Renderer) {
+	for i, a := range attrs {
+		a.RenderTo(r)
+		if i+1 < len(attrs) {
+			r.Text(",", "comma")
+			r.Space()
+		}
 	}
 }
 
