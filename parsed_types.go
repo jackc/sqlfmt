@@ -598,6 +598,48 @@ func (sl SubstrList) RenderTo(r Renderer) {
 	}
 }
 
+type TrimExpr struct {
+	Direction string
+	TrimList
+}
+
+func (te TrimExpr) RenderTo(r Renderer) {
+	r.Text("trim", "keyword")
+	r.Text("(", "lparen")
+	if te.Direction != "" {
+		r.Text(te.Direction, "keyword")
+		r.Space()
+	}
+	te.TrimList.RenderTo(r)
+	r.Text(")", "rparen")
+}
+
+type TrimList struct {
+	Left  Expr
+	From  bool
+	Right []Expr
+}
+
+func (tl TrimList) RenderTo(r Renderer) {
+	if tl.Left != nil {
+		tl.Left.RenderTo(r)
+		r.Space()
+	}
+
+	if tl.From {
+		r.Text("from", "keyword")
+		r.Space()
+	}
+
+	for i, e := range tl.Right {
+		e.RenderTo(r)
+		if i+1 < len(tl.Right) {
+			r.Text(",", "comma")
+			r.Space()
+		}
+	}
+}
+
 type CollateExpr struct {
 	Expr      Expr
 	Collation AnyName

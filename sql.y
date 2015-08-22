@@ -54,6 +54,7 @@ package sqlfmt
   overlayList OverlayList
   positionList *PositionList
   substrList SubstrList
+  trimList TrimList
 }
 
 %type <sqlSelect> top
@@ -95,6 +96,8 @@ package sqlfmt
 %type <positionList> position_list
 
 %type <placeholder> substr_list
+
+%type <trimList> trim_list
 
 %type <limitClause> select_limit opt_select_limit
 
@@ -1474,11 +1477,23 @@ func_expr_common_subexpr:
   {
     $$ = CastFunc{Name: "treat", Expr: $3, Type: $5}
   }
-/* TODO
 | TRIM '(' BOTH trim_list ')'
+  {
+    $$ = TrimExpr{Direction: "both", TrimList: $4}
+  }
 | TRIM '(' LEADING trim_list ')'
+  {
+    $$ = TrimExpr{Direction: "leading", TrimList: $4}
+  }
 | TRIM '(' TRAILING trim_list ')'
+  {
+    $$ = TrimExpr{Direction: "trailing", TrimList: $4}
+  }
 | TRIM '(' trim_list ')'
+  {
+    $$ = TrimExpr{TrimList: $3}
+  }
+/* TODO
 | NULLIF '(' a_expr ',' a_expr ')'
 */
 | COALESCE '(' expr_list ')'
@@ -1785,6 +1800,20 @@ substr_for:
   FOR a_expr
   {
     $$ = $2
+  }
+
+trim_list:
+  a_expr FROM expr_list
+  {
+    $$ = TrimList{Left: $1, From: true, Right: $3}
+  }
+| FROM expr_list
+  {
+    $$ = TrimList{From: true, Right: $2}
+  }
+| expr_list
+  {
+    $$ = TrimList{Right: $1}
   }
 
 /*****************************************************************************
