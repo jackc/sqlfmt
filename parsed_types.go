@@ -769,7 +769,27 @@ func (p XmlParse) RenderTo(r Renderer) {
 		r.Text(p.WhitespaceOption, "keyword")
 	}
 
-	r.Text(")", "lparen")
+	r.Text(")", "rparen")
+}
+
+type XmlPi struct {
+	Name    string
+	Content Expr
+}
+
+func (p XmlPi) RenderTo(r Renderer) {
+	r.Text("xmlpi", "keyword")
+	r.Text("(", "lparen")
+	r.Text("name", "keyword")
+	r.Space()
+	r.Text(p.Name, "identifier")
+
+	if p.Content != nil {
+		r.Text(",", "comma")
+		r.Space()
+		p.Content.RenderTo(r)
+	}
+	r.Text(")", "rparen")
 }
 
 type CollateExpr struct {

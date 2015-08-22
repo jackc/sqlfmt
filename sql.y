@@ -1567,9 +1567,15 @@ func_expr_common_subexpr:
   {
     $$ = XmlParse{Type: $3, Content: $4, WhitespaceOption: $5}
   }
-/* TODO
 | XMLPI '(' NAME_P ColLabel ')'
+  {
+    $$ = XmlPi{Name: $4}
+  }
 | XMLPI '(' NAME_P ColLabel ',' a_expr ')'
+  {
+    $$ = XmlPi{Name: $4, Content: $6}
+  }
+/* TODO
 | XMLROOT '(' a_expr ',' xml_root_version opt_xml_root_standalone ')'
 | XMLSERIALIZE '(' document_or_content a_expr AS SimpleTypename ')'
 */
