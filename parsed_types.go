@@ -640,6 +640,66 @@ func (tl TrimList) RenderTo(r Renderer) {
 	}
 }
 
+type XmlElement struct {
+	Name       string
+	Attributes XmlAttributes
+	Body       []Expr
+}
+
+func (el XmlElement) RenderTo(r Renderer) {
+	r.Text("xmlelement", "keyword")
+	r.Text("(", "lparen")
+	r.Text("name", "keyword")
+	r.Space()
+	r.Text(el.Name, "identifier")
+
+	if el.Attributes != nil {
+		r.Text(",", "comma")
+		r.Space()
+		el.Attributes.RenderTo(r)
+	}
+
+	if el.Body != nil {
+		for _, e := range el.Body {
+			r.Text(",", "comma")
+			r.Space()
+			e.RenderTo(r)
+		}
+	}
+
+	r.Text(")", "rparen")
+}
+
+type XmlAttributes []XmlAttributeEl
+
+func (attrs XmlAttributes) RenderTo(r Renderer) {
+	r.Text("xmlattributes", "keyword")
+	r.Text("(", "lparen")
+	for i, a := range attrs {
+		a.RenderTo(r)
+		if i+1 < len(attrs) {
+			r.Text(",", "comma")
+			r.Space()
+		}
+	}
+	r.Text(")", "rparen")
+}
+
+type XmlAttributeEl struct {
+	Value Expr
+	Name  string
+}
+
+func (el XmlAttributeEl) RenderTo(r Renderer) {
+	el.Value.RenderTo(r)
+	if el.Name != "" {
+		r.Space()
+		r.Text("as", "keyword")
+		r.Space()
+		r.Text(el.Name, "identifier")
+	}
+}
+
 type CollateExpr struct {
 	Expr      Expr
 	Collation AnyName

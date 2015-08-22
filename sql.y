@@ -55,6 +55,9 @@ package sqlfmt
   positionList *PositionList
   substrList SubstrList
   trimList TrimList
+  xmlAttributes XmlAttributes
+  xmlAttributeEls []XmlAttributeEl
+  xmlAttributeEl XmlAttributeEl
 }
 
 %type <sqlSelect> top
@@ -165,6 +168,10 @@ package sqlfmt
 %type <anyName> any_name attrs any_operator
 
 %type <subqueryOp> subquery_Op
+
+%type <xmlAttributes> xml_attributes
+%type <xmlAttributeEls> xml_attribute_list
+%type <xmlAttributeEl> xml_attribute_el
 
 %type <str>
   ColLabel
@@ -1529,11 +1536,23 @@ func_expr_common_subexpr:
   }
   $$ = fa
 }
-/* TODO
 | XMLELEMENT '(' NAME_P ColLabel ')'
+  {
+    $$ = XmlElement{Name: $4}
+  }
 | XMLELEMENT '(' NAME_P ColLabel ',' xml_attributes ')'
+  {
+    $$ = XmlElement{Name: $4, Attributes: $6}
+  }
 | XMLELEMENT '(' NAME_P ColLabel ',' expr_list ')'
+  {
+    $$ = XmlElement{Name: $4, Body: $6}
+  }
 | XMLELEMENT '(' NAME_P ColLabel ',' xml_attributes ',' expr_list ')'
+  {
+    $$ = XmlElement{Name: $4, Attributes: $6, Body: $8}
+  }
+/* TODO
 | XMLEXISTS '(' c_expr xmlexists_argument ')'
 | XMLFOREST '(' xml_attribute_list ')'
 | XMLPARSE '(' document_or_content a_expr xml_whitespace_option ')'
@@ -1543,6 +1562,35 @@ func_expr_common_subexpr:
 | XMLSERIALIZE '(' document_or_content a_expr AS SimpleTypename ')'
 */
 
+/*
+ * SQL/XML support
+ */
+
+xml_attributes:
+  XMLATTRIBUTES '(' xml_attribute_list ')'
+  {
+    $$ = XmlAttributes($3)
+  }
+
+xml_attribute_list:
+  xml_attribute_el
+  {
+    $$ = []XmlAttributeEl{$1}
+  }
+| xml_attribute_list ',' xml_attribute_el
+  {
+    $$ = append($1, $3)
+  }
+
+xml_attribute_el:
+  a_expr AS ColLabel
+  {
+    $$ = XmlAttributeEl{Value: $1, Name: $3}
+  }
+| a_expr
+  {
+    $$ = XmlAttributeEl{Value: $1}
+  }
 
 
 

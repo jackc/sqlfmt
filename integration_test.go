@@ -146,6 +146,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "treat.sql"},
 		{inputFile: "trim.sql"},
 		{inputFile: "nullif.sql"},
+		{inputFile: "xmlelement.sql"},
 	}
 
 	for i, tt := range tests {
