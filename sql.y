@@ -1493,9 +1493,10 @@ func_expr_common_subexpr:
   {
     $$ = TrimExpr{TrimList: $3}
   }
-/* TODO
 | NULLIF '(' a_expr ',' a_expr ')'
-*/
+  {
+    $$ = FuncApplication{Name: "nullif", Args: []FuncArg{{Expr: $3}, {Expr: $5}}}
+  }
 | COALESCE '(' expr_list ')'
 {
   fa := FuncApplication{Name: "coalesce"}
