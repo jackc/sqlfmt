@@ -11,6 +11,8 @@ package sqlfmt
   expr Expr
   str string
   identifiers []string
+  anyNames []AnyName
+  intoClause *IntoClause
   fromClause *FromClause
   whereClause *WhereClause
   orderExpr OrderExpr
@@ -76,12 +78,13 @@ package sqlfmt
 %type <fromClause> from_clause
 %type <identifiers> identifierSeq
 %type <expr> joinExpr
+%type <intoClause> OptTempTableName into_clause
+%type <boolean> opt_table
 %type <whereClause> where_clause
 %type <orderExpr> sortby
 %type <orderClause> opt_sort_clause sort_clause sortby_list
 %type <str> opt_asc_desc opt_nulls_order opt_charset
-%type <placeholder> into_clause
-  row_or_rows
+%type <placeholder> row_or_rows
   first_or_next
   within_group_clause
   opt_asymmetric
@@ -118,11 +121,13 @@ package sqlfmt
 %type <lockingItem> for_locking_item
 %type <str> for_locking_strength opt_nowait_or_skip
 
-%type <identifiers> locked_rels_list qualified_name_list name_list
+%type <identifiers> name_list
+%type <anyNames> qualified_name_list locked_rels_list
 
 %type <indirectionEl> indirection_el
 %type <indirection> indirection opt_indirection
-%type <str> attr_name qualified_name ColId name param_name
+%type <str> attr_name ColId name param_name
+%type <anyName> qualified_name
 
 %type <str> MathOp all_Op sub_type
 %type <anyName> qual_Op qual_all_Op
@@ -2054,16 +2059,17 @@ simple_select:
   SELECT opt_all_clause opt_target_list
   into_clause from_clause where_clause
   group_clause having_clause window_clause
-    {
-      ss := &SimpleSelect{}
-      ss.TargetList = $3
-      ss.FromClause = $5
-      ss.WhereClause = $6
-      ss.GroupByClause = $7
-      ss.HavingClause = $8
-      ss.WindowClause = $9
-      $$ = ss
-    }
+  {
+    ss := &SimpleSelect{}
+    ss.TargetList = $3
+    ss.IntoClause = $4
+    ss.FromClause = $5
+    ss.WhereClause = $6
+    ss.GroupByClause = $7
+    ss.HavingClause = $8
+    ss.WindowClause = $9
+    $$ = ss
+  }
 | SELECT distinct_clause target_list
   into_clause from_clause where_clause
   group_clause having_clause window_clause
@@ -2071,6 +2077,7 @@ simple_select:
     ss := &SimpleSelect{}
     ss.DistinctList = $2
     ss.TargetList = $3
+    ss.IntoClause = $4
     ss.FromClause = $5
     ss.WhereClause = $6
     ss.GroupByClause = $7
@@ -2119,23 +2126,61 @@ simple_select:
   }
 
 
-
 into_clause:
-/* TODO      INTO OptTempTableName
-        {
-          $$ = makeNode(IntoClause);
-          $$->rel = $2;
-          $$->colNames = NIL;
-          $$->options = NIL;
-          $$->onCommit = ONCOMMIT_NOOP;
-          $$->tableSpaceName = NULL;
-          $$->viewQuery = NULL;
-          $$->skipData = false;
-        }
-      | */ /*EMPTY*/
-        { $$ = nil }
+  INTO OptTempTableName
+  {
+    $$ = $2
+  }
+| /*EMPTY*/
+  {
+    $$ = nil
+  }
 
+/*
+ * Redundancy here is needed to avoid shift/reduce conflicts,
+ * since TEMP is not a reserved word.  See also OptTemp.
+ */
+OptTempTableName:
+  TEMPORARY opt_table qualified_name
+  {
+    $$ = &IntoClause{Options: "temporary", OptTable: $2, Target: $3}
+  }
+| TEMP opt_table qualified_name
+  {
+    $$ = &IntoClause{Options: "temp", OptTable: $2, Target: $3}
+  }
+| LOCAL TEMPORARY opt_table qualified_name
+  {
+    $$ = &IntoClause{Options: "local temporary", OptTable: $3, Target: $4}
+  }
+| LOCAL TEMP opt_table qualified_name
+  {
+    $$ = &IntoClause{Options: "local temp", OptTable: $3, Target: $4}
+  }
+| GLOBAL TEMPORARY opt_table qualified_name
+  {
+    $$ = &IntoClause{Options: "global temporary", OptTable: $3, Target: $4}
+  }
+| GLOBAL TEMP opt_table qualified_name
+  {
+    $$ = &IntoClause{Options: "global temp", OptTable: $3, Target: $4}
+  }
+| UNLOGGED opt_table qualified_name
+  {
+    $$ = &IntoClause{Options: "unlogged", OptTable: $2, Target: $3}
+  }
+| TABLE qualified_name
+  {
+    $$ = &IntoClause{OptTable: true, Target: $2}
+  }
+| qualified_name
+  {
+    $$ = &IntoClause{Target: $1}
+  }
 
+opt_table:
+  TABLE      { $$ = true }
+| /*EMPTY*/  { $$ = false }
 
 all_or_distinct:
   ALL                   { $$ = true }
@@ -2780,7 +2825,7 @@ target_el:
 qualified_name_list:
   qualified_name
   {
-    $$ = []string{$1}
+    $$ = []AnyName{$1}
   }
 | qualified_name_list ',' qualified_name
   {
@@ -2796,9 +2841,9 @@ qualified_name_list:
  */
 qualified_name:
   ColId
-    {
-      $$ = $1
-    }
+  {
+    $$ = AnyName{$1}
+  }
 /* TODO
 | ColId indirection
   {

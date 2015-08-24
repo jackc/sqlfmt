@@ -902,6 +902,30 @@ func (e AliasedExpr) RenderTo(r Renderer) {
 	r.Text(e.Alias, "identifier")
 }
 
+type IntoClause struct {
+	Options  string
+	OptTable bool
+	Target   AnyName
+}
+
+func (i IntoClause) RenderTo(r Renderer) {
+	r.Text("into", "keyword")
+	r.Space()
+
+	if i.Options != "" {
+		r.Text(i.Options, "keyword")
+		r.Space()
+	}
+
+	if i.OptTable {
+		r.Text("table", "keyword")
+		r.Space()
+	}
+
+	i.Target.RenderTo(r)
+	r.NewLine()
+}
+
 type FromClause struct {
 	Expr Expr
 }
@@ -1074,7 +1098,7 @@ func (e AtTimeZoneExpr) RenderTo(r Renderer) {
 
 type LockingItem struct {
 	Strength   string
-	LockedRels []string
+	LockedRels []AnyName
 	WaitPolicy string
 }
 
@@ -1089,7 +1113,7 @@ func (li LockingItem) RenderTo(r Renderer) {
 		r.Space()
 
 		for i, lr := range li.LockedRels {
-			r.Text(lr, "identifier")
+			lr.RenderTo(r)
 			if i < len(li.LockedRels)-1 {
 				r.Text(",", "comma")
 				r.Space()
@@ -1472,7 +1496,7 @@ func (fb FrameBound) RenderTo(r Renderer) {
 }
 
 type RelationExpr struct {
-	Name string
+	Name AnyName
 	Star bool
 	Only bool
 }
@@ -1483,7 +1507,7 @@ func (re RelationExpr) RenderTo(r Renderer) {
 		r.Space()
 	}
 
-	r.Text(re.Name, "identifier")
+	re.Name.RenderTo(r)
 
 	if re.Star {
 		r.Space()
@@ -1496,6 +1520,7 @@ func (re RelationExpr) RenderTo(r Renderer) {
 type SimpleSelect struct {
 	DistinctList  []Expr
 	TargetList    []Expr
+	IntoClause    *IntoClause
 	FromClause    *FromClause
 	WhereClause   *WhereClause
 	GroupByClause *GroupByClause
@@ -1575,6 +1600,10 @@ func (s SimpleSelect) RenderTo(r Renderer) {
 		r.NewLine()
 	}
 	r.Unindent()
+
+	if s.IntoClause != nil {
+		s.IntoClause.RenderTo(r)
+	}
 
 	if s.FromClause != nil {
 		s.FromClause.RenderTo(r)

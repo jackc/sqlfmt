@@ -153,6 +153,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "xmlpi.sql"},
 		{inputFile: "xmlroot.sql"},
 		{inputFile: "xmlserialize.sql"},
+		{inputFile: "select_into.sql"},
 	}
 
 	for i, tt := range tests {
