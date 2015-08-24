@@ -2844,33 +2844,13 @@ qualified_name:
   {
     $$ = AnyName{$1}
   }
-/* TODO
 | ColId indirection
   {
-    check_qualified_name($2, yyscanner);
-    $$ = makeRangeVar(NULL, NULL, @1);
-    switch (list_length($2))
-    {
-      case 1:
-        $$->catalogname = NULL;
-        $$->schemaname = $1;
-        $$->relname = strVal(linitial($2));
-        break;
-      case 2:
-        $$->catalogname = $1;
-        $$->schemaname = strVal(linitial($2));
-        $$->relname = strVal(lsecond($2));
-        break;
-      default:
-        ereport(ERROR,
-            (errcode(ERRCODE_SYNTAX_ERROR),
-             errmsg("improper qualified name (too many dotted names): %s",
-                NameListToString(lcons(makeString($1), $2))),
-             parser_errposition(@1)));
-        break;
+    $$ = AnyName{$1}
+    for _, s := range $2 {
+      $$ = append($$, s.Name)
     }
   }
-*/
 
 name_list:
   name { $$ = []string{$1} }

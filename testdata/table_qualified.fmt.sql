@@ -1,0 +1,1 @@
+table foo.baz

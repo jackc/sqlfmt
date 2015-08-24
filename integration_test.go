@@ -79,6 +79,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "table.sql"},
 		{inputFile: "table_star.sql"},
 		{inputFile: "table_only.sql"},
+		{inputFile: "table_qualified.sql"},
 		{
 			inputFile:          "table_only_paren.sql",
 			expectedOutputFile: "table_only.fmt.sql",
