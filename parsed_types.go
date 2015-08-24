@@ -1166,7 +1166,7 @@ func (fe FuncExpr) RenderTo(r Renderer) {
 }
 
 type FuncApplication struct {
-	Name string
+	Name AnyName
 
 	Distinct bool
 
@@ -1177,7 +1177,7 @@ type FuncApplication struct {
 }
 
 func (fa FuncApplication) RenderTo(r Renderer) {
-	r.Text(fa.Name, "identifier")
+	fa.Name.RenderTo(r)
 	r.Text("(", "lparen")
 
 	if fa.Distinct {

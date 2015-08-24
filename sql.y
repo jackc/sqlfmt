@@ -192,7 +192,8 @@ package sqlfmt
   type_function_name
   type_func_name_keyword
   reserved_keyword
-  func_name
+
+%type <anyName> func_name
 
 %type <pgType>
   GenericType
@@ -1400,7 +1401,7 @@ func_expr:
 func_expr_common_subexpr:
   COLLATION FOR '(' a_expr ')'
   {
-    $$ = FuncApplication{Name: "collation for", Args: []FuncArg{{Expr: $4}}}
+    $$ = FuncApplication{Name: AnyName{"collation for"}, Args: []FuncArg{{Expr: $4}}}
   }
 | CURRENT_DATE
   {
@@ -1412,7 +1413,7 @@ func_expr_common_subexpr:
   }
 | CURRENT_TIME '(' Iconst ')'
   {
-    $$ = FuncApplication{Name: "current_time", Args: []FuncArg{{Expr: $3}}}
+    $$ = FuncApplication{Name: AnyName{"current_time"}, Args: []FuncArg{{Expr: $3}}}
   }
 | CURRENT_TIMESTAMP
   {
@@ -1420,7 +1421,7 @@ func_expr_common_subexpr:
   }
 | CURRENT_TIMESTAMP '(' Iconst ')'
   {
-    $$ = FuncApplication{Name: "current_timestamp", Args: []FuncArg{{Expr: $3}}}
+    $$ = FuncApplication{Name: AnyName{"current_timestamp"}, Args: []FuncArg{{Expr: $3}}}
   }
 | LOCALTIME
   {
@@ -1428,7 +1429,7 @@ func_expr_common_subexpr:
   }
 | LOCALTIME '(' Iconst ')'
   {
-    $$ = FuncApplication{Name: "localtime", Args: []FuncArg{{Expr: $3}}}
+    $$ = FuncApplication{Name: AnyName{"localtime"}, Args: []FuncArg{{Expr: $3}}}
   }
 | LOCALTIMESTAMP
   {
@@ -1436,7 +1437,7 @@ func_expr_common_subexpr:
   }
 | LOCALTIMESTAMP '(' Iconst ')'
   {
-    $$ = FuncApplication{Name: "localtimestamp", Args: []FuncArg{{Expr: $3}}}
+    $$ = FuncApplication{Name: AnyName{"localtimestamp"}, Args: []FuncArg{{Expr: $3}}}
   }
 | CURRENT_ROLE
   {
@@ -1481,7 +1482,7 @@ func_expr_common_subexpr:
 | SUBSTRING '(' substr_list ')'
   {
     if $3 == nil {
-      $$ = FuncApplication{Name: "substring"}
+      $$ = FuncApplication{Name: AnyName{"substring"}}
     } else if se, ok := $3.(SubstrList); ok {
       $$ = SubstrExpr(se)
     } else {
@@ -1489,7 +1490,7 @@ func_expr_common_subexpr:
       for _, a := range $3.([]Expr) {
         args = append(args, FuncArg{Expr: a})
       }
-      $$ = FuncApplication{Name: "substring", Args: args}
+      $$ = FuncApplication{Name: AnyName{"substring"}, Args: args}
     }
   }
 | TREAT '(' a_expr AS Typename ')'
@@ -1514,11 +1515,11 @@ func_expr_common_subexpr:
   }
 | NULLIF '(' a_expr ',' a_expr ')'
   {
-    $$ = FuncApplication{Name: "nullif", Args: []FuncArg{{Expr: $3}, {Expr: $5}}}
+    $$ = FuncApplication{Name: AnyName{"nullif"}, Args: []FuncArg{{Expr: $3}, {Expr: $5}}}
   }
 | COALESCE '(' expr_list ')'
 {
-  fa := FuncApplication{Name: "coalesce"}
+  fa := FuncApplication{Name: AnyName{"coalesce"}}
   for _, e := range $3 {
     fa.Args = append(fa.Args, FuncArg{Expr: e})
   }
@@ -1526,7 +1527,7 @@ func_expr_common_subexpr:
 }
 | GREATEST '(' expr_list ')'
 {
-  fa := FuncApplication{Name: "greatest"}
+  fa := FuncApplication{Name: AnyName{"greatest"}}
   for _, e := range $3 {
     fa.Args = append(fa.Args, FuncArg{Expr: e})
   }
@@ -1534,7 +1535,7 @@ func_expr_common_subexpr:
 }
 | LEAST '(' expr_list ')'
 {
-  fa := FuncApplication{Name: "least"}
+  fa := FuncApplication{Name: AnyName{"least"}}
   for _, e := range $3 {
     fa.Args = append(fa.Args, FuncArg{Expr: e})
   }
@@ -1542,7 +1543,7 @@ func_expr_common_subexpr:
 }
 | XMLCONCAT '(' expr_list ')'
 {
-  fa := FuncApplication{Name: "xmlconcat"}
+  fa := FuncApplication{Name: AnyName{"xmlconcat"}}
   for _, e := range $3 {
     fa.Args = append(fa.Args, FuncArg{Expr: e})
   }
@@ -2877,11 +2878,14 @@ attr_name:
 func_name:
   type_function_name
   {
-    $$ = $1
+    $$ = AnyName{$1}
   }
 | ColId indirection
   {
-    panic("TODO")
+    $$ = AnyName{$1}
+    for _, s := range $2 {
+      $$ = append($$, s.Name)
+    }
   }
 
 
@@ -2907,11 +2911,11 @@ Iconst
 */
 | func_name Sconst
   {
-    $$ = ConstTypeExpr{Typename: PgType{Name: AnyName{$1}}, Expr: $2}
+    $$ = ConstTypeExpr{Typename: PgType{Name: $1}, Expr: $2}
   }
 | func_name '(' func_arg_list opt_sort_clause ')' Sconst
   {
-    pgType := PgType{Name: AnyName{$1}}
+    pgType := PgType{Name: $1}
 
     /*
      * We must use func_arg_list and opt_sort_clause in the

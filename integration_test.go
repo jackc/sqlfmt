@@ -112,6 +112,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "function_call_with_all.sql"},
 		{inputFile: "function_call_with_distinct.sql"},
 		{inputFile: "function_call_with_filter.sql"},
+		{inputFile: "function_call_qualified.sql"},
 		{inputFile: "null.sql"},
 		{inputFile: "window_function.sql"},
 		{inputFile: "window_function_partition_by.sql"},
