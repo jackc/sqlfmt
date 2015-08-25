@@ -162,6 +162,12 @@ func (n NullConst) RenderTo(r Renderer) {
 	r.Text("null", "NullConst")
 }
 
+type BitConst string
+
+func (b BitConst) RenderTo(r Renderer) {
+	r.Text(string(b), "bitConstant")
+}
+
 type BooleanExpr struct {
 	Left     Expr
 	Operator string

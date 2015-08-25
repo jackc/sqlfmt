@@ -119,6 +119,8 @@ func blankState(l *sqlLex) stateFn {
 		return lexAlmostOperator
 	case isOperator(r):
 		return lexOperator
+	case r == 'b' || r == 'B' || r == 'x' || r == 'X':
+		return lexPossibleBitString
 	case unicode.IsDigit(r):
 		return lexNumber
 	case isWhitespace(r):
@@ -257,6 +259,47 @@ func lexSimple(l *sqlLex) stateFn {
 	l.append(token{int(l.src[l.start]), l.src[l.start:l.pos]})
 	l.start = l.pos
 	return blankState
+}
+
+func lexPossibleBitString(l *sqlLex) stateFn {
+	var rangeTable unicode.RangeTable
+
+	if l.src[l.start] == 'b' || l.src[l.start] == 'B' {
+		rangeTable = unicode.RangeTable{
+			R16: []unicode.Range16{
+				unicode.Range16{Lo: '0', Hi: '1', Stride: 1},
+			},
+			LatinOffset: 1,
+		}
+	} else {
+		rangeTable = unicode.RangeTable{
+			R16: []unicode.Range16{
+				unicode.Range16{Lo: '0', Hi: '9', Stride: 1},
+				unicode.Range16{Lo: 'A', Hi: 'F', Stride: 1},
+				unicode.Range16{Lo: 'a', Hi: 'f', Stride: 1},
+			},
+			LatinOffset: 3,
+		}
+	}
+
+	r := l.next()
+	if r == '\'' {
+		l.acceptRunFunc(func(r rune) bool {
+			return unicode.In(r, &rangeTable)
+		})
+		r = l.next()
+		if r == '\'' {
+			t := token{src: l.src[l.start:l.pos], typ: BCONST}
+			l.append(t)
+			l.start = l.pos
+			return blankState
+		}
+		return nil // lex error
+	} else {
+		l.unnext()
+	}
+
+	return lexAlphanumeric
 }
 
 func (l *sqlLex) skipWhitespace() {

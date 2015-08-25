@@ -156,6 +156,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "xmlroot.sql"},
 		{inputFile: "xmlserialize.sql"},
 		{inputFile: "select_into.sql"},
+		{inputFile: "bitconst.sql"},
 	}
 
 	for i, tt := range tests {

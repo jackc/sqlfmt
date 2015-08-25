@@ -2905,11 +2905,15 @@ Iconst
   {
     $$ = $1
   }
-/* TODO
 | BCONST
+  {
+    $$ = BitConst($1)
+  }
 | XCONST
-*/
-| func_name Sconst
+  {
+    $$ = BitConst($1)
+  }
+  | func_name Sconst
   {
     $$ = ConstTypeExpr{Typename: PgType{Name: $1}, Expr: $2}
   }
