@@ -29,7 +29,7 @@ type PgType struct {
 
 func (t PgType) RenderTo(r Renderer) {
 	if t.Setof {
-		r.Text("setof", "keyword")
+		r.Keyword("setof")
 		r.Space()
 	}
 
@@ -42,37 +42,37 @@ func (t PgType) RenderTo(r Renderer) {
 
 	if t.ArrayWord {
 		r.Space()
-		r.Text("array", "keyword")
+		r.Keyword("array")
 	}
 
 	for _, ab := range t.ArrayBounds {
-		r.Text("[", "lbracket")
-		r.Text(string(ab), "IntegerConst")
-		r.Text("]", "lbracket")
+		r.Symbol("[")
+		r.Constant(string(ab))
+		r.Symbol("]")
 	}
 
 	if len(t.TypeMods) > 0 {
-		r.Text("(", "lparen")
+		r.Symbol("(")
 		for i, e := range t.TypeMods {
 			e.RenderTo(r)
 			if i < len(t.TypeMods)-1 {
-				r.Text(",", "comma")
+				r.Symbol(",")
 				r.Space()
 			}
 		}
-		r.Text(")", "rparen")
+		r.Symbol(")")
 	}
 
 	if t.WithTimeZone {
 		r.Space()
-		r.Text("with time zone", "keyword")
+		r.Keyword("with time zone")
 	}
 
 	if t.CharSet != "" {
 		r.Space()
-		r.Text("character set", "keyword")
+		r.Keyword("character set")
 		r.Space()
-		r.Text(t.CharSet, "charset")
+		r.Identifier(t.CharSet)
 	}
 }
 
@@ -80,9 +80,9 @@ type AnyName []string
 
 func (an AnyName) RenderTo(r Renderer) {
 	for i, n := range an {
-		r.Text(n, "identifer")
+		r.Identifier(n)
 		if i < len(an)-1 {
-			r.Text(".", "period")
+			r.Symbol(".")
 		}
 	}
 }
@@ -93,7 +93,7 @@ type ColumnRef struct {
 }
 
 func (cr ColumnRef) RenderTo(r Renderer) {
-	r.Text(cr.Name, "identifer")
+	r.Identifier(cr.Name)
 	if cr.Indirection != nil {
 		cr.Indirection.RenderTo(r)
 	}
@@ -115,57 +115,57 @@ type IndirectionEl struct {
 
 func (ie IndirectionEl) RenderTo(r Renderer) {
 	if ie.LowerSubscript != nil {
-		r.Text("[", "lbracket")
+		r.Symbol("[")
 		ie.LowerSubscript.RenderTo(r)
 		if ie.UpperSubscript != nil {
-			r.Text(":", "colon")
+			r.Symbol(":")
 			ie.UpperSubscript.RenderTo(r)
 		}
-		r.Text("]", "rbracket")
+		r.Symbol("]")
 	} else {
-		r.Text(".", "period")
-		r.Text(ie.Name, "identifier")
+		r.Symbol(".")
+		r.Identifier(ie.Name)
 	}
 }
 
 type StringConst string
 
 func (s StringConst) RenderTo(r Renderer) {
-	r.Text(string(s), "StringConst")
+	r.Constant(string(s))
 }
 
 type IntegerConst string
 
 func (s IntegerConst) RenderTo(r Renderer) {
-	r.Text(string(s), "IntegerConst")
+	r.Constant(string(s))
 }
 
 type FloatConst string
 
 func (s FloatConst) RenderTo(r Renderer) {
-	r.Text(string(s), "floatConstant")
+	r.Constant(string(s))
 }
 
 type BoolConst bool
 
 func (b BoolConst) RenderTo(r Renderer) {
 	if b {
-		r.Text("true", "BoolConst")
+		r.Keyword("true")
 	} else {
-		r.Text("false", "BoolConst")
+		r.Keyword("false")
 	}
 }
 
 type NullConst struct{}
 
 func (n NullConst) RenderTo(r Renderer) {
-	r.Text("null", "NullConst")
+	r.Keyword("null")
 }
 
 type BitConst string
 
 func (b BitConst) RenderTo(r Renderer) {
-	r.Text(string(b), "bitConstant")
+	r.Constant(string(b))
 }
 
 type BooleanExpr struct {
@@ -177,7 +177,7 @@ type BooleanExpr struct {
 func (e BooleanExpr) RenderTo(r Renderer) {
 	e.Left.RenderTo(r)
 	r.NewLine()
-	r.Text(e.Operator, "operator")
+	r.Symbol(e.Operator)
 	r.Space()
 	e.Right.RenderTo(r)
 }
@@ -199,22 +199,22 @@ func (e BinaryExpr) RenderTo(r Renderer) {
 type ArrayConstructorExpr ArrayExpr
 
 func (ace ArrayConstructorExpr) RenderTo(r Renderer) {
-	r.Text("array", "keyword")
+	r.Keyword("array")
 	ArrayExpr(ace).RenderTo(r)
 }
 
 type ArrayExpr []Expr
 
 func (a ArrayExpr) RenderTo(r Renderer) {
-	r.Text("[", "lbracket")
+	r.Symbol("[")
 	for i, e := range a {
 		e.RenderTo(r)
 		if i < len(a)-1 {
-			r.Text(",", "comma")
+			r.Symbol(",")
 			r.Space()
 		}
 	}
-	r.Text("]", "rbracket")
+	r.Symbol("]")
 }
 
 type TextOpWithEscapeExpr struct {
@@ -227,13 +227,13 @@ type TextOpWithEscapeExpr struct {
 func (e TextOpWithEscapeExpr) RenderTo(r Renderer) {
 	e.Left.RenderTo(r)
 	r.Space()
-	r.Text(e.Operator, "operator")
+	r.Symbol(e.Operator)
 	r.Space()
 	e.Right.RenderTo(r)
 
 	if e.Escape != nil {
 		r.Space()
-		r.Text("escape", "keyword")
+		r.Keyword("escape")
 		r.Space()
 		e.Escape.RenderTo(r)
 	}
@@ -272,7 +272,7 @@ func (s SubqueryOpExpr) RenderTo(r Renderer) {
 	r.Space()
 	s.Op.RenderTo(r)
 	r.Space()
-	r.Text(s.Type, "keyword")
+	r.Keyword(s.Type)
 	r.Space()
 	s.Query.RenderTo(r)
 }
@@ -284,12 +284,12 @@ type SubqueryOp struct {
 
 func (s SubqueryOp) RenderTo(r Renderer) {
 	if s.Operator {
-		r.Text("operator", "keyword")
-		r.Text("(", "lparen")
+		r.Keyword("operator")
+		r.Symbol("(")
 	}
 	s.Name.RenderTo(r)
 	if s.Operator {
-		r.Text(")", "lparen")
+		r.Symbol(")")
 	}
 }
 
@@ -299,11 +299,11 @@ type WhenClause struct {
 }
 
 func (w WhenClause) RenderTo(r Renderer) {
-	r.Text("when", "keyword")
+	r.Keyword("when")
 	r.Space()
 	w.When.RenderTo(r)
 	r.Space()
-	r.Text("then", "keyword")
+	r.Keyword("then")
 	r.NewLine()
 	r.Indent()
 	w.Then.RenderTo(r)
@@ -322,11 +322,11 @@ func (i InExpr) RenderTo(r Renderer) {
 	r.Space()
 
 	if i.Not {
-		r.Text("not", "keyword")
+		r.Keyword("not")
 		r.Space()
 	}
 
-	r.Text("in", "keyword")
+	r.Keyword("in")
 	r.Space()
 
 	i.In.RenderTo(r)
@@ -345,21 +345,21 @@ func (b BetweenExpr) RenderTo(r Renderer) {
 	r.Space()
 
 	if b.Not {
-		r.Text("not", "keyword")
+		r.Keyword("not")
 		r.Space()
 	}
 
-	r.Text("between", "keyword")
+	r.Keyword("between")
 	r.Space()
 
 	if b.Symmetric {
-		r.Text("symmetric", "keyword")
+		r.Keyword("symmetric")
 		r.Space()
 	}
 
 	b.Left.RenderTo(r)
 	r.Space()
-	r.Text("and", "keyword")
+	r.Keyword("and")
 	r.Space()
 	b.Right.RenderTo(r)
 }
@@ -371,7 +371,7 @@ type CaseExpr struct {
 }
 
 func (c CaseExpr) RenderTo(r Renderer) {
-	r.Text("case", "keyword")
+	r.Keyword("case")
 
 	if c.CaseArg != nil {
 		r.Space()
@@ -385,7 +385,7 @@ func (c CaseExpr) RenderTo(r Renderer) {
 	}
 
 	if c.Default != nil {
-		r.Text("else", "keyword")
+		r.Keyword("else")
 		r.NewLine()
 		r.Indent()
 		c.Default.RenderTo(r)
@@ -393,7 +393,7 @@ func (c CaseExpr) RenderTo(r Renderer) {
 		r.Unindent()
 	}
 
-	r.Text("end", "keyword")
+	r.Keyword("end")
 	r.NewLine()
 }
 
@@ -403,9 +403,9 @@ type ParenExpr struct {
 }
 
 func (e ParenExpr) RenderTo(r Renderer) {
-	r.Text("(", "lparen")
+	r.Symbol("(")
 	e.Expr.RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 	if e.Indirection != nil {
 		e.Indirection.RenderTo(r)
 	}
@@ -418,7 +418,7 @@ type TypecastExpr struct {
 
 func (t TypecastExpr) RenderTo(r Renderer) {
 	t.Expr.RenderTo(r)
-	r.Text("::", "typecast")
+	r.Symbol("::")
 	t.Typename.RenderTo(r)
 }
 
@@ -440,11 +440,11 @@ type ConstIntervalExpr struct {
 }
 
 func (i ConstIntervalExpr) RenderTo(r Renderer) {
-	r.Text("interval", "keyword")
+	r.Keyword("interval")
 	if i.Precision != "" {
-		r.Text("(", "lparen")
+		r.Symbol("(")
 		i.Precision.RenderTo(r)
-		r.Text(")", "lparen")
+		r.Symbol(")")
 	}
 
 	r.Space()
@@ -464,14 +464,14 @@ type OptInterval struct {
 
 func (oi OptInterval) RenderTo(r Renderer) {
 	if oi.Left != "" {
-		r.Text(oi.Left, "keyword")
+		r.Keyword(oi.Left)
 	}
 
 	if oi.Right != "" {
 		r.Space()
-		r.Text("to", "keyword")
+		r.Keyword("to")
 		r.Space()
-		r.Text(oi.Right, "keyword")
+		r.Keyword(oi.Right)
 	}
 
 	if oi.Second != nil {
@@ -487,21 +487,21 @@ type IntervalSecond struct {
 }
 
 func (is IntervalSecond) RenderTo(r Renderer) {
-	r.Text("second", "keyword")
+	r.Keyword("second")
 	if is.Precision != "" {
-		r.Text("(", "lparen")
+		r.Symbol("(")
 		is.Precision.RenderTo(r)
-		r.Text(")", "rparen")
+		r.Symbol(")")
 	}
 }
 
 type ExtractExpr ExtractList
 
 func (ee ExtractExpr) RenderTo(r Renderer) {
-	r.Text("extract", "keyword")
-	r.Text("(", "lparen")
+	r.Keyword("extract")
+	r.Symbol("(")
 	ExtractList(ee).RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type ExtractList struct {
@@ -512,7 +512,7 @@ type ExtractList struct {
 func (el ExtractList) RenderTo(r Renderer) {
 	el.Extract.RenderTo(r)
 	r.Space()
-	r.Text("from", "keyword")
+	r.Keyword("from")
 	r.Space()
 	el.Time.RenderTo(r)
 }
@@ -520,10 +520,10 @@ func (el ExtractList) RenderTo(r Renderer) {
 type OverlayExpr OverlayList
 
 func (oe OverlayExpr) RenderTo(r Renderer) {
-	r.Text("overlay", "keyword")
-	r.Text("(", "lparen")
+	r.Keyword("overlay")
+	r.Symbol("(")
 	OverlayList(oe).RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type OverlayList struct {
@@ -536,17 +536,17 @@ type OverlayList struct {
 func (ol OverlayList) RenderTo(r Renderer) {
 	ol.Dest.RenderTo(r)
 	r.Space()
-	r.Text("placing", "keyword")
+	r.Keyword("placing")
 	r.Space()
 	ol.Placing.RenderTo(r)
 	r.Space()
-	r.Text("from", "keyword")
+	r.Keyword("from")
 	r.Space()
 	ol.From.RenderTo(r)
 
 	if ol.For != nil {
 		r.Space()
-		r.Text("for", "keyword")
+		r.Keyword("for")
 		r.Space()
 		ol.For.RenderTo(r)
 	}
@@ -555,10 +555,10 @@ func (ol OverlayList) RenderTo(r Renderer) {
 type PositionExpr PositionList
 
 func (pe PositionExpr) RenderTo(r Renderer) {
-	r.Text("position", "keyword")
-	r.Text("(", "lparen")
+	r.Keyword("position")
+	r.Symbol("(")
 	PositionList(pe).RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type PositionList struct {
@@ -569,7 +569,7 @@ type PositionList struct {
 func (pl PositionList) RenderTo(r Renderer) {
 	pl.Substring.RenderTo(r)
 	r.Space()
-	r.Text("in", "keyword")
+	r.Keyword("in")
 	r.Space()
 	pl.String.RenderTo(r)
 }
@@ -577,10 +577,10 @@ func (pl PositionList) RenderTo(r Renderer) {
 type SubstrExpr SubstrList
 
 func (se SubstrExpr) RenderTo(r Renderer) {
-	r.Text("substring", "keyword")
-	r.Text("(", "lparen")
+	r.Keyword("substring")
+	r.Symbol("(")
 	SubstrList(se).RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type SubstrList struct {
@@ -592,13 +592,13 @@ type SubstrList struct {
 func (sl SubstrList) RenderTo(r Renderer) {
 	sl.Source.RenderTo(r)
 	r.Space()
-	r.Text("from", "keyword")
+	r.Keyword("from")
 	r.Space()
 	sl.From.RenderTo(r)
 
 	if sl.For != nil {
 		r.Space()
-		r.Text("for", "keyword")
+		r.Keyword("for")
 		r.Space()
 		sl.For.RenderTo(r)
 	}
@@ -610,14 +610,14 @@ type TrimExpr struct {
 }
 
 func (te TrimExpr) RenderTo(r Renderer) {
-	r.Text("trim", "keyword")
-	r.Text("(", "lparen")
+	r.Keyword("trim")
+	r.Symbol("(")
 	if te.Direction != "" {
-		r.Text(te.Direction, "keyword")
+		r.Keyword(te.Direction)
 		r.Space()
 	}
 	te.TrimList.RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type TrimList struct {
@@ -633,14 +633,14 @@ func (tl TrimList) RenderTo(r Renderer) {
 	}
 
 	if tl.From {
-		r.Text("from", "keyword")
+		r.Keyword("from")
 		r.Space()
 	}
 
 	for i, e := range tl.Right {
 		e.RenderTo(r)
 		if i+1 < len(tl.Right) {
-			r.Text(",", "comma")
+			r.Symbol(",")
 			r.Space()
 		}
 	}
@@ -653,36 +653,36 @@ type XmlElement struct {
 }
 
 func (el XmlElement) RenderTo(r Renderer) {
-	r.Text("xmlelement", "keyword")
-	r.Text("(", "lparen")
-	r.Text("name", "keyword")
+	r.Keyword("xmlelement")
+	r.Symbol("(")
+	r.Keyword("name")
 	r.Space()
-	r.Text(el.Name, "identifier")
+	r.Identifier(el.Name)
 
 	if el.Attributes != nil {
-		r.Text(",", "comma")
+		r.Symbol(",")
 		r.Space()
 		el.Attributes.RenderTo(r)
 	}
 
 	if el.Body != nil {
 		for _, e := range el.Body {
-			r.Text(",", "comma")
+			r.Symbol(",")
 			r.Space()
 			e.RenderTo(r)
 		}
 	}
 
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type XmlAttributes []XmlAttributeEl
 
 func (attrs XmlAttributes) RenderTo(r Renderer) {
-	r.Text("xmlattributes", "keyword")
-	r.Text("(", "lparen")
+	r.Keyword("xmlattributes")
+	r.Symbol("(")
 	xmlAttributes(attrs).RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type XmlAttributeEl struct {
@@ -694,9 +694,9 @@ func (el XmlAttributeEl) RenderTo(r Renderer) {
 	el.Value.RenderTo(r)
 	if el.Name != "" {
 		r.Space()
-		r.Text("as", "keyword")
+		r.Keyword("as")
 		r.Space()
-		r.Text(el.Name, "identifier")
+		r.Identifier(el.Name)
 	}
 }
 
@@ -706,12 +706,12 @@ type XmlExists struct {
 }
 
 func (e XmlExists) RenderTo(r Renderer) {
-	r.Text("xmlexists", "keyword")
-	r.Text("(", "lparen")
+	r.Keyword("xmlexists")
+	r.Symbol("(")
 	e.Path.RenderTo(r)
 	r.Space()
 	e.Body.RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type XmlExistsArgument struct {
@@ -721,11 +721,11 @@ type XmlExistsArgument struct {
 }
 
 func (a XmlExistsArgument) RenderTo(r Renderer) {
-	r.Text("passing", "keyword")
+	r.Keyword("passing")
 	r.Space()
 
 	if a.LeftByRef {
-		r.Text("by ref", "keyword")
+		r.Keyword("by ref")
 		r.Space()
 	}
 
@@ -733,17 +733,17 @@ func (a XmlExistsArgument) RenderTo(r Renderer) {
 
 	if a.RightByRef {
 		r.Space()
-		r.Text("by ref", "keyword")
+		r.Keyword("by ref")
 	}
 }
 
 type XmlForest []XmlAttributeEl
 
 func (f XmlForest) RenderTo(r Renderer) {
-	r.Text("xmlforest", "keyword")
-	r.Text("(", "lparen")
+	r.Keyword("xmlforest")
+	r.Symbol("(")
 	xmlAttributes(f).RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type xmlAttributes []XmlAttributeEl
@@ -752,7 +752,7 @@ func (attrs xmlAttributes) RenderTo(r Renderer) {
 	for i, a := range attrs {
 		a.RenderTo(r)
 		if i+1 < len(attrs) {
-			r.Text(",", "comma")
+			r.Symbol(",")
 			r.Space()
 		}
 	}
@@ -765,17 +765,17 @@ type XmlParse struct {
 }
 
 func (p XmlParse) RenderTo(r Renderer) {
-	r.Text("xmlparse", "keyword")
-	r.Text("(", "lparen")
-	r.Text(p.Type, "keyword")
+	r.Keyword("xmlparse")
+	r.Symbol("(")
+	r.Keyword(p.Type)
 	r.Space()
 	p.Content.RenderTo(r)
 	if p.WhitespaceOption != "" {
 		r.Space()
-		r.Text(p.WhitespaceOption, "keyword")
+		r.Keyword(p.WhitespaceOption)
 	}
 
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type XmlPi struct {
@@ -784,18 +784,18 @@ type XmlPi struct {
 }
 
 func (p XmlPi) RenderTo(r Renderer) {
-	r.Text("xmlpi", "keyword")
-	r.Text("(", "lparen")
-	r.Text("name", "keyword")
+	r.Keyword("xmlpi")
+	r.Symbol("(")
+	r.Keyword("name")
 	r.Space()
-	r.Text(p.Name, "identifier")
+	r.Identifier(p.Name)
 
 	if p.Content != nil {
-		r.Text(",", "comma")
+		r.Symbol(",")
 		r.Space()
 		p.Content.RenderTo(r)
 	}
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type XmlRoot struct {
@@ -805,20 +805,20 @@ type XmlRoot struct {
 }
 
 func (x XmlRoot) RenderTo(r Renderer) {
-	r.Text("xmlroot", "keyword")
-	r.Text("(", "lparen")
+	r.Keyword("xmlroot")
+	r.Symbol("(")
 	x.Xml.RenderTo(r)
-	r.Text(",", "comma")
+	r.Symbol(",")
 	r.Space()
 	x.Version.RenderTo(r)
 	if x.Standalone != "" {
-		r.Text(",", "comma")
+		r.Symbol(",")
 		r.Space()
-		r.Text("standalone", "keyword")
+		r.Keyword("standalone")
 		r.Space()
-		r.Text(x.Standalone, "keyword")
+		r.Keyword(x.Standalone)
 	}
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type XmlRootVersion struct {
@@ -826,12 +826,12 @@ type XmlRootVersion struct {
 }
 
 func (rv XmlRootVersion) RenderTo(r Renderer) {
-	r.Text("version", "keyword")
+	r.Keyword("version")
 	r.Space()
 	if rv.Expr != nil {
 		rv.Expr.RenderTo(r)
 	} else {
-		r.Text("no value", "keyword")
+		r.Keyword("no value")
 	}
 }
 
@@ -842,16 +842,16 @@ type XmlSerialize struct {
 }
 
 func (s XmlSerialize) RenderTo(r Renderer) {
-	r.Text("xmlserialize", "keyword")
-	r.Text("(", "lparen")
-	r.Text(s.XmlType, "keyword")
+	r.Keyword("xmlserialize")
+	r.Symbol("(")
+	r.Keyword(s.XmlType)
 	r.Space()
 	s.Content.RenderTo(r)
 	r.Space()
-	r.Text("as", "keyword")
+	r.Keyword("as")
 	r.Space()
 	s.Type.RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type CollateExpr struct {
@@ -862,7 +862,7 @@ type CollateExpr struct {
 func (c CollateExpr) RenderTo(r Renderer) {
 	c.Expr.RenderTo(r)
 	r.Space()
-	r.Text("collate", "keyword")
+	r.Keyword("collate")
 	r.Space()
 	c.Collation.RenderTo(r)
 }
@@ -872,7 +872,7 @@ type NotExpr struct {
 }
 
 func (e NotExpr) RenderTo(r Renderer) {
-	r.Text("not", "keyword")
+	r.Keyword("not")
 	r.Space()
 	e.Expr.RenderTo(r)
 }
@@ -886,13 +886,13 @@ type IsExpr struct {
 func (e IsExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
 	r.Space()
-	r.Text("is", "keyword")
+	r.Keyword("is")
 	r.Space()
 	if e.Not {
-		r.Text("not", "keyword")
+		r.Keyword("not")
 		r.Space()
 	}
-	r.Text(e.Op, "keyword")
+	r.Keyword(e.Op)
 }
 
 type AliasedExpr struct {
@@ -903,9 +903,9 @@ type AliasedExpr struct {
 func (e AliasedExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
 	r.Space()
-	r.Text("as", "keyword")
+	r.Keyword("as")
 	r.Space()
-	r.Text(e.Alias, "identifier")
+	r.Identifier(e.Alias)
 }
 
 type IntoClause struct {
@@ -915,16 +915,16 @@ type IntoClause struct {
 }
 
 func (i IntoClause) RenderTo(r Renderer) {
-	r.Text("into", "keyword")
+	r.Keyword("into")
 	r.Space()
 
 	if i.Options != "" {
-		r.Text(i.Options, "keyword")
+		r.Keyword(i.Options)
 		r.Space()
 	}
 
 	if i.OptTable {
-		r.Text("table", "keyword")
+		r.Keyword("table")
 		r.Space()
 	}
 
@@ -937,7 +937,7 @@ type FromClause struct {
 }
 
 func (e FromClause) RenderTo(r Renderer) {
-	r.Text("from", "keyword")
+	r.Keyword("from")
 	r.NewLine()
 	r.Indent()
 	e.Expr.RenderTo(r)
@@ -957,11 +957,11 @@ func (s JoinExpr) RenderTo(r Renderer) {
 	s.Left.RenderTo(r)
 
 	if s.Join == "," {
-		r.Text(",", "comma")
+		r.Symbol(",")
 		r.NewLine()
 	} else {
 		r.NewLine()
-		r.Text(s.Join, "keyword")
+		r.Keyword(s.Join)
 		r.Space()
 	}
 
@@ -969,23 +969,23 @@ func (s JoinExpr) RenderTo(r Renderer) {
 
 	if len(s.Using) > 0 {
 		r.Space()
-		r.Text("using", "keyword")
-		r.Text("(", "lparen")
+		r.Keyword("using")
+		r.Symbol("(")
 
 		for i, u := range s.Using {
-			r.Text(u, "identifier")
+			r.Identifier(u)
 			if i+1 < len(s.Using) {
-				r.Text(",", "comma")
+				r.Symbol(",")
 				r.Space()
 			}
 		}
 
-		r.Text(")", "rparen")
+		r.Symbol(")")
 	}
 
 	if s.On != nil {
 		r.Space()
-		r.Text("on", "keyword")
+		r.Keyword("on")
 		r.Space()
 		s.On.RenderTo(r)
 	}
@@ -996,7 +996,7 @@ type WhereClause struct {
 }
 
 func (e WhereClause) RenderTo(r Renderer) {
-	r.Text("where", "keyword")
+	r.Keyword("where")
 	r.NewLine()
 	r.Indent()
 	e.Expr.RenderTo(r)
@@ -1015,19 +1015,19 @@ func (e OrderExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
 	if e.Order != "" {
 		r.Space()
-		r.Text(e.Order, "keyword")
+		r.Keyword(e.Order)
 	}
 	if len(e.Using) > 0 {
 		r.Space()
-		r.Text("using", "keyword")
+		r.Keyword("using")
 		r.Space()
 		e.Using.RenderTo(r)
 	}
 	if e.Nulls != "" {
 		r.Space()
-		r.Text("nulls", "keyword")
+		r.Keyword("nulls")
 		r.Space()
-		r.Text(e.Nulls, "keyword")
+		r.Keyword(e.Nulls)
 	}
 }
 
@@ -1036,14 +1036,14 @@ type OrderClause struct {
 }
 
 func (e OrderClause) RenderTo(r Renderer) {
-	r.Text("order by", "keyword")
+	r.Keyword("order by")
 	r.NewLine()
 	r.Indent()
 
 	for i, f := range e.Exprs {
 		f.RenderTo(r)
 		if i < len(e.Exprs)-1 {
-			r.Text(",", "comma")
+			r.Symbol(",")
 		}
 		r.NewLine()
 	}
@@ -1055,14 +1055,14 @@ type GroupByClause struct {
 }
 
 func (e GroupByClause) RenderTo(r Renderer) {
-	r.Text("group by", "keyword")
+	r.Keyword("group by")
 	r.NewLine()
 	r.Indent()
 
 	for i, f := range e.Exprs {
 		f.RenderTo(r)
 		if i < len(e.Exprs)-1 {
-			r.Text(",", "comma")
+			r.Symbol(",")
 		}
 		r.NewLine()
 	}
@@ -1076,13 +1076,13 @@ type LimitClause struct {
 
 func (e LimitClause) RenderTo(r Renderer) {
 	if e.Limit != nil {
-		r.Text("limit", "keyword")
+		r.Keyword("limit")
 		r.Space()
 		e.Limit.RenderTo(r)
 		r.NewLine()
 	}
 	if e.Offset != nil {
-		r.Text("offset", "keyword")
+		r.Keyword("offset")
 		r.Space()
 		e.Offset.RenderTo(r)
 		r.NewLine()
@@ -1097,7 +1097,7 @@ type AtTimeZoneExpr struct {
 func (e AtTimeZoneExpr) RenderTo(r Renderer) {
 	e.Expr.RenderTo(r)
 	r.Space()
-	r.Text("at time zone", "keyword")
+	r.Keyword("at time zone")
 	r.Space()
 	e.TimeZone.RenderTo(r)
 }
@@ -1109,19 +1109,19 @@ type LockingItem struct {
 }
 
 func (li LockingItem) RenderTo(r Renderer) {
-	r.Text("for", "keyword")
+	r.Keyword("for")
 	r.Space()
-	r.Text(li.Strength, "keyword")
+	r.Keyword(li.Strength)
 
 	if li.LockedRels != nil {
 		r.Space()
-		r.Text("of", "keyword")
+		r.Keyword("of")
 		r.Space()
 
 		for i, lr := range li.LockedRels {
 			lr.RenderTo(r)
 			if i < len(li.LockedRels)-1 {
-				r.Text(",", "comma")
+				r.Symbol(",")
 				r.Space()
 			}
 		}
@@ -1129,7 +1129,7 @@ func (li LockingItem) RenderTo(r Renderer) {
 
 	if li.WaitPolicy != "" {
 		r.Space()
-		r.Text(li.WaitPolicy, "keyword")
+		r.Keyword(li.WaitPolicy)
 	}
 
 	r.NewLine()
@@ -1148,7 +1148,7 @@ func (lc LockingClause) RenderTo(r Renderer) {
 type FuncExprNoParens string
 
 func (fe FuncExprNoParens) RenderTo(r Renderer) {
-	r.Text(string(fe), "keyword")
+	r.Keyword(string(fe))
 }
 
 type FuncExpr struct {
@@ -1191,20 +1191,20 @@ type FuncApplication struct {
 
 func (fa FuncApplication) RenderTo(r Renderer) {
 	fa.Name.RenderTo(r)
-	r.Text("(", "lparen")
+	r.Symbol("(")
 
 	if fa.Distinct {
-		r.Text("distinct", "keyword")
+		r.Keyword("distinct")
 		r.Space()
 	}
 
 	if fa.Star {
-		r.Text("*", "star")
+		r.Symbol("*")
 	} else if len(fa.Args) > 0 {
 		for i, a := range fa.Args {
 			a.RenderTo(r)
 			if i < len(fa.Args)-1 {
-				r.Text(",", "comma")
+				r.Symbol(",")
 				r.Space()
 			}
 		}
@@ -1212,11 +1212,11 @@ func (fa FuncApplication) RenderTo(r Renderer) {
 
 	if fa.VariadicArg != nil {
 		if len(fa.Args) > 0 {
-			r.Text(",", "comma")
+			r.Symbol(",")
 			r.Space()
 		}
 
-		r.Text("variadic", "keyword")
+		r.Keyword("variadic")
 		r.Space()
 		fa.VariadicArg.RenderTo(r)
 	}
@@ -1226,7 +1226,7 @@ func (fa FuncApplication) RenderTo(r Renderer) {
 		fa.OrderClause.RenderTo(r)
 	}
 
-	r.Text(")", "lparen")
+	r.Symbol(")")
 }
 
 type FuncArg struct {
@@ -1237,9 +1237,9 @@ type FuncArg struct {
 
 func (fa FuncArg) RenderTo(r Renderer) {
 	if fa.Name != "" {
-		r.Text(fa.Name, "identifier")
+		r.Identifier(fa.Name)
 		r.Space()
-		r.Text(fa.NameOp, "operator")
+		r.Symbol(fa.NameOp)
 		r.Space()
 	}
 	fa.Expr.RenderTo(r)
@@ -1252,14 +1252,14 @@ type CastFunc struct {
 }
 
 func (cf CastFunc) RenderTo(r Renderer) {
-	r.Text(cf.Name, "keyword")
-	r.Text("(", "lparen")
+	r.Keyword(cf.Name)
+	r.Symbol("(")
 	cf.Expr.RenderTo(r)
 	r.Space()
-	r.Text("as", "keyword")
+	r.Keyword("as")
 	r.Space()
 	cf.Type.RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type IsOfExpr struct {
@@ -1271,38 +1271,38 @@ type IsOfExpr struct {
 func (io IsOfExpr) RenderTo(r Renderer) {
 	io.Expr.RenderTo(r)
 	r.Space()
-	r.Text("is", "keyword")
+	r.Keyword("is")
 	r.Space()
 
 	if io.Not {
-		r.Text("not", "keyword")
+		r.Keyword("not")
 		r.Space()
 	}
 
-	r.Text("of", "keyword")
+	r.Keyword("of")
 	r.Space()
-	r.Text("(", "lparen")
+	r.Symbol("(")
 
 	for i, t := range io.Types {
 		t.RenderTo(r)
 
 		if i < len(io.Types)-1 {
-			r.Text(",", "comma")
+			r.Symbol(",")
 			r.Space()
 		}
 	}
 
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type WithinGroupClause OrderClause
 
 func (w WithinGroupClause) RenderTo(r Renderer) {
-	r.Text("within group", "keyword")
+	r.Keyword("within group")
 	r.Space()
-	r.Text("(", "lparen")
+	r.Symbol("(")
 	OrderClause(w).RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type FilterClause struct {
@@ -1310,19 +1310,19 @@ type FilterClause struct {
 }
 
 func (f FilterClause) RenderTo(r Renderer) {
-	r.Text("filter", "keyword")
+	r.Keyword("filter")
 	r.Space()
-	r.Text("(", "lparen")
-	r.Text("where", "keyword")
+	r.Symbol("(")
+	r.Keyword("where")
 	r.Space()
 	f.Expr.RenderTo(r)
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type DefaultExpr bool
 
 func (d DefaultExpr) RenderTo(r Renderer) {
-	r.Text("default", "keyword")
+	r.Keyword("default")
 }
 
 type Row struct {
@@ -1332,50 +1332,50 @@ type Row struct {
 
 func (row Row) RenderTo(r Renderer) {
 	if row.RowWord {
-		r.Text("row", "keyword")
+		r.Keyword("row")
 		r.Space()
 	}
 
-	r.Text("(", "lparen")
+	r.Symbol("(")
 
 	for i, e := range row.Exprs {
 		e.RenderTo(r)
 		if i < len(row.Exprs)-1 {
-			r.Text(",", "comma")
+			r.Symbol(",")
 			r.Space()
 		}
 	}
 
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type ValuesRow []Expr
 
 func (vr ValuesRow) RenderTo(r Renderer) {
-	r.Text("(", "lparen")
+	r.Symbol("(")
 
 	for i, e := range vr {
 		e.RenderTo(r)
 		if i < len(vr)-1 {
-			r.Text(",", "comma")
+			r.Symbol(",")
 			r.Space()
 		}
 	}
 
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type ValuesClause []ValuesRow
 
 func (vc ValuesClause) RenderTo(r Renderer) {
-	r.Text("values", "keyword")
+	r.Keyword("values")
 	r.NewLine()
 	r.Indent()
 
 	for i, row := range vc {
 		row.RenderTo(r)
 		if i < len(vc)-1 {
-			r.Text(",", "comma")
+			r.Symbol(",")
 		}
 		r.NewLine()
 	}
@@ -1389,10 +1389,10 @@ type OverClause struct {
 }
 
 func (oc *OverClause) RenderTo(r Renderer) {
-	r.Text("over", "keyword")
+	r.Keyword("over")
 	r.Space()
 	if oc.Name != "" {
-		r.Text(oc.Name, "identifier")
+		r.Identifier(oc.Name)
 	} else {
 		oc.Specification.RenderTo(r)
 	}
@@ -1401,14 +1401,14 @@ func (oc *OverClause) RenderTo(r Renderer) {
 type WindowClause []WindowDefinition
 
 func (wc WindowClause) RenderTo(r Renderer) {
-	r.Text("window", "keyword")
+	r.Keyword("window")
 	r.NewLine()
 	r.Indent()
 
 	for i, wd := range wc {
 		wd.RenderTo(r)
 		if i < len(wc)-1 {
-			r.Text(",", "comma")
+			r.Symbol(",")
 		}
 		r.NewLine()
 	}
@@ -1422,9 +1422,9 @@ type WindowDefinition struct {
 }
 
 func (wd WindowDefinition) RenderTo(r Renderer) {
-	r.Text(wd.Name, "identifier")
+	r.Identifier(wd.Name)
 	r.Space()
-	r.Text("as", "keyword")
+	r.Keyword("as")
 	r.Space()
 	wd.Specification.RenderTo(r)
 }
@@ -1437,10 +1437,10 @@ type WindowSpecification struct {
 }
 
 func (ws WindowSpecification) RenderTo(r Renderer) {
-	r.Text("(", "lparen")
+	r.Symbol("(")
 
 	if ws.ExistingName != "" {
-		r.Text(ws.ExistingName, "identifier")
+		r.Identifier(ws.ExistingName)
 		r.Space()
 	}
 
@@ -1464,19 +1464,19 @@ func (ws WindowSpecification) RenderTo(r Renderer) {
 		ws.FrameClause.RenderTo(r)
 	}
 
-	r.Text(")", "rparen")
+	r.Symbol(")")
 }
 
 type PartitionClause []Expr
 
 func (pc PartitionClause) RenderTo(r Renderer) {
-	r.Text("partition by", "keyword")
+	r.Keyword("partition by")
 	r.Space()
 
 	for i, e := range pc {
 		e.RenderTo(r)
 		if i < len(pc)-1 {
-			r.Text(",", "comma")
+			r.Symbol(",")
 			r.Space()
 		}
 	}
@@ -1489,15 +1489,15 @@ type FrameClause struct {
 }
 
 func (fc *FrameClause) RenderTo(r Renderer) {
-	r.Text(fc.Mode, "keyword")
+	r.Keyword(fc.Mode)
 	r.Space()
 
 	if fc.End != nil {
-		r.Text("between", "keyword")
+		r.Keyword("between")
 		r.Space()
 		fc.Start.RenderTo(r)
 		r.Space()
-		r.Text("and", "keyword")
+		r.Keyword("and")
 		r.Space()
 		fc.End.RenderTo(r)
 	} else {
@@ -1514,19 +1514,19 @@ type FrameBound struct {
 
 func (fb FrameBound) RenderTo(r Renderer) {
 	if fb.CurrentRow {
-		r.Text("current row", "keyword")
+		r.Keyword("current row")
 		return
 	}
 
 	if fb.BoundExpr != nil {
 		fb.BoundExpr.RenderTo(r)
 	} else {
-		r.Text("unbounded", "keyword")
+		r.Keyword("unbounded")
 	}
 
 	r.Space()
 
-	r.Text(fb.Direction, "keyword")
+	r.Keyword(fb.Direction)
 }
 
 type RelationExpr struct {
@@ -1537,7 +1537,7 @@ type RelationExpr struct {
 
 func (re RelationExpr) RenderTo(r Renderer) {
 	if re.Only {
-		r.Text("only", "keyword")
+		r.Keyword("only")
 		r.Space()
 	}
 
@@ -1545,7 +1545,7 @@ func (re RelationExpr) RenderTo(r Renderer) {
 
 	if re.Star {
 		r.Space()
-		r.Text("*", "star")
+		r.Symbol("*")
 	}
 
 	r.NewLine()
@@ -1573,7 +1573,7 @@ type SimpleSelect struct {
 
 func (s SimpleSelect) RenderTo(r Renderer) {
 	if s.Table != nil {
-		r.Text("table", "keyword")
+		r.Keyword("table")
 		r.Space()
 		s.Table.RenderTo(r)
 		return
@@ -1587,11 +1587,11 @@ func (s SimpleSelect) RenderTo(r Renderer) {
 	if s.LeftSelect != nil {
 		s.LeftSelect.RenderTo(r)
 		r.NewLine()
-		r.Text(s.SetOp, "keyword")
+		r.Keyword(s.SetOp)
 
 		if s.SetAll {
 			r.Space()
-			r.Text("all", "keyword")
+			r.Keyword("all")
 		}
 
 		r.NewLine()
@@ -1601,25 +1601,25 @@ func (s SimpleSelect) RenderTo(r Renderer) {
 		return
 	}
 
-	r.Text("select", "keyword")
+	r.Keyword("select")
 
 	if s.DistinctList != nil {
 		r.Space()
-		r.Text("distinct", "keyword")
+		r.Keyword("distinct")
 
 		if len(s.DistinctList) > 0 {
 			r.Space()
-			r.Text("on", "keyword")
-			r.Text("(", "lparen")
+			r.Keyword("on")
+			r.Symbol("(")
 
 			for i, f := range s.DistinctList {
 				f.RenderTo(r)
 				if i < len(s.DistinctList)-1 {
-					r.Text(",", "comma")
+					r.Symbol(",")
 					r.Space()
 				}
 			}
-			r.Text(")", "rparen")
+			r.Symbol(")")
 		}
 
 	}
@@ -1629,7 +1629,7 @@ func (s SimpleSelect) RenderTo(r Renderer) {
 	for i, f := range s.TargetList {
 		f.RenderTo(r)
 		if i < len(s.TargetList)-1 {
-			r.Text(",", "comma")
+			r.Symbol(",")
 		}
 		r.NewLine()
 	}
@@ -1652,7 +1652,7 @@ func (s SimpleSelect) RenderTo(r Renderer) {
 	}
 
 	if s.HavingClause != nil {
-		r.Text("having", "keyword")
+		r.Keyword("having")
 		r.NewLine()
 		r.Indent()
 		s.HavingClause.RenderTo(r)
@@ -1676,7 +1676,7 @@ type SelectStmt struct {
 
 func (s SelectStmt) RenderTo(r Renderer) {
 	if s.ParenWrapped {
-		r.Text("(", "lparen")
+		r.Symbol("(")
 	}
 
 	s.SimpleSelect.RenderTo(r)
@@ -1694,12 +1694,12 @@ func (s SelectStmt) RenderTo(r Renderer) {
 	}
 
 	if s.ParenWrapped {
-		r.Text(")", "rparen")
+		r.Symbol(")")
 		r.NewLine()
 	}
 
 	if s.Semicolon {
-		r.Text(";", "semicolon")
+		r.Symbol(";")
 		r.NewLine()
 	}
 }
@@ -1707,7 +1707,7 @@ func (s SelectStmt) RenderTo(r Renderer) {
 type ExistsExpr SelectStmt
 
 func (e ExistsExpr) RenderTo(r Renderer) {
-	r.Text("exists", "keyword")
+	r.Keyword("exists")
 
 	SelectStmt(e).RenderTo(r)
 }
@@ -1715,7 +1715,7 @@ func (e ExistsExpr) RenderTo(r Renderer) {
 type ArraySubselect SelectStmt
 
 func (a ArraySubselect) RenderTo(r Renderer) {
-	r.Text("array", "keyword")
+	r.Keyword("array")
 
 	SelectStmt(a).RenderTo(r)
 }

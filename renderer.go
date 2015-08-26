@@ -5,7 +5,10 @@ import (
 )
 
 type Renderer interface {
-	Text(val string, typ string)
+	Keyword(val string)
+	Identifier(val string)
+	Symbol(val string)
+	Constant(val string)
 	Space()
 	NewLine()
 	Indent()
@@ -25,11 +28,7 @@ func NewTextRenderer(w io.Writer) *TextRenderer {
 	return &TextRenderer{w: w, indent: "  "}
 }
 
-func (tr *TextRenderer) Text(val, typ string) {
-	if tr.err != nil {
-		return
-	}
-
+func (tr *TextRenderer) text(val string) {
 	tr.newLine = false
 
 	if !tr.lineIndented {
@@ -44,6 +43,38 @@ func (tr *TextRenderer) Text(val, typ string) {
 	}
 
 	_, tr.err = io.WriteString(tr.w, val)
+}
+
+func (tr *TextRenderer) Keyword(val string) {
+	if tr.err != nil {
+		return
+	}
+
+	tr.text(val)
+}
+
+func (tr *TextRenderer) Identifier(val string) {
+	if tr.err != nil {
+		return
+	}
+
+	tr.text(val)
+}
+
+func (tr *TextRenderer) Symbol(val string) {
+	if tr.err != nil {
+		return
+	}
+
+	tr.text(val)
+}
+
+func (tr *TextRenderer) Constant(val string) {
+	if tr.err != nil {
+		return
+	}
+
+	tr.text(val)
 }
 
 func (tr *TextRenderer) Space() {

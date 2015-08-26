@@ -10,16 +10,16 @@ func TestTextRenderer(t *testing.T) {
 
 	tr := NewTextRenderer(&buf)
 
-	tr.Text("select", "")
+	tr.Keyword("select")
 	tr.NewLine()
 	tr.Indent()
-	tr.Text("foo", "")
+	tr.Identifier("foo")
 	tr.NewLine()
 	tr.Unindent()
-	tr.Text("from", "")
+	tr.Keyword("from")
 	tr.NewLine()
 	tr.Indent()
-	tr.Text("bar", "")
+	tr.Identifier("bar")
 
 	expected := `select
   foo
