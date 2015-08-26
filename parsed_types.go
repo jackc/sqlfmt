@@ -1153,12 +1153,18 @@ func (fe FuncExprNoParens) RenderTo(r Renderer) {
 
 type FuncExpr struct {
 	FuncApplication
-	FilterClause *FilterClause
-	OverClause   *OverClause
+	WithinGroupClause *WithinGroupClause
+	FilterClause      *FilterClause
+	OverClause        *OverClause
 }
 
 func (fe FuncExpr) RenderTo(r Renderer) {
 	fe.FuncApplication.RenderTo(r)
+
+	if fe.WithinGroupClause != nil {
+		r.Space()
+		fe.WithinGroupClause.RenderTo(r)
+	}
 
 	if fe.FilterClause != nil {
 		r.Space()
@@ -1286,6 +1292,16 @@ func (io IsOfExpr) RenderTo(r Renderer) {
 		}
 	}
 
+	r.Text(")", "rparen")
+}
+
+type WithinGroupClause OrderClause
+
+func (w WithinGroupClause) RenderTo(r Renderer) {
+	r.Text("within group", "keyword")
+	r.Space()
+	r.Text("(", "lparen")
+	OrderClause(w).RenderTo(r)
 	r.Text(")", "rparen")
 }
 

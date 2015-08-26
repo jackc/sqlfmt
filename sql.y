@@ -34,6 +34,7 @@ package sqlfmt
   funcApplication FuncApplication
   funcArgs []FuncArg
   funcArg FuncArg
+  withinGroupClause *WithinGroupClause
   filterClause *FilterClause
   relationExpr *RelationExpr
   windowDefinitions []WindowDefinition
@@ -86,11 +87,11 @@ package sqlfmt
 %type <str> opt_asc_desc opt_nulls_order opt_charset
 %type <placeholder> row_or_rows
   first_or_next
-  within_group_clause
   opt_asymmetric
 
 %type <fields> opt_type_modifiers
 
+%type <withinGroupClause> within_group_clause
 %type <filterClause> filter_clause
 
 %type <relationExpr> relation_expr
@@ -1387,9 +1388,9 @@ func_application:
  * sense as functional index entries, but we ignore that consideration here.)
  */
 func_expr:
-  func_application /* TODO within_group_clause */ filter_clause over_clause
+  func_application within_group_clause filter_clause over_clause
   {
-    $$ = &FuncExpr{FuncApplication: $1, FilterClause: $2, OverClause: $3}
+    $$ = &FuncExpr{FuncApplication: $1, WithinGroupClause: $2, FilterClause: $3, OverClause: $4}
   }
 | func_expr_common_subexpr
   {
@@ -2573,9 +2574,11 @@ where_clause:
  * Aggregate decoration clauses
  */
 within_group_clause:
-      WITHIN GROUP_P '(' sort_clause ')'    { panic("TODO") }
-      | /*EMPTY*/               { $$ = nil }
-    ;
+  WITHIN GROUP_P '(' sort_clause ')'
+  {
+    $$ = (*WithinGroupClause)($4)
+  }
+| /*EMPTY*/ { $$ = nil }
 
 filter_clause:
   FILTER '(' WHERE a_expr ')'

@@ -104,6 +104,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "intersect.sql"},
 		{inputFile: "except.sql"},
 		{inputFile: "function_call_without_args.sql"},
+		{inputFile: "function_call_with_grouping_set.sql"}, // TODO - fix formatting when order by is inside function call
 		{inputFile: "function_call_with_star_arg.sql"},
 		{inputFile: "function_call_with_positional_args.sql"},
 		{inputFile: "function_call_with_pg_named_args.sql"},
