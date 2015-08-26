@@ -121,12 +121,11 @@ package sqlfmt
 %type <lockingItem> for_locking_item
 %type <str> for_locking_strength opt_nowait_or_skip
 
-%type <identifiers> name_list
 %type <anyNames> qualified_name_list locked_rels_list
 
 %type <indirectionEl> indirection_el
 %type <indirection> indirection opt_indirection
-%type <str> attr_name ColId name param_name
+%type <str> attr_name ColId param_name
 %type <anyName> qualified_name
 
 %type <str> MathOp all_Op sub_type
@@ -2859,16 +2858,6 @@ qualified_name:
     }
   }
 
-name_list:
-  name { $$ = []string{$1} }
-| name_list ',' name
-  {
-    $$ = append($1, $3)
-  }
-
-name:
-  ColId { $$ = $1 }
-
 attr_name:
   ColLabel { $$ = $1 }
 
@@ -3004,14 +2993,6 @@ ColId:
 type_function_name:
   IDENT
 | unreserved_keyword
-| type_func_name_keyword
-
-/* Any not-fully-reserved word --- these names can be, eg, role names.
- */
-NonReservedWord:
-  IDENT
-| unreserved_keyword
-| col_name_keyword
 | type_func_name_keyword
 
 /* Column label --- allowed labels in "AS" clauses.
