@@ -1354,10 +1354,16 @@ func_application:
   {
     $$ = FuncApplication{Name: $1, Args: $3, OrderClause: $4}
   }
-/* TODO
-      | func_name '(' VARIADIC func_arg_expr opt_sort_clause ')'
-      | func_name '(' func_arg_list ',' VARIADIC func_arg_expr opt_sort_clause ')'
-*/
+| func_name '(' VARIADIC func_arg_expr opt_sort_clause ')'
+  {
+    va := $4
+    $$ = FuncApplication{Name: $1, VariadicArg: &va, OrderClause: $5}
+  }
+| func_name '(' func_arg_list ',' VARIADIC func_arg_expr opt_sort_clause ')'
+  {
+    va := $6
+    $$ = FuncApplication{Name: $1, Args: $3, VariadicArg: &va, OrderClause: $7}
+  }
 | func_name '(' ALL func_arg_list opt_sort_clause ')'
   {
     $$ = FuncApplication{Name: $1, Args: $4, OrderClause: $5}

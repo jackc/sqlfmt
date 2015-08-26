@@ -1176,8 +1176,9 @@ type FuncApplication struct {
 
 	Distinct bool
 
-	Star bool
-	Args []FuncArg
+	Star        bool
+	Args        []FuncArg
+	VariadicArg *FuncArg
 
 	OrderClause *OrderClause
 }
@@ -1201,6 +1202,17 @@ func (fa FuncApplication) RenderTo(r Renderer) {
 				r.Space()
 			}
 		}
+	}
+
+	if fa.VariadicArg != nil {
+		if len(fa.Args) > 0 {
+			r.Text(",", "comma")
+			r.Space()
+		}
+
+		r.Text("variadic", "keyword")
+		r.Space()
+		fa.VariadicArg.RenderTo(r)
 	}
 
 	if fa.OrderClause != nil {
