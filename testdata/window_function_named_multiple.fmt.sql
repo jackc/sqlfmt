@@ -5,6 +5,4 @@ from
   baz
 window
   w as (partition by quz),
-  w2 as (w order by
-    abc
-  )
+  w2 as (w order by abc)

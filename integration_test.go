@@ -104,12 +104,12 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "intersect.sql"},
 		{inputFile: "except.sql"},
 		{inputFile: "function_call_without_args.sql"},
-		{inputFile: "function_call_with_grouping_set.sql"}, // TODO - fix formatting when order by is inside function call
+		{inputFile: "function_call_with_grouping_set.sql"},
 		{inputFile: "function_call_with_star_arg.sql"},
 		{inputFile: "function_call_with_positional_args.sql"},
 		{inputFile: "function_call_with_pg_named_args.sql"},
 		{inputFile: "function_call_with_sql_named_args.sql"},
-		{inputFile: "function_call_with_order.sql"}, // TODO - fix formatting when order by is inside function call
+		{inputFile: "function_call_with_order.sql"},
 		{inputFile: "function_call_with_all.sql"},
 		{inputFile: "function_call_with_distinct.sql"},
 		{inputFile: "function_call_with_filter.sql"},
@@ -118,7 +118,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "null.sql"},
 		{inputFile: "window_function.sql"},
 		{inputFile: "window_function_partition_by.sql"},
-		{inputFile: "window_function_order_by.sql"}, // TODO - fix formatting when order by is inside function call
+		{inputFile: "window_function_order_by.sql"},
 		{inputFile: "window_function_named.sql"},
 		{inputFile: "window_function_named_multiple.sql"},
 		{inputFile: "window_function_frame.sql"},

@@ -4,6 +4,4 @@ select
 from
   baz
 window
-  w as (partition by quz order by
-    abc
-  )
+  w as (partition by quz order by abc)

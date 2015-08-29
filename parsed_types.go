@@ -1059,7 +1059,10 @@ func (fe FuncExpr) RenderTo(r Renderer) {
 	fe.FuncApplication.RenderTo(r)
 
 	if fe.WithinGroupClause != nil {
-		fe.WithinGroupClause.RenderTo(r)
+		tr := &TokenRenderer{}
+		fe.WithinGroupClause.RenderTo(tr)
+		tokens := TryOneLine([]RenderToken(*tr), 60)
+		RenderTokens(r, tokens)
 	}
 
 	if fe.FilterClause != nil {
@@ -1112,7 +1115,10 @@ func (fa FuncApplication) RenderTo(r Renderer) {
 	}
 
 	if fa.OrderClause != nil {
-		fa.OrderClause.RenderTo(r)
+		tr := &TokenRenderer{}
+		fa.OrderClause.RenderTo(tr)
+		tokens := TryOneLine([]RenderToken(*tr), 60)
+		RenderTokens(r, tokens)
 	}
 
 	r.Text(")", SymbolToken)
@@ -1324,7 +1330,10 @@ func (ws WindowSpecification) RenderTo(r Renderer) {
 	}
 
 	if ws.OrderClause != nil {
-		ws.OrderClause.RenderTo(r)
+		tr := &TokenRenderer{}
+		ws.OrderClause.RenderTo(tr)
+		tokens := TryOneLine([]RenderToken(*tr), 60)
+		RenderTokens(r, tokens)
 	}
 
 	if ws.FrameClause != nil {

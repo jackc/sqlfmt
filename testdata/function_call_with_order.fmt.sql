@@ -1,8 +1,6 @@
 select
   name,
-  array_agg(foo order by
-    bar
-  )
+  array_agg(foo order by bar)
 from
   baz
 group by
