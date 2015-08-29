@@ -14,17 +14,19 @@ func TestTextRenderer(t *testing.T) {
 	tr.NewLine()
 	tr.Indent()
 	tr.Identifier("foo")
+	tr.Symbol(",")
+	tr.Identifier("bar")
 	tr.NewLine()
 	tr.Unindent()
 	tr.Keyword("from")
 	tr.NewLine()
 	tr.Indent()
-	tr.Identifier("bar")
+	tr.Identifier("baz")
 
 	expected := `select
-  foo
+  foo, bar
 from
-  bar`
+  baz`
 
 	if buf.String() != expected {
 		t.Errorf("Expected `%s`, got `%s`", expected, buf.String())
