@@ -23,15 +23,8 @@ type RenderToken struct {
 }
 
 type Renderer interface {
-	Keyword(val string)
-	Identifier(val string)
-	Symbol(val string)
-	Constant(val string)
-	Space()
-	RefuseSpace()
-	NewLine()
-	Indent()
-	Unindent()
+	Text(val string, typ int)
+	Control(typ int)
 }
 
 type TextRenderer struct {
@@ -92,7 +85,7 @@ func NewTextRenderer(w io.Writer) *TextRenderer {
 	return &TextRenderer{w: w, indent: "  "}
 }
 
-func (tr *TextRenderer) text(val string, tokenType int) {
+func (tr *TextRenderer) Text(val string, tokenType int) {
 	if !tr.lineIndented {
 		for i := 0; i < tr.indentLvl; i++ {
 			_, tr.err = io.WriteString(tr.w, tr.indent)
@@ -120,60 +113,26 @@ func (tr *TextRenderer) text(val string, tokenType int) {
 	_, tr.err = io.WriteString(tr.w, val)
 }
 
-func (tr *TextRenderer) Keyword(val string) {
+func (tr *TextRenderer) Control(typ int) {
 	if tr.err != nil {
 		return
 	}
 
-	tr.text(val, KeywordToken)
+	switch typ {
+	case SpaceToken:
+		_, tr.err = io.WriteString(tr.w, " ")
+	case NewLineToken:
+		tr.renderNewLine()
+	case IndentToken:
+		tr.indentLvl = tr.indentLvl + 1
+	case UnindentToken:
+		tr.indentLvl = tr.indentLvl - 1
+	}
+
+	tr.lastRenderToken = RenderToken{Type: typ}
 }
 
-func (tr *TextRenderer) Identifier(val string) {
-	if tr.err != nil {
-		return
-	}
-
-	tr.text(val, IdentifierToken)
-}
-
-func (tr *TextRenderer) Symbol(val string) {
-	if tr.err != nil {
-		return
-	}
-
-	tr.text(val, SymbolToken)
-}
-
-func (tr *TextRenderer) Constant(val string) {
-	if tr.err != nil {
-		return
-	}
-
-	tr.text(val, ConstantToken)
-}
-
-func (tr *TextRenderer) Space() {
-	if tr.err != nil {
-		return
-	}
-
-	tr.lastRenderToken = RenderToken{Type: SpaceToken}
-	_, tr.err = io.WriteString(tr.w, " ")
-}
-
-func (tr *TextRenderer) RefuseSpace() {
-	if tr.err != nil {
-		return
-	}
-
-	tr.lastRenderToken = RenderToken{Type: RefuseSpaceToken}
-}
-
-func (tr *TextRenderer) NewLine() {
-	if tr.err != nil {
-		return
-	}
-
+func (tr *TextRenderer) renderNewLine() {
 	if tr.newLine {
 		return
 	}
@@ -187,12 +146,4 @@ func (tr *TextRenderer) NewLine() {
 	}
 
 	tr.lineIndented = false
-}
-
-func (tr *TextRenderer) Indent() {
-	tr.indentLvl = tr.indentLvl + 1
-}
-
-func (tr *TextRenderer) Unindent() {
-	tr.indentLvl = tr.indentLvl - 1
 }
