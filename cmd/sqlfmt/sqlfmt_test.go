@@ -69,6 +69,32 @@ func sqlfmt(sql []byte, args ...string) ([]byte, error) {
 	return output, nil
 }
 
+func TestFileInput(t *testing.T) {
+	inputFile := "simple_select_without_from.sql"
+	expectedOutputFile := "simple_select_without_from.fmt.sql"
+
+	expected, err := ioutil.ReadFile(path.Join("../../testdata", expectedOutputFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	filePath := path.Join("../../testdata", inputFile)
+	output, err := sqlfmt(nil, filePath)
+	if err != nil {
+		t.Fatalf("sqlfmt failed with %s: %v", filePath, err)
+	}
+
+	if bytes.Compare(output, expected) != 0 {
+		actualFileName := path.Join("tmp", "TestFileInput.sql")
+		err = ioutil.WriteFile(actualFileName, output, os.ModePerm)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		t.Errorf("Given %s, did not receive %s. Unexpected output written to %s", filePath, expectedOutputFile, actualFileName)
+	}
+}
+
 func TestSqlFmt(t *testing.T) {
 	tests := []struct {
 		inputFile          string

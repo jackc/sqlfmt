@@ -16,7 +16,7 @@ var options struct {
 
 func main() {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "usage:  %s [options]\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "usage:  %s [options] [path]\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 
@@ -28,10 +28,22 @@ func main() {
 		os.Exit(0)
 	}
 
-	input, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
+	var input []byte
+	var err error
+
+	if len(flag.Args()) == 0 {
+		input, err = ioutil.ReadAll(os.Stdin)
+	} else if len(flag.Args()) == 1 {
+		input, err = ioutil.ReadFile(flag.Arg(0))
+	} else {
+		flag.Usage()
 		os.Exit(1)
 	}
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
 	lexer := sqlfmt.NewSqlLexer(string(input))
 	stmt, err := sqlfmt.Parse(lexer)
 	if err != nil {
