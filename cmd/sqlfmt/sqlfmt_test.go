@@ -95,6 +95,47 @@ func TestFileInput(t *testing.T) {
 	}
 }
 
+func TestFileFormatInPlace(t *testing.T) {
+	inputFile := "simple_select_without_from.sql"
+	expectedOutputFile := "simple_select_without_from.fmt.sql"
+	expectedOutputPath := path.Join("../../testdata", expectedOutputFile)
+
+	expected, err := ioutil.ReadFile(expectedOutputPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sourcePath := path.Join("../../testdata", inputFile)
+	source, err := ioutil.ReadFile(sourcePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tmpFilePath := path.Join("tmp", inputFile)
+	err = ioutil.WriteFile(tmpFilePath, source, os.ModePerm)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	output, err := sqlfmt(nil, "-w", tmpFilePath)
+	if err != nil {
+		t.Fatalf("sqlfmt failed with %s: %v", tmpFilePath, err)
+	}
+
+	if len(output) != 0 {
+		t.Fatal("Expected output to be empty, but it wasn't")
+	}
+
+	output, err = ioutil.ReadFile(tmpFilePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if bytes.Compare(output, expected) != 0 {
+		t.Errorf("Given %s, did not receive %s. Unexpected output written to %s", sourcePath, expectedOutputPath, tmpFilePath)
+	}
+}
+
 func TestSqlFmt(t *testing.T) {
 	tests := []struct {
 		inputFile          string

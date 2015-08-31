@@ -1,16 +1,20 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"github.com/jackc/sqlfmt"
 	"io/ioutil"
 	"os"
+	"path"
+	"path/filepath"
 )
 
 const Version = "0.1.0"
 
 var options struct {
+	write   bool
 	version bool
 }
 
@@ -20,6 +24,7 @@ func main() {
 		flag.PrintDefaults()
 	}
 
+	flag.BoolVar(&options.write, "w", false, "write result to (source) file instead of stdout")
 	flag.BoolVar(&options.version, "version", false, "print version and exit")
 	flag.Parse()
 
@@ -50,6 +55,23 @@ func main() {
 		os.Exit(1)
 	}
 
-	r := sqlfmt.NewTextRenderer(os.Stdout)
+	buf := &bytes.Buffer{}
+	r := sqlfmt.NewTextRenderer(buf)
 	stmt.RenderTo(r)
+
+	if options.write {
+		dir := filepath.Dir(flag.Arg(0))
+		base := filepath.Base(flag.Arg(0))
+		tmpPath := path.Join(dir, "."+base+".sqlfmt")
+		err = ioutil.WriteFile(tmpPath, buf.Bytes(), os.ModePerm)
+		if err != nil {
+			os.Exit(1)
+		}
+		err = os.Rename(tmpPath, flag.Arg(0))
+		if err != nil {
+			os.Exit(1)
+		}
+	} else {
+		buf.WriteTo(os.Stdout)
+	}
 }
