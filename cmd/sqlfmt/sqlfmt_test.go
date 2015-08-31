@@ -70,8 +70,8 @@ func sqlfmt(sql []byte, args ...string) ([]byte, error) {
 }
 
 func TestFileInput(t *testing.T) {
-	inputFile := "simple_select_without_from.sql"
-	expectedOutputFile := "simple_select_without_from.fmt.sql"
+	inputFile := "simple_select_without_from.input.sql"
+	expectedOutputFile := "simple_select_without_from.golden.sql"
 
 	expected, err := ioutil.ReadFile(path.Join("../../testdata", expectedOutputFile))
 	if err != nil {
@@ -96,8 +96,8 @@ func TestFileInput(t *testing.T) {
 }
 
 func TestFileFormatInPlace(t *testing.T) {
-	inputFile := "simple_select_without_from.sql"
-	expectedOutputFile := "simple_select_without_from.fmt.sql"
+	inputFile := "simple_select_without_from.input.sql"
+	expectedOutputFile := "simple_select_without_from.golden.sql"
 	expectedOutputPath := path.Join("../../testdata", expectedOutputFile)
 
 	expected, err := ioutil.ReadFile(expectedOutputPath)
@@ -136,52 +136,47 @@ func TestFileFormatInPlace(t *testing.T) {
 	}
 }
 
-func TestSqlFmt(t *testing.T) {
-	tests := []struct {
-		inputFile          string
-		expectedOutputFile string
-	}{
-		{
-			inputFile:          "simple_select_without_from.sql",
-			expectedOutputFile: "simple_select_without_from.fmt.sql",
-		},
-		{
-			inputFile:          "simple_select_with_from.sql",
-			expectedOutputFile: "simple_select_with_from.fmt.sql",
-		},
-		{
-			inputFile:          "select_from_aliased.sql",
-			expectedOutputFile: "select_from_aliased.fmt.sql",
-		},
+func TestSqlFmtAll(t *testing.T) {
+	fileInfos, err := ioutil.ReadDir("../../testdata")
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	for i, tt := range tests {
-		input, err := ioutil.ReadFile(path.Join("../../testdata", tt.inputFile))
-		if err != nil {
-			t.Errorf("%d. %v", i, err)
+	for _, fi := range fileInfos {
+		if fi.Name()[len(fi.Name())-10:] != ".input.sql" {
 			continue
 		}
 
-		expected, err := ioutil.ReadFile(path.Join("../../testdata", tt.expectedOutputFile))
+		testName := fi.Name()[:len(fi.Name())-10]
+		inputPath := path.Join("../../testdata", fi.Name())
+		goldenPath := path.Join("../../testdata", testName+".golden.sql")
+
+		input, err := ioutil.ReadFile(inputPath)
 		if err != nil {
-			t.Errorf("%d. %v", i, err)
+			t.Errorf("%s: %v", testName, err)
+			continue
+		}
+
+		expected, err := ioutil.ReadFile(goldenPath)
+		if err != nil {
+			t.Errorf("%s: %v", testName, err)
 			continue
 		}
 
 		output, err := sqlfmt(input)
 		if err != nil {
-			t.Errorf("%d. sqlfmt failed with %s: %v", i, tt.inputFile, err)
+			t.Errorf("%d: sqlfmt failed with: %v", testName, err)
 			continue
 		}
 
 		if bytes.Compare(output, expected) != 0 {
-			actualFileName := path.Join("tmp", fmt.Sprintf("%d.sql", i))
+			actualFileName := path.Join("tmp", fmt.Sprintf("%s.sql", testName))
 			err = ioutil.WriteFile(actualFileName, output, os.ModePerm)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			t.Errorf("%d. Given %s, did not receive %s. Unexpected output written to %s", i, tt.inputFile, tt.expectedOutputFile, actualFileName)
+			t.Errorf("%s: Unexpected output written to %s", testName, actualFileName)
 		}
 	}
 }
