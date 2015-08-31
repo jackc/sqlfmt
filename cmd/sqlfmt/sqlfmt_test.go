@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -20,52 +21,52 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func sqlfmt(sql string, args ...string) (string, error) {
+func sqlfmt(sql []byte, args ...string) ([]byte, error) {
 	cmd := exec.Command("tmp/sqlfmt", args...)
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		return "", fmt.Errorf("cmd.StdinPipe failed: %v", err)
+		return nil, fmt.Errorf("cmd.StdinPipe failed: %v", err)
 	}
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return "", fmt.Errorf("cmd.StdoutPipe failed: %v", err)
+		return nil, fmt.Errorf("cmd.StdoutPipe failed: %v", err)
 	}
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return "", fmt.Errorf("cmd.StderrPipe failed: %v", err)
+		return nil, fmt.Errorf("cmd.StderrPipe failed: %v", err)
 	}
 
 	err = cmd.Start()
 	if err != nil {
-		return "", fmt.Errorf("cmd.Start failed: %v", err)
+		return nil, fmt.Errorf("cmd.Start failed: %v", err)
 	}
 
-	_, err = fmt.Fprint(stdin, sql)
+	_, err = stdin.Write(sql)
 	if err != nil {
-		return "", fmt.Errorf("fmt.Fprint failed: %v", err)
+		return nil, fmt.Errorf("stdin.Write failed: %v", err)
 	}
 
 	err = stdin.Close()
 	if err != nil {
-		return "", fmt.Errorf("stdin.Close failed: %v", err)
+		return nil, fmt.Errorf("stdin.Close failed: %v", err)
 	}
 
 	output, err := ioutil.ReadAll(stdout)
 	if err != nil {
-		return "", fmt.Errorf("ioutil.ReadAll(stdout) failed: %v", err)
+		return nil, fmt.Errorf("ioutil.ReadAll(stdout) failed: %v", err)
 	}
 
 	errout, err := ioutil.ReadAll(stderr)
 	if err != nil {
-		return "", fmt.Errorf("ioutil.ReadAll(stderr) failed: %v", err)
+		return nil, fmt.Errorf("ioutil.ReadAll(stderr) failed: %v", err)
 	}
 
 	err = cmd.Wait()
 	if err != nil {
-		return "", fmt.Errorf("cmd.Wait failed: %v\n%s", err, string(errout))
+		return nil, fmt.Errorf("cmd.Wait failed: %v\n%s", err, string(errout))
 	}
 
-	return string(output), nil
+	return output, nil
 }
 
 func TestSqlFmt(t *testing.T) {
@@ -100,15 +101,15 @@ func TestSqlFmt(t *testing.T) {
 			continue
 		}
 
-		output, err := sqlfmt(string(input))
+		output, err := sqlfmt(input)
 		if err != nil {
 			t.Errorf("%d. sqlfmt failed with %s: %v", i, tt.inputFile, err)
 			continue
 		}
 
-		if output != string(expected) {
+		if bytes.Compare(output, expected) != 0 {
 			actualFileName := path.Join("tmp", fmt.Sprintf("%d.sql", i))
-			err = ioutil.WriteFile(actualFileName, []byte(output), os.ModePerm)
+			err = ioutil.WriteFile(actualFileName, output, os.ModePerm)
 			if err != nil {
 				t.Fatal(err)
 			}
