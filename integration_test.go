@@ -13,18 +13,14 @@ import (
 
 func TestIntegration(t *testing.T) {
 	tests := []struct {
-		inputFile          string
-		expectedOutputFile string
+		inputFile string
 	}{
 		{inputFile: "float_constant.sql"},
 		{inputFile: "simple_select_without_from.sql"},
 		{inputFile: "simple_select_with_from.sql"},
 		{inputFile: "select_from_aliased.sql"},
 		{inputFile: "simple_select_with_selection_alias.sql"},
-		{
-			inputFile:          "simple_select_with_selection_alias_no_as.sql",
-			expectedOutputFile: "simple_select_with_selection_alias.fmt.sql",
-		},
+		{inputFile: "simple_select_with_selection_alias_no_as.sql"},
 		{inputFile: "select_table_dot_column.sql"},
 		{inputFile: "simple_select_literal_integer.sql"},
 		{inputFile: "simple_select_literal_text.sql"},
@@ -54,20 +50,11 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "group_by.sql"},
 		{inputFile: "having.sql"},
 		{inputFile: "limit.sql"},
-		{
-			inputFile:          "limit_fetch.sql",
-			expectedOutputFile: "limit.fmt.sql",
-		},
+		{inputFile: "limit_fetch.sql"},
 		{inputFile: "offset.sql"},
 		{inputFile: "limit_offset.sql"},
-		{
-			inputFile:          "offset_limit.sql",
-			expectedOutputFile: "limit_offset.fmt.sql",
-		},
-		{
-			inputFile:          "offset_fetch.sql",
-			expectedOutputFile: "limit_offset.fmt.sql",
-		},
+		{inputFile: "offset_limit.sql"},
+		{inputFile: "offset_fetch.sql"},
 		{inputFile: "select_for_update.sql"},
 		{inputFile: "select_for_no_key_update.sql"},
 		{inputFile: "select_for_share.sql"},
@@ -80,10 +67,7 @@ func TestIntegration(t *testing.T) {
 		{inputFile: "table_star.sql"},
 		{inputFile: "table_only.sql"},
 		{inputFile: "table_qualified.sql"},
-		{
-			inputFile:          "table_only_paren.sql",
-			expectedOutputFile: "table_only.fmt.sql",
-		},
+		{inputFile: "table_only_paren.sql"},
 		{inputFile: "case_full.sql"},
 		{inputFile: "case_implicit.sql"},
 		{inputFile: "typecast.sql"},
@@ -168,11 +152,9 @@ func TestIntegration(t *testing.T) {
 			continue
 		}
 
-		if tt.expectedOutputFile == "" {
-			tt.expectedOutputFile = tt.inputFile[:len(tt.inputFile)-3] + "fmt.sql"
-		}
+		expectedOutputFile := tt.inputFile[:len(tt.inputFile)-3] + "fmt.sql"
 
-		expected, err := ioutil.ReadFile(path.Join("testdata", tt.expectedOutputFile))
+		expected, err := ioutil.ReadFile(path.Join("testdata", expectedOutputFile))
 		if err != nil {
 			t.Errorf("%d. %v", i, err)
 			continue
@@ -196,7 +178,7 @@ func TestIntegration(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			t.Errorf("%d. Given %s, did not receive %s. Unexpected output written to %s", i, tt.inputFile, tt.expectedOutputFile, actualFileName)
+			t.Errorf("%d. Given %s, did not receive %s. Unexpected output written to %s", i, tt.inputFile, expectedOutputFile, actualFileName)
 		}
 	}
 }
