@@ -24,6 +24,65 @@ type job struct {
 	w    io.WriteCloser
 }
 
+func (j *job) run() error {
+	if j.r == nil {
+		var err error
+		j.r, err = os.Open(j.name)
+		if err != nil {
+			return err
+		}
+	}
+
+	input, err := ioutil.ReadAll(j.r)
+	if err != nil {
+		return err
+	}
+
+	err = j.r.Close()
+	if err != nil {
+		return err
+	}
+
+	lexer := sqlfmt.NewSqlLexer(string(input))
+	stmt, err := sqlfmt.Parse(lexer)
+	if err != nil {
+		return err
+	}
+
+	var inPlace bool
+	var tmpPath string
+
+	if j.w == nil {
+		dir := filepath.Dir(j.name)
+		base := filepath.Base(j.name)
+		tmpPath = path.Join(dir, "."+base+".sqlfmt")
+		j.w, err = os.Create(tmpPath)
+		if err != nil {
+			return err
+		}
+		inPlace = true
+	}
+
+	r := sqlfmt.NewTextRenderer(j.w)
+	stmt.RenderTo(r)
+	if r.Error() != nil {
+		return err
+	}
+
+	if inPlace {
+		err = j.w.Close()
+		if err != nil {
+			return err
+		}
+		err = os.Rename(tmpPath, j.name)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage:  %s [options] [path ...]\n", os.Args[0])
@@ -56,67 +115,8 @@ func main() {
 	var errors []error
 
 	for _, j := range jobs {
-		var err error
-		if j.r == nil {
-			j.r, err = os.Open(j.name)
-			if err != nil {
-				errors = append(errors, err)
-				continue
-			}
-		}
-
-		input, err := ioutil.ReadAll(j.r)
-		if err != nil {
+		if err := j.run(); err != nil {
 			errors = append(errors, err)
-			continue
-		}
-
-		err = j.r.Close()
-		if err != nil {
-			errors = append(errors, err)
-			continue
-		}
-
-		lexer := sqlfmt.NewSqlLexer(string(input))
-		stmt, err := sqlfmt.Parse(lexer)
-		if err != nil {
-			errors = append(errors, err)
-			continue
-		}
-
-		var inPlace bool
-		var tmpPath string
-
-		if j.w == nil {
-			dir := filepath.Dir(j.name)
-			base := filepath.Base(j.name)
-			tmpPath = path.Join(dir, "."+base+".sqlfmt")
-			j.w, err = os.Create(tmpPath)
-			if err != nil {
-				errors = append(errors, err)
-				continue
-			}
-			inPlace = true
-		}
-
-		r := sqlfmt.NewTextRenderer(j.w)
-		stmt.RenderTo(r)
-		if r.Error() != nil {
-			errors = append(errors, err)
-			continue
-		}
-
-		if inPlace {
-			err = j.w.Close()
-			if err != nil {
-				errors = append(errors, err)
-				continue
-			}
-			err = os.Rename(tmpPath, j.name)
-			if err != nil {
-				errors = append(errors, err)
-				continue
-			}
 		}
 	}
 
