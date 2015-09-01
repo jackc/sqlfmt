@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"github.com/jackc/sqlfmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -18,9 +18,15 @@ var options struct {
 	version bool
 }
 
+type job struct {
+	name string
+	r    io.ReadCloser
+	w    io.WriteCloser
+}
+
 func main() {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "usage:  %s [options] [path]\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "usage:  %s [options] [path ...]\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 
@@ -33,45 +39,91 @@ func main() {
 		os.Exit(0)
 	}
 
-	var input []byte
-	var err error
+	var jobs []job
 
-	if len(flag.Args()) == 0 {
-		input, err = ioutil.ReadAll(os.Stdin)
-	} else if len(flag.Args()) == 1 {
-		input, err = ioutil.ReadFile(flag.Arg(0))
-	} else {
-		flag.Usage()
-		os.Exit(1)
-	}
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-
-	lexer := sqlfmt.NewSqlLexer(string(input))
-	stmt, err := sqlfmt.Parse(lexer)
-	if err != nil {
-		os.Exit(1)
-	}
-
-	buf := &bytes.Buffer{}
-	r := sqlfmt.NewTextRenderer(buf)
-	stmt.RenderTo(r)
-
-	if options.write {
-		dir := filepath.Dir(flag.Arg(0))
-		base := filepath.Base(flag.Arg(0))
-		tmpPath := path.Join(dir, "."+base+".sqlfmt")
-		err = ioutil.WriteFile(tmpPath, buf.Bytes(), os.ModePerm)
-		if err != nil {
-			os.Exit(1)
-		}
-		err = os.Rename(tmpPath, flag.Arg(0))
-		if err != nil {
-			os.Exit(1)
+	if len(flag.Args()) > 0 {
+		for _, fp := range flag.Args() {
+			j := job{name: fp}
+			if !options.write {
+				j.w = os.Stdout
+			}
+			jobs = append(jobs, j)
 		}
 	} else {
-		buf.WriteTo(os.Stdout)
+		jobs = append(jobs, job{r: os.Stdin, w: os.Stdout})
+	}
+
+	var errors []error
+
+	for _, j := range jobs {
+		var err error
+		if j.r == nil {
+			j.r, err = os.Open(j.name)
+			if err != nil {
+				errors = append(errors, err)
+				continue
+			}
+		}
+
+		input, err := ioutil.ReadAll(j.r)
+		if err != nil {
+			errors = append(errors, err)
+			continue
+		}
+
+		err = j.r.Close()
+		if err != nil {
+			errors = append(errors, err)
+			continue
+		}
+
+		lexer := sqlfmt.NewSqlLexer(string(input))
+		stmt, err := sqlfmt.Parse(lexer)
+		if err != nil {
+			errors = append(errors, err)
+			continue
+		}
+
+		var inPlace bool
+		var tmpPath string
+
+		if j.w == nil {
+			dir := filepath.Dir(j.name)
+			base := filepath.Base(j.name)
+			tmpPath = path.Join(dir, "."+base+".sqlfmt")
+			j.w, err = os.Create(tmpPath)
+			if err != nil {
+				errors = append(errors, err)
+				continue
+			}
+			inPlace = true
+		}
+
+		r := sqlfmt.NewTextRenderer(j.w)
+		stmt.RenderTo(r)
+		if r.Error() != nil {
+			errors = append(errors, err)
+			continue
+		}
+
+		if inPlace {
+			err = j.w.Close()
+			if err != nil {
+				errors = append(errors, err)
+				continue
+			}
+			err = os.Rename(tmpPath, j.name)
+			if err != nil {
+				errors = append(errors, err)
+				continue
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		for _, e := range errors {
+			fmt.Fprintln(os.Stderr, e)
+		}
+		os.Exit(1)
 	}
 }

@@ -147,3 +147,7 @@ func (tr *TextRenderer) renderNewLine() {
 
 	tr.lineIndented = false
 }
+
+func (tr *TextRenderer) Error() error {
+	return tr.err
+}

@@ -136,6 +136,62 @@ func TestFileFormatInPlace(t *testing.T) {
 	}
 }
 
+func TestMultipleFileFormatInPlace(t *testing.T) {
+	tests := []struct {
+		Name        string
+		Source      []byte
+		Expected    []byte
+		TmpFilePath string
+	}{
+		{Name: "between"},
+		{Name: "bitconst"},
+	}
+
+	var err error
+	args := []string{"-w"}
+	for i, _ := range tests {
+		sourcePath := path.Join("../../testdata", tests[i].Name+".input.sql")
+		tests[i].Source, err = ioutil.ReadFile(sourcePath)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		expectedOutputPath := path.Join("../../testdata", tests[i].Name+".golden.sql")
+		tests[i].Expected, err = ioutil.ReadFile(expectedOutputPath)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		tests[i].TmpFilePath = path.Join("tmp", tests[i].Name+".sql")
+		err = ioutil.WriteFile(tests[i].TmpFilePath, tests[i].Source, os.ModePerm)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		args = append(args, tests[i].TmpFilePath)
+	}
+
+	output, err := sqlfmt(nil, args...)
+	if err != nil {
+		t.Fatalf("sqlfmt failed with %s: %v", args, err)
+	}
+
+	if len(output) != 0 {
+		t.Fatal("Expected output to be empty, but it wasn't")
+	}
+
+	for _, tt := range tests {
+		output, err = ioutil.ReadFile(tt.TmpFilePath)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if bytes.Compare(output, tt.Expected) != 0 {
+			t.Errorf("%s: unexpected output written to %s", tt.Name, tt.TmpFilePath)
+		}
+	}
+}
+
 func TestSqlFmtAll(t *testing.T) {
 	fileInfos, err := ioutil.ReadDir("../../testdata")
 	if err != nil {
