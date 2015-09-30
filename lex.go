@@ -234,6 +234,10 @@ func lexAlmostOperator(l *sqlLex) stateFn {
 func lexOperator(l *sqlLex) stateFn {
 	l.acceptRunFunc(isOperator)
 
+	if (l.pos-l.start) >= 2 && l.src[l.start:l.start+2] == "--" {
+		return lexDashDashComment
+	}
+
 	t := token{src: l.src[l.start:l.pos]}
 	switch {
 	case t.src == "+" || t.src == "-" || t.src == "*" || t.src == "/" || t.src == "%" || t.src == "^" || t.src == "<" || t.src == ">" || t.src == "=" || t.src == "[" || t.src == "]" || t.src == ":":
@@ -300,6 +304,17 @@ func lexPossibleBitString(l *sqlLex) stateFn {
 	}
 
 	return lexAlphanumeric
+}
+
+func lexDashDashComment(l *sqlLex) stateFn {
+	var r rune
+	for r = l.next(); r != '\n'; r = l.next() {
+	}
+
+	// TODO - don't ignore comments
+	l.ignore()
+
+	return blankState
 }
 
 func (l *sqlLex) skipWhitespace() {
