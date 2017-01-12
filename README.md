@@ -1,6 +1,4 @@
 # sqlfmt
 
-- `git clone https://github.com/jackc/sqlfmt`
-- `cd sqlfmt`
-- `build ./cmd/sqlfmt/main.go`
-- `echo "select * from users" | ./main`
+- `go get github.com/jackc/sqlfmt`
+- `echo "select * from users" | sqlfmt`
