@@ -221,7 +221,7 @@ func TestSqlFmtAll(t *testing.T) {
 
 		output, err := sqlfmt(input)
 		if err != nil {
-			t.Errorf("%d: sqlfmt failed with: %v", testName, err)
+			t.Errorf("%s: sqlfmt failed with: %v", testName, err)
 			continue
 		}
 
