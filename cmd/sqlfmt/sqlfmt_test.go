@@ -7,12 +7,17 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"runtime"
 	"testing"
 )
 
 func TestMain(m *testing.M) {
 	os.MkdirAll("tmp", os.ModeDir|os.ModePerm)
-	err := exec.Command("go", "build", "-o", "tmp/sqlfmt").Run()
+	exe := "tmp/sqlfmt"
+	if runtime.GOOS == "windows" {
+		exe += ".exe"
+	}
+	err := exec.Command("go", "build", "-o", exe).Run()
 	if err != nil {
 		fmt.Println("Failed to build sqlfmt binary:", err)
 		os.Exit(1)
@@ -221,7 +226,7 @@ func TestSqlFmtAll(t *testing.T) {
 
 		output, err := sqlfmt(input)
 		if err != nil {
-			t.Errorf("%d: sqlfmt failed with: %v", testName, err)
+			t.Errorf("%s: sqlfmt failed with: %v", testName, err)
 			continue
 		}
 

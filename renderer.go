@@ -2,6 +2,7 @@ package sqlfmt
 
 import (
 	"io"
+	"strings"
 )
 
 const (
@@ -35,6 +36,8 @@ type TextRenderer struct {
 	lineIndented    bool
 	newLine         bool
 	lastRenderToken RenderToken
+
+	UpperCase bool
 }
 
 func (left RenderToken) SpaceBetween(right RenderToken) bool {
@@ -109,6 +112,12 @@ func (tr *TextRenderer) Text(val string, tokenType int) {
 	}
 
 	tr.lastRenderToken = token
+
+	if tr.UpperCase {
+		if tokenType == KeywordToken || tokenType == SymbolToken {
+			val = strings.ToUpper(val)
+		}
+	}
 
 	_, tr.err = io.WriteString(tr.w, val)
 }
