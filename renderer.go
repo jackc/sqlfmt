@@ -114,7 +114,7 @@ func (tr *TextRenderer) Text(val string, tokenType int) {
 	tr.lastRenderToken = token
 
 	if tr.UpperCase {
-		if tokenType == KeywordToken || tokenType == SymbolToken || tokenType == IdentifierToken {
+		if tokenType == KeywordToken || tokenType == SymbolToken {
 			val = strings.ToUpper(val)
 		}
 	}

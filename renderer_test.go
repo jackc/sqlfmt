@@ -61,11 +61,11 @@ func TestTextRendererUpper(t *testing.T) {
 	tr.Text("'foo'", ConstantToken)
 
 	expected := `SELECT
-  FOO, BAR
+  foo, bar
 FROM
-  BAZ
+  baz
 WHERE
-  FOO = 'foo'`
+  foo = 'foo'`
 
 	if buf.String() != expected {
 		t.Errorf("Expected `%s`, got `%s`", expected, buf.String())
