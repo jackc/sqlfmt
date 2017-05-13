@@ -3,18 +3,20 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/jackc/sqlfmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/jackc/sqlfmt"
 )
 
 const Version = "0.1.0"
 
 var options struct {
 	write   bool
+	upper   bool
 	version bool
 }
 
@@ -64,6 +66,9 @@ func (j *job) run() error {
 	}
 
 	r := sqlfmt.NewTextRenderer(j.w)
+
+	r.UpperCase = options.upper
+
 	stmt.RenderTo(r)
 	if r.Error() != nil {
 		return err
@@ -90,6 +95,7 @@ func main() {
 	}
 
 	flag.BoolVar(&options.write, "w", false, "write result to (source) file instead of stdout")
+	flag.BoolVar(&options.upper, "u", false, "format with upper-case")
 	flag.BoolVar(&options.version, "version", false, "print version and exit")
 	flag.Parse()
 
