@@ -2,7 +2,7 @@
 
 ## Installation
 
-```sh
+```console
 $ go get github.com/jackc/sqlfmt/...
 $ which sqlfmt
 $GOPATH/bin/sqlfmt
@@ -14,7 +14,7 @@ $GOPATH/bin/sqlfmt
 
     + Provide the path to one or more SQL files as command line arguments:
 
-      ```sh
+      ```console
       $ sqlfmt testdata/select_where.input.sql
       select
         foo,
@@ -28,7 +28,7 @@ $GOPATH/bin/sqlfmt
 
     + Or, directly provide the SQL string via stdin:
 
-      ```sh
+      ```console
       $ echo "select * from users" | sqlfmt
       select
         *
@@ -36,7 +36,7 @@ $GOPATH/bin/sqlfmt
         users
       ```
 
-      ```sh
+      ```console
       $ sqlfmt < testdata/like.input.sql
       select
         foo,
