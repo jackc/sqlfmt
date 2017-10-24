@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 
 	"github.com/jackc/sqlfmt"
@@ -57,7 +56,7 @@ func (j *job) run() error {
 	if j.w == nil {
 		dir := filepath.Dir(j.name)
 		base := filepath.Base(j.name)
-		tmpPath = path.Join(dir, "."+base+".sqlfmt")
+		tmpPath = filepath.Join(dir, "."+base+".sqlfmt")
 		j.w, err = os.Create(tmpPath)
 		if err != nil {
 			return err
