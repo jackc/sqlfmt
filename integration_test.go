@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/jackc/sqlfmt"
@@ -27,8 +27,8 @@ func TestIntegration(t *testing.T) {
 		}
 
 		testName := fi.Name()[:len(fi.Name())-10]
-		inputPath := path.Join("testdata", fi.Name())
-		goldenPath := path.Join("testdata", testName+".golden.sql")
+		inputPath := filepath.Join("testdata", fi.Name())
+		goldenPath := filepath.Join("testdata", testName+".golden.sql")
 
 		input, err := ioutil.ReadFile(inputPath)
 		if err != nil {
@@ -54,7 +54,7 @@ func TestIntegration(t *testing.T) {
 		stmt.RenderTo(r)
 
 		if outBuf.String() != string(expected) {
-			actualFileName := path.Join("tmp", fmt.Sprintf("%s.sql", testName))
+			actualFileName := filepath.Join("tmp", fmt.Sprintf("%s.sql", testName))
 			err = ioutil.WriteFile(actualFileName, outBuf.Bytes(), os.ModePerm)
 			if err != nil {
 				t.Fatal(err)

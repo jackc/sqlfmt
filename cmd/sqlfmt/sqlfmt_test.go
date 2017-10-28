@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"runtime"
 	"testing"
 )
@@ -78,19 +78,19 @@ func TestFileInput(t *testing.T) {
 	inputFile := "simple_select_without_from.input.sql"
 	expectedOutputFile := "simple_select_without_from.golden.sql"
 
-	expected, err := ioutil.ReadFile(path.Join("../../testdata", expectedOutputFile))
+	expected, err := ioutil.ReadFile(filepath.Join("../../testdata", expectedOutputFile))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	filePath := path.Join("../../testdata", inputFile)
+	filePath := filepath.Join("../../testdata", inputFile)
 	output, err := sqlfmt(nil, filePath)
 	if err != nil {
 		t.Fatalf("sqlfmt failed with %s: %v", filePath, err)
 	}
 
 	if bytes.Compare(output, expected) != 0 {
-		actualFileName := path.Join("tmp", "TestFileInput.sql")
+		actualFileName := filepath.Join("tmp", "TestFileInput.sql")
 		err = ioutil.WriteFile(actualFileName, output, os.ModePerm)
 		if err != nil {
 			t.Fatal(err)
@@ -103,20 +103,20 @@ func TestFileInput(t *testing.T) {
 func TestFileFormatInPlace(t *testing.T) {
 	inputFile := "simple_select_without_from.input.sql"
 	expectedOutputFile := "simple_select_without_from.golden.sql"
-	expectedOutputPath := path.Join("../../testdata", expectedOutputFile)
+	expectedOutputPath := filepath.Join("../../testdata", expectedOutputFile)
 
 	expected, err := ioutil.ReadFile(expectedOutputPath)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	sourcePath := path.Join("../../testdata", inputFile)
+	sourcePath := filepath.Join("../../testdata", inputFile)
 	source, err := ioutil.ReadFile(sourcePath)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	tmpFilePath := path.Join("tmp", inputFile)
+	tmpFilePath := filepath.Join("tmp", inputFile)
 	err = ioutil.WriteFile(tmpFilePath, source, os.ModePerm)
 	if err != nil {
 		t.Fatal(err)
@@ -155,19 +155,19 @@ func TestMultipleFileFormatInPlace(t *testing.T) {
 	var err error
 	args := []string{"-w"}
 	for i, _ := range tests {
-		sourcePath := path.Join("../../testdata", tests[i].Name+".input.sql")
+		sourcePath := filepath.Join("../../testdata", tests[i].Name+".input.sql")
 		tests[i].Source, err = ioutil.ReadFile(sourcePath)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		expectedOutputPath := path.Join("../../testdata", tests[i].Name+".golden.sql")
+		expectedOutputPath := filepath.Join("../../testdata", tests[i].Name+".golden.sql")
 		tests[i].Expected, err = ioutil.ReadFile(expectedOutputPath)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		tests[i].TmpFilePath = path.Join("tmp", tests[i].Name+".sql")
+		tests[i].TmpFilePath = filepath.Join("tmp", tests[i].Name+".sql")
 		err = ioutil.WriteFile(tests[i].TmpFilePath, tests[i].Source, os.ModePerm)
 		if err != nil {
 			t.Fatal(err)
@@ -209,8 +209,8 @@ func TestSqlFmtAll(t *testing.T) {
 		}
 
 		testName := fi.Name()[:len(fi.Name())-10]
-		inputPath := path.Join("../../testdata", fi.Name())
-		goldenPath := path.Join("../../testdata", testName+".golden.sql")
+		inputPath := filepath.Join("../../testdata", fi.Name())
+		goldenPath := filepath.Join("../../testdata", testName+".golden.sql")
 
 		input, err := ioutil.ReadFile(inputPath)
 		if err != nil {
@@ -231,7 +231,7 @@ func TestSqlFmtAll(t *testing.T) {
 		}
 
 		if bytes.Compare(output, expected) != 0 {
-			actualFileName := path.Join("tmp", fmt.Sprintf("%s.sql", testName))
+			actualFileName := filepath.Join("tmp", fmt.Sprintf("%s.sql", testName))
 			err = ioutil.WriteFile(actualFileName, output, os.ModePerm)
 			if err != nil {
 				t.Fatal(err)
