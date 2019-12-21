@@ -1701,6 +1701,10 @@ joinExpr:
   {
     $$ = JoinExpr{Left: $1, Join: "join", Right: $3, Using: $6}
   }
+| aliasableExpr LEFT JOIN aliasableExpr ON a_expr
+  {
+    $$ = JoinExpr{Left: $1, Join: "left join", Right: $4, On: $6}
+  }
 | aliasableExpr JOIN aliasableExpr ON a_expr
   {
     $$ = JoinExpr{Left: $1, Join: "join", Right: $3, On: $5}
